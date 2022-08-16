@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Mentoring-Mapper">
+
+	<select id="selectMyMentee" parameterType="int" resultType="mentoring">
+		select
+			b.name, d.ppsname, b.condition
+		from
+			mentoring a, employee b, submentoring c, postposition d
+		where a.smno=c.smno
+		and c.eno=b.eno
+		and b.ppscode=d.ppscode
+		and a.mento=#{mento}
+        and c.approve=1
+	</select>
+
+	<select id="selectMyMento" parameterType="int" resultType="submentoring">
+		select
+			b.name, d.ppsname, b.condition
+		from
+			mentoring a, employee b, submentoring c, postposition d
+		where a.smno=c.smno
+		and a.mento=b.eno
+		and b.ppscode=d.ppscode
+		and c.eno=#{eno}
+        and c.approve=1
+	</select>
+
+	<select id="selectMentoRank" resultType="mentoring">
+		select
+            count(a.mento) as count, b.name, c.ppsname, b.condition
+        from
+            mentoring a, employee b, postposition c
+        where a.mento = b.eno
+        and b.ppscode=c.ppscode
+        group by a.mento, b.name, c.ppsname, b.condition
+        order by count(a.mento) desc
+	</select>
+
+	<select id="subMentoringList" parameterType="int" resultType="submentoring">
+		select
+			b.name, d.ppsname, c.regDate
+		from
+			mentoring a, employee b, submentoring c, postposition d
+		where a.smno=c.smno
+		and c.eno=b.eno
+		and b.ppscode=d.ppscode
+		and a.mento=#{eno}
+	</select>
+
+
+
+	<select id="selectMyMentoCount" resultType="int">
+		select
+			count(b.name)
+		from
+			mentoring a, employee b, submentoring c, postposition d
+		where a.smno=c.smno
+		and a.mento=b.eno
+		and b.ppscode=d.ppscode
+		and c.eno=#{eno}
+        and c.approve=1
+	</select>
+
+
+
+
+
+	<select id="selectMentoName" resultType="str">
+		select b.name
+		from
+		mentoring a, employee b
+		where a.mento = b.eno
+		and b.eno=#{eno}
+	</select>
+	<select id="selectMenteeName" resultType="str">
+		select b.name
+		from
+		submentoring a, employee b
+		where a.eno = b.eno
+	</select>
+
+
+</mapper>
+

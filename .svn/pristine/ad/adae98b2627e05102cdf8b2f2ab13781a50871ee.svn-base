@@ -1,0 +1,65 @@
+package kr.or.warehouse.dto;
+
+import java.util.Date;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
+public class MentoringVO {
+	private String mtno;
+	private int smno;
+	private Date startDate;
+	private int mento;
+	private Date endDate;
+	private int extension;
+	private int exDate;
+
+	public Date getEndDate() {
+		return endDate;
+	}
+	public void setEndDate(Date endDate) {
+		this.endDate = endDate;
+	}
+	public int getExtension() {
+		return extension;
+	}
+	public void setExtension(int extension) {
+		this.extension = extension;
+	}
+	public int getExDate() {
+		return exDate;
+	}
+	public void setExDate(int exDate) {
+		this.exDate = exDate;
+	}
+	public int getSmno() {
+		return smno;
+	}
+	public void setSmno(int smno) {
+		this.smno = smno;
+	}
+	public String getMtno() {
+		return mtno;
+	}
+	public void setMtno(String mtno) {
+		this.mtno = mtno;
+	}
+	public Date getStartDate() {
+		return startDate;
+	}
+	public void setStartDate(Date startDate) {
+		this.startDate = startDate;
+	}
+	public int getMento() {
+		return mento;
+	}
+	public void setMento(int mento) {
+		this.mento = mento;
+	}
+
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this, ToStringStyle.JSON_STYLE);
+	}
+
+}

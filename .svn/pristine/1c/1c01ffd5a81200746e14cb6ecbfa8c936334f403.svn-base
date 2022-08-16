@@ -1,0 +1,54 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+
+<script>
+//     $(function(){    	
+//     	$("input[type='checkbox']:checked").each(function(index){
+//     		var field = $(this).val();
+//     		list.push(field);
+//     	})
+		
+//     })
+    
+    var fieldArr = $('.fieldItem');
+
+    // 체크된 값 저장
+    function fieldSave(){
+    	var fieldList = []
+    	var checkBox = $('.fieldCheck');
+    	
+    	checkBox.each(function(index){
+    		var field = $(this).val();
+    		if($(this).is(":checked")){    			
+	    		$('#' + field).text(field);
+	    		fieldList.push(field);
+    		}else{
+	    		$('#' + field).text("");
+    		}
+    	});
+    	
+    	$.ajax({
+    		url : ,
+    		type : 'post',
+    		data : fieldList,
+    		success : function(res){
+    			alert("필드가 저장되었습니다.");
+    		},
+    		error : function(error){
+    			alert("error : " + error.status);
+    		}
+    	});
+    	
+    }
+
+    
+	
+	$.each(fieldArr, function(i,v){
+		var label = $('.form-check-label');
+		$.each(label, function(i,z){
+			if(v.innerText == z.innerText){
+				$('#' + z.getAttribute('for')).attr("checked", true);
+			}
+		})
+	})
+</script>

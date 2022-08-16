@@ -1,0 +1,13 @@
+package kr.or.warehouse.service;
+
+import java.sql.SQLException;
+import java.util.List;
+
+import kr.or.warehouse.dto.WorkVO;
+
+public interface HomeService {
+
+	public List<WorkVO> waitMyWork(int eno) throws SQLException;
+	public List<WorkVO> cooperReqWork(int eno) throws SQLException;
+	public List<WorkVO> proxyReqWork(int eno) throws SQLException;
+}

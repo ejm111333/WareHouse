@@ -1,0 +1,175 @@
+package kr.or.warehouse.controller.view;
+
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import kr.or.warehouse.command.Criteria;
+import kr.or.warehouse.controller.rest.GetAttachesByMultipartFileAdatpter;
+import kr.or.warehouse.dto.AttachVO;
+import kr.or.warehouse.dto.CommunityVO;
+import kr.or.warehouse.dto.DepartmentVO;
+import kr.or.warehouse.dto.ManualVO;
+import kr.or.warehouse.service.CommunityService;
+import kr.or.warehouse.service.DepartMentService;
+import kr.or.warehouse.service.WorkService;
+
+@Controller
+@RequestMapping("/community")
+public class CommnuityConrtoller {
+
+	@Autowired
+	private CommunityService communityService;
+	@Autowired
+	private WorkService workService;
+	@Autowired
+	private DepartMentService depService;
+
+	
+	
+	@RequestMapping("/main")
+	public void main()throws Exception{}
+
+	@RequestMapping("/detail")
+	public ModelAndView detail(String cmno, int eno, ModelAndView mnv)throws Exception{
+		String url ="/community/detail";
+		
+		CommunityVO community = communityService.getCommunity(cmno,eno);
+		
+		mnv.addObject("community", community);
+		mnv.setViewName(url);
+		
+		return mnv;
+		
+	}
+
+	@RequestMapping("/commuRegistGo")
+	public ModelAndView commuRegistGo(ModelAndView mnv)throws Exception{
+		String url = "/community/commuRegistGo";
+		
+		List<CommunityVO> openCommunityList = communityService.getOpenCommuList();
+		
+		mnv.addObject("openCommunityList", openCommunityList);
+		mnv.setViewName(url);
+		
+		return mnv;
+		
+	}
+	
+   @RequestMapping(value="/commuRegist",method=RequestMethod.POST,produces="text/plain; charset=utf-8")
+   public String regist(CommunityVO community,HttpServletRequest request,
+                   RedirectAttributes rttr)throws Exception{
+      String url="redirect:/community/main.do?mCode=M180000";
+      
+      
+      community.setCname((String)request.getAttribute("XSScname"));
+      community.setIntro((String)request.getAttribute("XSSintro"));
+      System.out.println(community);
+      communityService.insertCommunity(community);
+
+      rttr.addFlashAttribute("from","regist");
+
+      return url;
+   }
+	
+
+	@RequestMapping("/commuApproval")
+	public ModelAndView commuApproval(ModelAndView mnv, Criteria cri)throws Exception{
+		String url = "/community/commuApproval";
+		System.out.println("도착");
+		
+		Map<String, Object> dataMap = communityService.getApproveCommuList(cri);
+		
+		mnv.addObject("dataMap", dataMap);
+		mnv.setViewName(url);
+		
+		return mnv;
+		
+	}
+
+	@RequestMapping("/commuSub")
+	public ModelAndView commuSub(String cmno, ModelAndView mnv) throws Exception{
+		String url = "/community/commuSub";
+		
+		CommunityVO community = communityService.getCommunity(cmno);
+		
+		
+		mnv.addObject("community", community);
+		mnv.setViewName(url);
+		
+		return mnv;
+	}
+
+	
+	 @RequestMapping(value="/removeJoinCommu",method=RequestMethod.POST,produces="text/plain; charset=utf-8")
+	public String manualDetail(CommunityVO community,HttpServletRequest request,
+            RedirectAttributes rttr)throws Exception{
+		 String url="redirect:/community/main.do?mCode=M180000";
+		 
+		 communityService.removeJoinCommu(community);
+		
+		 rttr.addFlashAttribute("from","removeJoinCommu");
+		return url;
+	}
+	
+	@RequestMapping("/commuInviteForm")
+	public ModelAndView commuInviteForm(ModelAndView mnv, String cmno) throws Exception{
+		String url = "/community/commuInviteForm";
+
+		List<DepartmentVO> departMentList = depService.getDepartMentList();
+		List<OrganizationNode> organizationNode = workService.organization(departMentList);
+		
+		mnv.addObject("organizationNode", organizationNode);
+		mnv.addObject("cmno", cmno);
+		mnv.setViewName(url);
+		
+		return mnv;
+	}
+	
+	@RequestMapping("/commuInvite")
+	public String commuInvite(String cmno, @RequestParam(value="eno",required=true) List<Integer> eno, HttpServletRequest request, RedirectAttributes rttr) throws Exception{
+		String url = "redirect:/community/commuSub.do?mCode=M180000&cmno=" + cmno;
+		
+		communityService.insertInviteCommu(cmno, eno);
+
+		rttr.addFlashAttribute("from", "invite");
+
+		return url; 
+	}
+
+	@RequestMapping("/boardGo")
+	public String boardGo(){
+		String url = "/community/board";
+		return url;
+	}
+
+	@RequestMapping("/boardRegistForm")
+	public void boardRegistForm()throws Exception{}
+
+	@RequestMapping("/boardDetail")
+	public void boardDetail()throws Exception{}
+
+	@RequestMapping("/boardModifyForm")
+	public void boardModifyForm()throws Exception{}
+
+	@RequestMapping("/management")
+	public void management()throws Exception{}
+
+	@RequestMapping("/organizationForm")
+	public String organization()throws Exception{
+		String url = "/community/organization";
+		return url;
+
+	}
+
+}

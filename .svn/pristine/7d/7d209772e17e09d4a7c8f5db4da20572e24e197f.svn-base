@@ -1,0 +1,856 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib prefix="c"  uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+    
+
+<head>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css" integrity="sha256-2XFplPlrFClt0bIdPgpz8H7ojnk10H69xRqd9+uTShA=" crossorigin="anonymous" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/4.5.6/css/ionicons.min.css" integrity="sha512-0/rEDduZGrqo4riUlwqyuHDQzp2D1ZCgH/gFIfjMIL5az8so6ZiXyhf1Rg8i6xsjv+z/Ubc4tt1thLigEcu6Ug==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/css/pds.css">
+	<style>
+		.table th,.table td{
+			padding: 4px 0.75rem;
+		}
+
+		.card-header{
+			padding: 4px 1.25rem;
+		}
+		.card-body{
+			padding: 0.75rem 1.25rem;
+		}
+		.small-box{
+			margin: 0;
+		}
+		.table{
+			margin: 0;
+		}
+	</style>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
+</head>
+<body>
+<div class="wrapper">
+	<h3 class="title">개인자료실</h3>
+	
+	<div class="row">
+	
+	<div class="card card-navy card-outline col-2 p-2 mr-2">
+		<span>개인자료실</span>
+		<div id="pdsExplorer" style="font-size: 0.85em;">
+		</div>
+	</div>
+	
+	<div class="card card-navy card-outline col-9">
+		<div class="card-header header-padding">
+			<button type="button" class="btn btn-sm checkbox-toggle" onclick="newFolder()">
+				<i class="fas fa-folder">&nbsp;새폴더</i>
+			</button>
+			<button type="button" class="btn btn-sm" onclick="getPnoForfileDownload()">
+				<i class="fas fa-cloud-download-alt">&nbsp;다운로드</i>
+			</button>
+			<button type="button" class="btn btn-sm" onclick="moveTrash()">
+				<i class="fas fa-trash-alt">&nbsp;삭제</i>
+			</button>
+<!-- 			<button type="button" class="btn btn-sm"> -->
+<!-- 				<i class="fas fa-copy">&nbsp;복사</i> -->
+<!-- 			</button> -->
+			<button type="button" class="btn btn-sm" onclick="pdsSendMail()">
+				<i class="fas fa-envelope">&nbsp;메일</i>
+			</button>
+
+<!-- 			<div class="card-tools"> -->
+<!-- 				<div class="input-group input-group-sm"> -->
+<!-- 					<input type="text" class="form-control" placeholder="검색어를 입력하세요"> -->
+<!-- 					<div class="input-group-append"> -->
+<!-- 						<div class="btn btn-info"> -->
+<!-- 							<i class="fas fa-search"></i> -->
+<!-- 						</div> -->
+<!-- 					</div> -->
+<!-- 				</div> -->
+<!-- 			</div> -->
+		</div>
+		<!-- card-header  -->
+
+
+		<div class="card-body">
+			<div class="row">
+				
+			
+				<div class="col-8">
+					<div class="file-manager-container file-manager-col-view">
+				        <div class="file-manager-row-header">
+				            <div class="file-item-name pb-2">Filename</div>
+				            <div class="file-item-changed pb-2">Changed</div>
+				        </div>
+				        
+				        <div class="file-item backBtn" style="display: none; visibility: visible;" onclick="backBtn()">
+						    <div class="file-item-icon file-item-level-up fas fa-level-up-alt text-secondary"></div>
+						    <input type="text" class="lastDist" value="">
+						    <a href="javascript:void(0)" class="file-item-name">
+						        ..
+						    </a>
+						</div>
+				        
+					</div>
+					<div class="mt-3 alertMsg" style="display: none; text-align: right; height: 300px;">
+				        <div class="row" style="height: 100px;"></div>
+				        <div class="row">
+				        	<div class="col-11">
+					        	<span class="text-center">자료실이 비어있습니다</span>
+				        	</div>			
+				        </div>
+		            </div>
+<!-- 			        <div class="text-center mt-3"> -->
+<!-- 		                <button type="button" class="btn btn-outline-danger w-md waves-effect waves-light"><i class="mdi mdi-refresh"></i> Load More Files</button> -->
+<!-- 		            </div> -->
+					<!-- file -->
+
+				</div>
+
+				<div class="col-4 detail-target">
+
+				</div>
+			</div>
+		</div>
+		<!-- card-body  -->
+	</div>
+	<!-- card  -->
+	</div>
+<form role="fileForm" action="regist.do" method="post" enctype="multipart/form-data">
+	<input id="uploadFile" name="uploadFile" type="file" class="form-control" 
+		style="display:none;" onchange="regist()">
+	<input type="text" name="eno" value="${loginUser.eno }" />	
+	<input type="text" id="fileName" name="fileName" value="" />	
+	<input type="text" id="upPno" name="upPno" value="#" />	
+	<input type="text" id="dist" name="dist" value="개인자료실" onchange="distChange(this)">
+</form>
+</div>
+<!-- div-wrapper -->
+
+
+<div id="testDiv" style="visibility: hidden;">
+	<div class="length-target" style="background: none; border: none!important;">
+		<div class="card-body pt-1 text-white length-remove">
+			<h6 class="mb-2">개인자료실 용량</h6>
+			<div class="progress" style="height: 10px;">
+				<div class="progress-bar bg-info" role="progressbar"
+					style="width: 65%;" aria-valuenow="65" aria-valuemin="0"
+					aria-valuemax="100"></div>
+			</div>
+			<p class="">
+				<span>2.5GB</span> <span class="float-end"> / 3GB</span>
+			</p>
+			<div>
+				<button type="button" onclick="removeAllFile()" class="btn btn-sm mt-1 pl-0 text-white">
+					<i class="far fa-trash-alt mr-2"></i>휴지통 비우기
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<form name="sendMail">
+
+</form>
+
+<script>
+$('#pdsExplorer').jstree({
+	core : {
+		data :${pdsExplorer}
+	},
+	types : {
+		'default' : {'icon': 'jstree-folder'}
+	},
+	 plugins: ['wholerow', 'types']
+})
+</script>
+
+<script>
+//탐색창에서 클릭 이벤트
+$('#pdsExplorer').on("changed.jstree", function (e, data) {
+	console.log("data",data);
+    if(data.node.icon == "far fa-folder"){
+		var upPno = data.node.id;
+		var dist = data.node.text;
+    	var data ={
+    			'eno' : ${loginUser.eno },
+    			'upPno' : data.node.id
+    		}
+    	
+    	$.ajax({
+<%--     		url : '<%=request.getContextPath()%>/pds/detail.do', --%>
+    		url : '<%=request.getContextPath()%>/pds/goInOut.do',
+    		data : data,
+    		type : 'post',
+    		success: function(res){
+    			console.log("dd",res);
+    			printPds(res, $('.file-manager-container'), $('#pds-template'), $('.removeFileItem'));
+    			pdsLength();
+    			
+    			detail(res[0].pno);
+    			
+    			
+//     			upPno값을 바꿔주고
+    			$('#upPno').val(upPno);
+    			
+    			$('.lastDist').val(dist);
+    			dist = $('#dist').val() +"/"+ dist;
+    			$('#dist').val(dist).trigger('change');
+    			
+    			
+    			
+    			//upPno값을 바꿔주고
+//     			var upPno = res.pno;
+//     			$('#upPno').val(upPno);
+    			
+//     			var dist = res.fileName;
+//     			$('.lastDist').val(dist);
+    			
+//     			dist = $('#dist').val() +"/"+ dist;
+//     			$('#dist').val(dist).trigger('change');
+//     			getPds(dist);
+    			
+
+    		},
+    		error:function(error){
+    			AjaxErrorSecurityRedirectHandler(error.status);
+    		}
+    	});
+    }
+});
+
+</script>
+
+<script type="text/javascript">
+$(document).on('click', 'body > aside > div > ul > li:nth-child(2) > a', function(){
+	$(this).attr("href", "#");
+	$('#uploadFile').click();
+})
+
+$('body > aside > div > ul > li:nth-child(2) > a').ready(function(){
+	var testDiv = $('#testDiv');
+	$('body > aside > div > ul').after(testDiv);
+	testDiv.css('visibility','visible');
+})
+</script>
+
+<script type="text/javascript">
+function pdsSendMail(){
+	var chekedFile = [];
+	  
+	$('input[type="checkbox"]:checked').each(function (index) {
+		chekedFile.push($(this).next().val());
+	});
+	
+	if(chekedFile.length==0) return;
+	
+	var form = $('form[name="sendMail"]');
+// 	<input type="hidden" name="pno" value="">
+
+// 	var div=$('<div>').addClass("inputRow").attr("data-no",dataNum);
+
+	for(var pno of chekedFile ){
+		console.log(pno);
+		var input = $('<input>').attr({"type":"hidden","name":"pno"});
+		input.val(pno)
+		form.append(input);
+	}
+
+
+	
+	winleft = (screen.width - 1000) / 2;
+	wintop = (screen.height - 800) / 2;
+	
+	var win = window.open("about:blank","메일작성","width=1000,height=800, top=" + wintop + " left= " + winleft );
+	
+	document.sendMail.target = "메일작성";
+	document.sendMail.action = "<%=request.getContextPath()%>/mail/pdsRegistForm.do";
+	document.sendMail.submit();
+
+	
+
+<%-- 	OpenWindow('<%=request.getContextPath()%>/mail/pdsRegistForm.do','메일작성',1000,800); --%>
+}
+
+function getPds(dist){
+	if(dist==null) dist="개인자료실";
+	$('.title').text(dist);
+	var data ={
+			'eno' : ${loginUser.eno },
+			'dist' : dist
+	}
+	
+	$.ajax({
+		url : '<%=request.getContextPath()%>/pds/getPds.do',
+		data : data,
+		type : 'post',
+		success: function(res){
+// 			console.log(res);
+			if(dist=="개인자료실" && res.length == 0){
+				$('.alertMsg').css('display','block');
+				$('.removeFileItem').remove();
+				$('.removeDetail').remove();
+				return;
+			}
+			$('.alertMsg').css('display','none');
+			printPds(res, $('.file-manager-container'), $('#pds-template'), $('.removeFileItem'));
+			pdsLength();
+			
+// 			if(res.length == 0){
+// 				printDetail("", $('.detail-target'), $('#detail-template'), $('.removeDetail'));
+// 				return;				
+// 			}
+			detail(res[0].pno);
+		},
+		error:function(error){
+			AjaxErrorSecurityRedirectHandler(error.status);
+		}
+	});
+}
+getPds();
+</script>
+
+<script type="text/javascript">
+function pdsLength() {
+	var data ={
+		'eno' : ${loginUser.eno },
+	}
+	
+	$.ajax({
+		url : '<%=request.getContextPath()%>/pds/pdsLength.do',
+		data : data,
+		type : 'post',
+		success: function(res){
+			console.log(res);
+			var length = 0;
+			var bar = 0;
+			bar = Math.round((res / (1024*1024) / 10 * 100) *100) /100;
+			if(res >= (1024*1024)){
+				length = res / (1024*1024);
+				length = Math.round(length * 100) / 100
+				length = length.toLocaleString()+"MB";
+			} else {
+				length = res / 1024;
+				length = Math.round(length * 100) / 100
+				length = length.toLocaleString()+"KB";
+			}
+			console.log(length);
+			var data ={
+					'length' : length,
+					'bar' : bar
+			}
+			printDetail(data, $('.length-target'), $('#length-template'), $('.length-remove'));
+			
+		},
+		error:function(error){
+			AjaxErrorSecurityRedirectHandler(error.status);
+		}
+	});
+	
+}
+pdsLength();
+</script>
+
+<script type="text/javascript">
+function newFolder(){
+	var fileName = prompt("새폴더 이름");
+	if(fileName == null) return;
+// 	console.log(fileName);
+	var dist = $('#dist').val();
+	var upPno = $('#upPno').val();
+	console.log(upPno);
+	var data={
+			'eno' : ${loginUser.eno },
+			'fileName' : fileName,
+			'dist' : dist,
+			'upPno' : upPno
+	}
+	$.ajax({
+		url : '<%=request.getContextPath()%>/pds/newFolder.do',
+		data : data,
+		type : 'post',
+		success: function(res){
+// 			console.log(res);
+			if(res=="OK"){
+				getPds(dist);
+				
+				//parameter : 수신자(eno_int), signalContent(title_String), classCode(common table 참조), 
+				//				moveUrl(이동할 페이지의 url), sigMcode(이동할 페이지의 mCode)
+// 				parent.sendSignal(14310056, fileName, "C101", "pds/main.do", '${menu.mcode}');
+			}
+		},
+		error:function(error){
+			AjaxErrorSecurityRedirectHandler(error.status);
+		}
+	});
+}
+</script>
+
+
+<script type="text/javascript">
+function regist(){
+	//용량체크
+	var form = $('form[role="fileForm"]');
+	var file = form.find('[name=uploadFile]')[0];
+	if(file.files[0].size>1024*1024*10){
+      alert("파일 용량은 10MB 이하만 가능합니다.");
+      file.value="";
+      return;
+	}
+	
+	//파일이름 저장
+	$('#fileName').val(file.files[0].name);
+	var fileName = $('#fileName').val();
+
+	//파일이름 중복
+	var arr = $('.file-item-name');
+	var dupYn = false;
+	for(var i = 0; i < arr.length; i++) {
+		if($(arr[i]).text().trim() == fileName)  {
+			alert(fileName+"은(는) 이미 있습니다.");
+	    	return;
+		}
+	}
+	var dist = $('#dist').val();
+	
+	//업로드
+	var data = new FormData($('form[role="fileForm"]')[0]);
+	$.ajax({
+		url : '<%=request.getContextPath()%>/pds/regist.do',
+		data : data,
+		type : 'post',
+		processData:false,
+        contentType:false,
+		success: function(res){
+			if(res=="OK"){
+				alert(fileName+"이(가) 업로드 되었습니다.");
+				getPds(dist);
+			}
+		},
+		error:function(error){
+			AjaxErrorSecurityRedirectHandler(error.status);
+		}
+	});
+}
+
+</script>
+
+<script type="text/javascript">
+function moveTrash(){
+	var chekedFile = [];
+	  
+	$('input[type="checkbox"]:checked').each(function (index) {
+		chekedFile.push($(this).next().val());
+	});
+	
+	if(chekedFile.length==0) return;
+	var result = confirm("선택한 파일을 휴지통으로 이동하시겠습니까?");
+	if(result){
+		for(var pno of chekedFile ){
+			console.log(pno);
+			var data={
+					'pno' : pno
+			}
+			$.ajax({
+				url : '<%=request.getContextPath()%>/pds/moveTrash.do',
+				data : data,
+				type : 'post',
+				success: function(res){
+					console.log(res);
+					var dist = $('#dist').val();
+					getPds(dist);
+				},
+				error:function(error){
+					AjaxErrorSecurityRedirectHandler(error.status);
+				}
+			});
+			
+		}
+		
+	} else {
+		return;
+	}
+	
+}
+</script>
+
+<script type="text/javascript">
+function getPnoForfileDownload(){
+	var chekedFile = [];
+	$('input[type="checkbox"]:checked').each(function (index) {
+		var type = $(this).parent().parent().find('.fileType').val();
+		if(type=="folder") {
+			alert('폴더 다운로드는 지원하지 않습니다.');
+			return false;
+		}
+		chekedFile.push($(this).next().val());
+	});
+	
+	var data = {
+		"pno" : chekedFile
+	}
+	
+	$.ajax({
+		url:"<%=request.getContextPath()%>/pds/getPnoForfileDownload.do",
+		type:"post",
+		data:JSON.stringify(data),
+		contentType:'application/json',
+		success:function(data){
+			for(var pno of data ){
+				downloadByPno(pno);
+			}
+		},
+		error:function(error){
+			AjaxErrorSecurityRedirectHandler(error.status);
+		}
+	});
+}
+
+var iFrameCnt = 0;
+
+function downloadByPno(pno){
+	var url = '<%=request.getContextPath()%>/pds/downloadByPno.do?pno='+pno;
+	fnCreateIframe(iFrameCnt);
+	$("iframe[name=" + iFrameCnt + "]").attr("src", url);
+	iFrameCnt++;
+    
+    fnSleep(100);
+}
+
+function fnCreateIframe(name){
+    var frm = $('<iframe name="' + name + '" style="display: none;"></iframe>');
+    frm.appendTo("body");
+}
+function fnSleep(delay){
+    var start = new Date().getTime();
+    while (start + delay > new Date().getTime());
+}
+
+</script>
+
+<script type="text/javascript">
+function detail(pno){
+	var data={
+			'pno' : pno
+	}
+	$.ajax({
+		url : '<%=request.getContextPath()%>/pds/detail.do',
+		data : data,
+		type : 'post',
+		success: function(res){
+// 			console.log("de",res);
+			printDetail(res, $('.detail-target'), $('#detail-template'), $('.removeDetail'));
+		},
+		error:function(error){
+			AjaxErrorSecurityRedirectHandler(error.status);
+		}
+	});
+	
+}
+</script>
+
+<script type="text/javascript">
+function dbClick(div){
+	console.log($(div).find('.fileType').val());
+	if($(div).find('.fileType').val() != "folder"){
+		//다운로드?
+		var pno = $(div).find('.pno').val();		
+		downloadByPno(pno);	
+		
+		//뷰어?
+				
+		return;
+	}
+	//upPno값을 바꿔주고
+	var upPno = $(div).find('.pno').val();
+	$('#upPno').val(upPno);
+	
+	var dist = $(div).find('.file-item-name').text().trim();
+	$('.lastDist').val(dist);
+	
+	dist = $('#dist').val() +"/"+ dist;
+	$('#dist').val(dist).trigger('change');
+	getPds(dist);
+}
+</script>
+
+<script type="text/javascript">
+var DELAY = 200, clicks = 0, timer = null;
+function clickOrDbClick(div){
+	clicks++;  //count clicks
+	
+    if(clicks == 1) {
+
+        timer = setTimeout(function() {
+//         	console.log($(div).find('.pno').val());
+        	detail($(div).find('.pno').val());
+        	
+        	$('.file-item').removeClass("card");
+//         	$('.file-item').removeClass("bg-Lightblue");
+//         	$('.file-item').css("opacity", "1.0");
+        	$(div).addClass("card");
+//         	$(div).addClass("card-info");
+//         	$(div).addClass("card-outline");
+//         	$(div).addClass("bg-Lightblue");
+//         	$(div).css("opacity", "0.5");
+//         	$(div).css("background-color", "rgba(0, 123, 255, 0.3)");
+        	
+//         	console.log("dd",$(div));
+//             alert("Single Click");  //perform single-click action    
+            clicks = 0;             //after action performed, reset counter
+
+        }, DELAY);
+
+    } else {
+
+        clearTimeout(timer);    //prevent single-click action
+        dbClick(div);
+//         alert("Double Click");  //perform double-click action
+        clicks = 0;             //after action performed, reset counter
+    }
+}
+</script>
+
+<script type="text/javascript">
+function backBtn(){
+	clicks++;  //count clicks
+	
+    if(clicks == 1) {
+        timer = setTimeout(function() {
+            clicks = 0;
+        }, DELAY);
+
+    } else {
+        clearTimeout(timer);  
+		var dist = $('#dist').val();
+		var lastDist = $('.lastDist').val();
+		console.log("dist : ",dist);
+		console.log("lastDist : ",lastDist);
+		
+		distFront = dist.replace("/"+lastDist, "");
+		distEnd = distFront.substring(distFront.lastIndexOf("/")+1);
+		console.log("index : ", distFront.lastIndexOf("/"));
+		console.log(distFront.substring(distFront.lastIndexOf("/")+1));
+		
+		$('.lastDist').val(distEnd);
+		$('#dist').val(distFront).trigger('change');
+		getPds(distFront);
+        clicks = 0; 
+    }
+}
+
+function distChange(dist){
+	console.log($(dist).val());
+	if($(dist).val()!="개인자료실"){
+		var backBtn = $('.backBtn');
+// 		$('.file-manager-row-header').after(backBtn);
+// 		backBtn.css('visibility','visible');
+		backBtn.css('display','block');
+	} else {
+		var backBtn = $('.backBtn');
+// 		$('.wrapper').after(backBtn);
+// 		backBtn.css('visibility','hidden');
+		backBtn.css('display','none');
+		$('.lastDist').val('');
+	}
+}
+</script>
+
+<script type="text/javascript">
+function removeAllFile(){
+	var result = confirm("휴지통의 모든 파일을 삭제하시겠습니까?");
+	if(result){
+		var data={
+				'eno' : ${loginUser.eno }
+		}
+		$.ajax({
+			url : '<%=request.getContextPath()%>/pds/removeAllFile.do',
+			data : data,
+			type : 'post',
+			success: function(res){
+				console.log(res);
+				if(res == 0){
+					alert("삭제할 파일이 없습니다.");
+				} else{
+					alert(res+"개의 파일이 삭제되었습니다.");
+					var dist = $('#dist').val();
+					getPds(dist);
+				}
+			},
+			error:function(error){
+				AjaxErrorSecurityRedirectHandler(error.status);
+			}
+		});
+			
+		
+	} else {
+		return;
+	}
+	
+}
+</script>
+
+<script type="text/x-handlebars-template"  id="detail-template" >
+<div class="card card-widget removeDetail">
+	<div class="card-header">
+		<span>{{fileName}}</span>
+		<div class="card-tools">
+			<button type="button" class="btn btn-tool pt-3"
+				data-card-widget="remove">
+				<i class="fas fa-times"></i>
+			</button>
+		</div>
+	</div>
+
+	<div class="card-body">
+		<p class="text-muted mb-2">상세정보</p>
+		<div class="attachment-block clearfix p-4">
+			<div class="file-img-box file-item-icon" style="text-align: center;">
+				<img width="80px" src="<%=request.getContextPath()%>/resources/images/fileicon/{{fileType}}.svg" 
+					onerror="this.src='<%=request.getContextPath()%>/resources/images/fileicon/file.svg'" alt="icon">
+			</div>
+		</div>
+		<table style="font-size: 0.80em;" class="table table-hover">
+			<tbody>
+				<tr>
+					<td style="width: 40%;">종류</td>
+					<td>{{kind fileType}}</td>
+				</tr>
+				<tr>
+					<td>위치</td>
+					<td>{{dist}}</td>
+				</tr>
+				<tr>
+					<td>크기</td>
+					<td>{{fileSizeToKB fileSize}}</td>
+				</tr>
+				<tr>
+					<td>내용</td>
+					<td>{{content}}</td>
+				</tr>
+				<tr>
+					<td>등록일자</td>
+					<td>{{formatDate regDate}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+</script>
+
+<script type="text/x-handlebars-template"  id="length-template">
+<div class="card-body pt-1 text-white length-remove">
+	<h6 class="mb-2">개인자료실 용량</h6>
+	<div class="progress" style="height: 10px;">
+		<div class="progress-bar" role="progressbar"
+			style="width: {{bar}}%; background-color:{{barColor bar}};" aria-valuenow="{{bar}}" aria-valuemin="0"
+			aria-valuemax="100"></div>
+	</div>
+	<p class="">
+		<span>{{length}}</span> <span class="float-end"> / 10MB</span>
+	</p>
+	<div>
+		<button type="button" onclick="removeAllFile()" class="btn btn-sm mt-1 pl-0 text-white">
+			<i class="far fa-trash-alt mr-2"></i>휴지통 비우기
+		</button>
+	</div>
+</div>
+</script>
+
+<script type="text/x-handlebars-template"  id="pds-template">
+{{#each .}}
+	<div class="file-item removeFileItem" onclick="clickOrDbClick(this)">
+	    <div class="file-item-select-bg bg-primary"></div>
+	    <label class="file-item-checkbox custom-control custom-checkbox">
+	        <input type="checkbox" class="custom-control-input" name="fileChek" onclick="event.cancelBubble=true" />
+			<input type="hidden" class="pno" name="pno" value="{{pno}}">
+	        <span class="custom-control-label"></span>
+	    </label>
+	    <div class="file-img-box file-item-icon">
+	    	<img src="<%=request.getContextPath()%>/resources/images/fileicon/{{fileType}}.svg" 
+				onerror="this.src='<%=request.getContextPath()%>/resources/images/fileicon/file.svg'" alt="icon">
+	    </div>
+	    <a href="javascript:void(0)" class="file-item-name">
+	        {{fileName}}
+	    </a>
+	    <div class="file-item-changed"></div>
+		<input type="hidden" class="pno" name="pno" value="{{pno}}">
+		<input type="hidden" id="uploadPath" value="{{uploadPath}}">
+		<input type="hidden" class="fileType" value="{{fileType}}">
+		<input type="hidden" class="fileSize" value="{{fileSize}}">
+		<input type="hidden" class="regDate" value="{{formatDate regDate}}">
+		<input type="hidden" class="dist" value="{{dist}}">
+		<input type="hidden" class="upPno" value="{{upPno}}">
+		<input type="hidden" class="delYn" value="{{delYn}}">
+		<input type="hidden" class="delDate" value="{{formatDate delDate}}">
+	    <div class="file-item-actions btn-group">
+	    </div>
+	</div>
+{{/each}}
+</script>
+
+<script>
+//handelbars printElement (args : data Array, appent target, handlebar template, remove class)
+function printPds(dataArr,target,templateObject, removeClass){
+	var template=Handlebars.compile(templateObject.html());
+
+	var html = template(dataArr);
+
+	removeClass.remove();
+
+	target.append(html);
+}
+function printDetail(dataArr,target,templateObject, removeClass){
+	var template=Handlebars.compile(templateObject.html());
+
+	var html = template(dataArr);
+
+	removeClass.remove();
+
+	target.append(html);
+}
+</script>
+<script type="text/javascript">
+Handlebars.registerHelper({
+	"formatDate" : function(strDate){
+		var dateObj = new Date(strDate);
+		var year = dateObj.getFullYear();
+		var month = dateObj.getMonth() + 1;
+		if(month < 10) month = '0'+month;
+		var date = dateObj.getDate();
+		if(date < 10) date = '0'+date;
+		return year+"-"+month+"-"+date;
+	},
+	"fileSizeToKB" : function(fileSize){
+		var kb = 0;
+		if(fileSize > 1024) {
+			kb = fileSize / 1024;
+			kb = Math.round(kb * 100) / 100
+			return kb.toLocaleString()+"KB";
+		} else{
+			return fileSize.toLocaleString()+"Byte";
+		}
+	},
+	"kind" : function(fileType){
+		var str = "";
+		if(fileType == "folder"){
+			str = "폴더"
+			return str;
+		} else {
+			str = fileType +" 파일";
+		}
+		return str;
+	},
+	"barColor" : function(size){
+		var str = "#17a2b8";
+		if(size >= 80){
+			str = "#dc3545"
+			return str;
+		}
+		return str;
+	}
+})
+</script>
+</body>

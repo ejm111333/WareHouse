@@ -1,0 +1,28 @@
+package kr.or.warehouse.controller.view;
+
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import kr.or.warehouse.dto.EmployeeVO;
+import kr.or.warehouse.dto.MenuVO;
+import kr.or.warehouse.service.MenuService;
+
+@Controller
+@RequestMapping("/home")
+public class HomeController {
+
+
+	@RequestMapping("/main")
+	public String home(Model model, HttpSession session) throws Exception{
+		String url = "common/home";
+
+		EmployeeVO loginUser = (EmployeeVO)session.getAttribute("loginUser");
+
+		model.addAttribute("loginUser", loginUser);
+		return url;
+	}
+}

@@ -1,0 +1,67 @@
+package kr.or.warehouse.dao;
+
+import java.sql.SQLException;
+import java.util.List;
+
+import org.apache.ibatis.session.RowBounds;
+import org.apache.ibatis.session.SqlSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import kr.or.warehouse.command.Criteria;
+import kr.or.warehouse.dto.EmployeeVO;
+import kr.or.warehouse.dto.WorkManagerVO;
+import kr.or.warehouse.dto.WorkVO;
+
+@Repository
+public class KnowhowDAOImpl implements KnowhowDAO {
+
+	@Autowired
+	private SqlSession session;
+
+	@Override
+	public List<WorkVO> selectRecommendWorkList(String wcode,RowBounds rowBounds) throws SQLException {
+
+		return session.selectList("Knowhow-Mapper.selectRecommendWorkList",wcode,rowBounds);
+	}
+
+	@Override
+	public int selectRecommendWorkListCount(String wcode) throws SQLException {
+		return session.selectOne("Knowhow-Mapper.selectRecommendWorkListCount",wcode);
+	}
+
+	@Override
+	public List<WorkManagerVO> selectWorkManagerList(String wcode) throws SQLException {
+		return session.selectList("Knowhow-Mapper.selectWorkManagerList", wcode);
+	}
+
+	@Override
+	public EmployeeVO selectWorkRequestBy(String wcode) throws SQLException {
+		return session.selectOne("Knowhow-Mapper.selectWorkRequestBy", wcode);
+	}
+
+	@Override
+	public List<WorkVO> selectPopularEmpWorkList(int eno) throws SQLException {
+		return session.selectList("Knowhow-Mapper.selectPopularEmpWorkList",eno);
+	}
+
+	@Override
+	public List<WorkVO> selectMyWorkList(int eno) throws SQLException {
+		return session.selectList("Knowhow-Mapper.selectMyWorkList",eno);
+	}
+
+	@Override
+	public List<WorkVO> selectAllKnowHow(Criteria cri) throws SQLException {
+		int offset = cri.getStartRowNum();
+		int limit = cri.getPerPageNum();
+		RowBounds rowBounds = new RowBounds(offset, limit);
+
+		return session.selectList("Knowhow-Mapper.selectAllKnowHow", cri, rowBounds);
+	}
+
+	@Override
+	public int selectAllKnowHowTotalCount(Criteria cri) throws SQLException {
+		return session.selectOne("Knowhow-Mapper.selectAllKnowHowTotalCount", cri);
+	}
+
+}

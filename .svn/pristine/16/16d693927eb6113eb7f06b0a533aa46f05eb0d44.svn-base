@@ -1,0 +1,73 @@
+package kr.or.warehouse.dao;
+
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.session.RowBounds;
+
+import kr.or.warehouse.dto.MailVO;
+import kr.or.warehouse.dto.MtoVO;
+
+public interface MailDAO {
+
+	// 이름 검색
+	String selectName(String mailNo) throws SQLException;
+
+	// 이름으로 사번 찾기
+	int selectEnoByName(String name) throws SQLException;
+
+	// 메일 기본키 생성
+	String selectMailNo() throws SQLException;
+
+	// 받은메일함 리스트
+	List<MailVO> selectMailList(Map<String, Object> paramMap, RowBounds rowBounds) throws SQLException;
+
+	// 받은메일함 count
+	int selectMailCriteriaTotalCount(Map<String, Object> paramMap) throws SQLException;
+
+	// 받은메일함 count 계산
+	int selectMailCriteriaTotalCountMinus(Map<String, Object> paramMap) throws SQLException;
+
+	// 보낸메일함 리스트
+	List<MailVO> selectSendMailList(Map<String, Object> paramMap, RowBounds rowBounds) throws SQLException;
+
+	// 보낸메일함 수신자 리스트
+	List<MtoVO> selectReceiver(String mailNo) throws SQLException;
+
+	// 보낸메일함 count
+	int selectSendMailCriteriaTotalCount(Map<String, Object> paramMap) throws SQLException;
+
+	// 중요메일함 리스트
+	List<MailVO> selectImporMailList(Map<String, Object> paramMap, RowBounds rowBounds) throws SQLException;
+
+	// 중요메일함 count
+	int selectImporMailCriteriaTotalCount(Map<String, Object> paramMap) throws SQLException;
+
+	// 중요메일함 count 계산
+	int selectImporMailCriteriaTotalCountMinus(Map<String, Object> paramMap) throws SQLException;
+
+	// 휴지통 리스트
+	List<MailVO> selectTrashMailList(Map<String, Object> paramMap, RowBounds rowBounds) throws SQLException;
+
+	// 휴지통 count
+	int selectTrashMailCriteriaTotalCount(Map<String, Object> paramMap) throws SQLException;
+
+	// 내게쓴메일함 리스트
+	List<MailVO> selectToMeMailList(Map<String, Object> paramMap, RowBounds rowBounds) throws SQLException;
+
+	// 내게쓴메일함 count
+	int selectToMeMailCriteriaTotalCount(Map<String, Object> paramMap) throws SQLException;
+
+	// 임시메일함 리스트
+	List<MailVO> selectTempMailList(Map<String, Object> paramMap, RowBounds rowBounds) throws SQLException;
+
+	// 임시메일함 count
+	int selectTempMailCriteriaTotalCount(Map<String, Object> paramMap) throws SQLException;
+
+	// 메일 전송
+	void insertMail(MailVO mail) throws SQLException;
+
+	void insertMto(MtoVO mto) throws SQLException;
+
+}

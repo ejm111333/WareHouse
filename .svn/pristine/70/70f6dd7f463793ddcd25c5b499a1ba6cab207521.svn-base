@@ -1,0 +1,28 @@
+@charset "UTF-8";
+
+.timeline::before {
+	left: 20px;
+}
+.timeline{
+	margin: 0px;
+}
+
+.page-link {
+    line-height: 1;
+    color: #17a2b8;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+}
+.page-item.active .page-link {
+    z-index: 3;
+    color: #fff;
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+}
+.table td,.card-footer{
+	padding: 6px 0.75rem;
+}
+.card-header, .table th{
+	padding: 8px 0.75rem;
+}
+

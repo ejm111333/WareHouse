@@ -1,0 +1,266 @@
+package kr.or.warehouse.controller.view;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import kr.or.warehouse.command.Criteria;
+import kr.or.warehouse.controller.rest.GetAttachesByMultipartFileAdatpter;
+import kr.or.warehouse.dto.AttachVO;
+import kr.or.warehouse.dto.DepartmentVO;
+import kr.or.warehouse.dto.EmployeeVO;
+import kr.or.warehouse.dto.SignDocVO;
+import kr.or.warehouse.service.DepartMentService;
+import kr.or.warehouse.service.NewApprovalService;
+
+@Controller
+@RequestMapping("/approval")
+public class ApprovalController {
+
+	@Resource(name = "fileUploadPath")
+	private String fileUploadPath;
+
+	@Autowired
+	private NewApprovalService newApprovalService;
+
+	@Autowired
+	private DepartMentService depService;
+
+	@RequestMapping("/main")
+	public String main() throws Exception {
+		String url = "approval/main";
+
+		return url;
+	}
+
+	@RequestMapping(value = "/registGo", method = RequestMethod.GET)
+	public ModelAndView regist(Criteria cri, ModelAndView mnv, HttpServletRequest request,
+			@RequestParam("sFormNo") String sFormNo) throws Exception {
+		String url = "approval/regist";
+
+		HttpSession session = request.getSession();
+		EmployeeVO loginUser = (EmployeeVO) session.getAttribute("loginUser");
+		int dno = loginUser.getDno();
+
+		int eno = loginUser.getEno();
+		// System.out.println("sformno:"+sFormNo);
+
+		// 관련문서
+		Map<String, Object> dataMap = newApprovalService.getRelatedDocList(cri, sFormNo);
+
+		// 참조자
+		Map<String, Object> dataRefLine = newApprovalService.getRefLineList(cri);
+
+		// 조직도
+		List<DepartmentVO> departMentList = depService.getDepartMentList();
+		List<OrganizationNode> organization = newApprovalService.organization(departMentList);
+
+		// 결재자 리스트
+		Map<String, Object> dataSignLine = newApprovalService.getSignLineList(cri, dno);
+
+		// 개인결재선 그룹 리스트 - 그룹속한 사원들은 비동기로 보내기
+		Map<String, Object> dataSignLineGr = newApprovalService.getSignLineGr(eno);
+
+		mnv.addObject("dataMap", dataMap);
+
+		mnv.addObject("dataRefLine", dataRefLine);
+
+		mnv.addObject("organization", organization);
+
+		mnv.addObject("dataSignLine", dataSignLine);
+
+		mnv.addObject("dataSignLineGr", dataSignLineGr);
+		// System.out.println(dataSignLine.get("mySignLineList"));
+
+		mnv.setViewName(url);
+
+		return mnv;
+
+	}
+
+	// 문서저장
+	@RequestMapping(value = "/registSignDoc", method = RequestMethod.POST)
+	public String registSignDoc(SignDocVO signDoc, @RequestParam("signerMemberList") List<String> signerMemberList,
+			@RequestParam("reFMemberList")List<String> reFMemberList, @RequestParam("viewerMemberList")List<String> viewerMemberList,
+			HttpServletRequest request, RedirectAttributes rttr) throws Exception {
+		// System.out.println("문서저장");
+		String url = "redirect:/approval/main.do";
+		System.out.println("컨트롤러 전체" + signDoc);
+		// System.out.println("signerMemberList:"+signerMemberList);
+
+		String savePath = this.fileUploadPath;
+		List<AttachVO> attachList = GetAttachesByMultipartFileAdatpter.save(signDoc.getUploadFile(), savePath);
+
+		System.out.println("attachList컨트롤" + attachList);
+		signDoc.setAttachList(attachList);
+
+		// 결재문서 저장
+		newApprovalService.registSignDoc(signDoc, signerMemberList,reFMemberList,viewerMemberList);
+
+		rttr.addFlashAttribute("from", "regist");
+
+		return url;
+	}
+
+	// 개인결재선 그룹 삭제
+	@RequestMapping(value = "/removeSignGr", method = RequestMethod.POST, produces = "text/plain; charset=utf-8")
+	public String removeSignGr(String signGroupNo, RedirectAttributes rttr) throws Exception {
+		String url = "redirect:/approval/regist.do";
+
+		newApprovalService.removeSignGr(signGroupNo);
+
+		rttr.addAttribute("signGroupNo", signGroupNo);
+		rttr.addFlashAttribute("from", "remove");
+		return url;
+	}
+
+	
+	@RequestMapping("/approveList") 
+	public ModelAndView approveList(Criteria cri,@RequestParam(defaultValue = "1") int state, ModelAndView mnv, HttpServletRequest request, HttpSession session) throws Exception{
+		String url = "approval/approveList";
+		
+		EmployeeVO loginUser = (EmployeeVO) session.getAttribute("loginUser");
+		int eno = loginUser.getEno();
+		System.out.println("ㅋㅋㅋㅋㅋㅋ : " + cri);
+		
+		Map<String, Object> dataMap = newApprovalService.getApproveList(cri, eno, state);
+		
+		mnv.addObject("dataMap", dataMap);
+		mnv.setViewName(url);
+		
+		return mnv;
+	}
+	
+	@RequestMapping("/viewerList") 
+	public ModelAndView viewerList(Criteria cri,@RequestParam(defaultValue = "1") int state, ModelAndView mnv, HttpServletRequest request, HttpSession session) throws Exception{
+		String url = "approval/viewerList";
+		
+		EmployeeVO loginUser = (EmployeeVO) session.getAttribute("loginUser");
+		int eno = loginUser.getEno();
+		
+		Map<String, Object> dataMap = newApprovalService.getViewerList(cri, eno, state);
+		mnv.addObject("dataMap", dataMap);
+		mnv.setViewName(url);
+		
+		return mnv;
+	}
+
+	@RequestMapping("/draftList") 
+	public ModelAndView draftList(Criteria cri,@RequestParam(defaultValue = "1") int state, ModelAndView mnv, HttpServletRequest request, HttpSession session) throws Exception{
+		String url = "approval/draftList";
+		
+		EmployeeVO loginUser = (EmployeeVO) session.getAttribute("loginUser");
+		int eno = loginUser.getEno();
+		
+		Map<String, Object> dataMap = newApprovalService.getDraftList(cri, eno, state);
+		mnv.addObject("dataMap", dataMap);
+		mnv.setViewName(url);
+		
+		return mnv;
+	}
+	
+	@RequestMapping("/tempList") 
+	public ModelAndView tempList(Criteria cri,@RequestParam(defaultValue = "1") int state, ModelAndView mnv, HttpServletRequest request, HttpSession session) throws Exception{
+		String url = "approval/tempList";
+		
+		EmployeeVO loginUser = (EmployeeVO) session.getAttribute("loginUser");
+		int eno = loginUser.getEno();
+		
+		Map<String, Object> dataMap = newApprovalService.getTempList(cri, eno, state);
+		mnv.addObject("dataMap", dataMap);
+		mnv.setViewName(url);
+		
+		System.out.println("dataMap : " + dataMap);
+		return mnv;
+	}
+	
+	@RequestMapping("/circulateList") // 회람함
+	public String circulateList() throws Exception {
+		String url = "approval/circulateList";
+
+		return url;
+	}
+
+	@RequestMapping("/viewerListDetailGo") // 참조문서함 상세
+	public String viewerListDetail() throws Exception {
+		String url = "approval/viewerListDetail";
+
+		return url;
+	}
+
+	@RequestMapping("/draftListProceedingDetailGo") // 기안문서함 상세 진행중
+	public String draftListDetail() throws Exception {
+		String url = "approval/draftListDetailProceeding";
+
+		return url;
+	}
+
+	@RequestMapping("/draftListCompleteDetailGo") // 기안문서함 상세 완료
+	public String draftListDetailComplete() throws Exception {
+		String url = "approval/draftListDetailComplete";
+
+		return url;
+	}
+
+	@RequestMapping("/draftListCompanionDetailGo") // 기안문서함 상세 반려
+	public String draftListDetailCompanion() throws Exception {
+		String url = "approval/draftListDetailCompanion";
+
+		return url;
+	}
+
+	@RequestMapping("/tempListDetailGo") // 임시저장함 상세
+	public String tempListDetail() throws Exception {
+		String url = "approval/tempListDetail";
+
+		return url;
+	}
+
+	@RequestMapping("/approveListWaitDetailGo") // 결재문서함 상세 대기
+	public String approveListDetailWait() throws Exception {
+		String url = "approval/approveListDetailWait";
+
+		return url;
+	}
+
+	@RequestMapping("/approveListProceedingDetailGo") // 결재문서함 상세 진행중
+	public String approveListDetailProceeding() throws Exception {
+		String url = "approval/approveListDetailProceeding";
+
+		return url;
+	}
+
+	@RequestMapping("/approveListCompleteDetailGo") // 결재문서함 상세 완료
+	public String approveListDetailComplete() throws Exception {
+		String url = "approval/approveListDetailComplete";
+
+		return url;
+	}
+
+	@RequestMapping("/approveListCompanionDetailGo") // 결재문서함 상세 반려
+	public String approveListDetailCompanion() throws Exception {
+		String url = "approval/approveListDetailCompanion";
+
+		return url;
+	}
+
+	@RequestMapping("/circulateListDetailGo") // 회람함 상세
+	public String circulateListDetail() throws Exception {
+		String url = "approval/circulateListDetail";
+
+		return url;
+	}
+	
+
+}

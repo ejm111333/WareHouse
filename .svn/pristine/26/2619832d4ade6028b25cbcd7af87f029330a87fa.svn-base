@@ -1,0 +1,127 @@
+package kr.or.warehouse.dao;
+
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.session.RowBounds;
+import org.apache.ibatis.session.SqlSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import kr.or.warehouse.command.Criteria;
+import kr.or.warehouse.dto.EmployeeVO;
+import kr.or.warehouse.dto.WorkManagerVO;
+import kr.or.warehouse.dto.WorkVO;
+
+@Repository
+public class WorkDAOImpl implements WorkDAO{
+
+	@Autowired
+	SqlSession session;
+
+	@Override
+	public List<WorkVO> selectMyWorkList(int eno,String wstatus, Criteria cri) throws SQLException {
+		int offset = cri.getStartRowNum();
+		int limit = cri.getPerPageNum();
+		RowBounds rowBounds = new RowBounds(offset, limit);
+
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("eno", eno);
+		param.put("wstatus", wstatus);
+
+		return session.selectList("Work-Mapper.selectMyWorkList", param, rowBounds);
+	}
+
+	@Override
+	public List<WorkManagerVO> selectWorkManagerList(String wcode) throws SQLException {
+		return session.selectList("Work-Mapper.selectWorkManagerList", wcode);
+	}
+
+	@Override
+	public EmployeeVO selectWorkRequestBy(String wcode) throws SQLException {
+		return session.selectOne("Work-Mapper.selectWorkRequestBy", wcode);
+	}
+
+	@Override
+	public int selectMyWorkTotalCount(int eno, String wstatus) throws SQLException {
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("eno", eno);
+		param.put("wstatus", wstatus);
+
+		return session.selectOne("Work-Mapper.selectMyWorkTotalCount", param);
+
+	}
+
+	@Override
+	public List<WorkVO> selectMyWorkAllStatusList(int eno) throws SQLException {
+		return session.selectList("Work-Mapper.selectMyWorkAllStatusList", eno);
+	}
+
+	@Override
+	public List<WorkVO> selectToReqAllStatusList(int eno) throws SQLException {
+		return session.selectList("Work-Mapper.selectToReqAllStatusList", eno);
+	}
+
+	@Override
+	public List<WorkVO> selectToReqList(int eno, String wstatus, Criteria cri) throws SQLException {
+		int offset = cri.getStartRowNum();
+		int limit = cri.getPerPageNum();
+		RowBounds rowBounds = new RowBounds(offset, limit);
+
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("eno", eno);
+		param.put("wstatus", wstatus);
+
+		return session.selectList("Work-Mapper.selectToReqList", param, rowBounds);
+	}
+
+	@Override
+	public int selectToReqTotalCount(int eno, String wstatus) throws SQLException {
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("eno", eno);
+		param.put("wstatus", wstatus);
+
+		return session.selectOne("Work-Mapper.selectToReqTotalCount", param);
+	}
+
+	@Override
+	public List<WorkVO> selectDepWorkAllStatusList(int dno) throws SQLException {
+		return session.selectList("Work-Mapper.selectDepWorkAllStatusList", dno);
+	}
+
+	@Override
+	public List<WorkVO> selectDepWorkList(int dno, String wstatus, Criteria cri) throws SQLException {
+		int offset = cri.getStartRowNum();
+		int limit = cri.getPerPageNum();
+		RowBounds rowBounds = new RowBounds(offset, limit);
+
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("dno", dno);
+		param.put("wstatus", wstatus);
+
+		return session.selectList("Work-Mapper.selectDepWorkList", param, rowBounds);
+	}
+
+	@Override
+	public int selectDepWorkTotalCount(int dno, String wstatus) throws SQLException {
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("dno", dno);
+		param.put("wstatus", wstatus);
+
+		return session.selectOne("Work-Mapper.selectDepWorkTotalCount", param);
+	}
+
+	@Override
+	public int workReadCheck(String wcode, int eno) throws SQLException {
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("wcode", wcode);
+		param.put("eno", eno);
+
+		return session.selectOne("Work-Mapper.workReadCheck", param);
+	}
+
+
+
+}

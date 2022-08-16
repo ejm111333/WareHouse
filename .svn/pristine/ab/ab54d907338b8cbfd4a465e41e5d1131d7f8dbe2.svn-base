@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="NewApproval-Mapper">
+
+	<!-- 관련문서 리스트-->
+	<select id="selectRelatedDocList" resultType="signDoc">
+
+		select
+		    b.name
+		   ,a.title
+		   ,c.ppsname
+		   ,b.photo
+		from
+		    signdoc a, employee b, postposition c, signform d
+		where a.eno = b.eno
+		and b.ppscode = c.ppscode
+		and a.sformno = d.sformno
+		<!-- and a.sformno = 'SF000002'  문서 양식 종류-->
+	</select>
+
+	<!-- 결재선 리스트 -->
+	<select id="selectSignLineList" resultType="signline">
+
+		 select
+		    a.state
+		   ,b.name
+		   ,d.ppsname
+		   ,b.photo
+		   ,c.dname
+		from signline a, employee b, department c,postposition d, signdoc e
+		where a.eno = b.eno
+		and b.dno = c.dno
+		and b.ppscode = d.ppscode
+		and a.signno = e.signno
+		and c.dno = e.dno
+		order by a.signrank desc
+	</select>
+
+
+	<!-- 참조자 -->
+	<select id="selectRefLineList" resultType="employee">
+		select  c.name,
+		        d.dname,
+		        e.ppsname,
+		        c.photo
+
+		from  signref a, signdoc b, employee c, department d, postposition e
+		where a.signno = b.signno
+		and a.eno = c.eno
+		and c.dno =d.dno
+		and c.ppscode = e.ppscode
+	</select>
+
+
+
+
+</mapper>

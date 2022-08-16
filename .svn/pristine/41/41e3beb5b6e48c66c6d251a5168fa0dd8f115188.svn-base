@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Knowhow-Mapper">
+
+
+	<select id="selectRecommendWorkList" resultType="work">
+		select distinct g.wcode, g.wtitle, g.wdate, g.wend, g.wopen,walarm, g.eno, g.wprogress, g.wstatus, g.classcode, g.wcontent, h.viewcnt
+		  from hashtag f, work g, knowhow h,
+		       (select distinct b.tagcontent
+		          from(select regexp_substr(a.langlist, '[^ ]+', 1, level) as tagcontent
+		                 from (select tagcontent as langlist
+		                         from hashtag
+							    where classcode = 'B103') a
+							    <![CDATA[
+			   		  connect by level <= length(regexp_replace(a.langlist, '[^ ]+','')) + 1) b
+			   		  ]]>
+				 where not b.tagcontent like '%'||'년차'||'%' 
+				 
+				intersect
+				
+				select distinct d.tagcontent
+				  from(select regexp_substr(c.tagcontent, '[^ ]+', 1, level) as tagcontent
+		                 from (select b.tagcontent
+		                         from work a, hashtag b
+				        where a.wcode = b.hashno
+						  and a.eno = #{eno}
+						  and a.classcode = 'B102') c
+						     <![CDATA[
+					  connect by level <= length(regexp_replace(c.tagcontent, '[^ ]+','')) + 1) d
+					   ]]>
+				 where not d.tagcontent like '%'||'년차'||'%') e
+		 where f.hashno = g.wcode
+		   and g.wcode = h.wcode
+		   and f.tagcontent like '%'||e.tagcontent||'%'
+	</select>
+	
+	<select id="selectRecommendWorkListCount" resultType="int">
+	select  count(*)
+	  from  (select distinct g.wcode, g.wtitle, g.wdate, g.wend, g.wopen,walarm, g.eno, g.wprogress, g.wstatus, g.classcode, g.wcontent, h.viewcnt
+			  from hashtag f, work g, knowhow h,
+			       (select distinct b.tagcontent
+			          from(select regexp_substr(a.langlist, '[^ ]+', 1, level) as tagcontent
+			                 from (select tagcontent as langlist
+			                         from hashtag
+								    where classcode = 'B103') a
+								    <![CDATA[
+				   		  connect by level <= length(regexp_replace(a.langlist, '[^ ]+','')) + 1) b
+				   		  ]]>
+					 where not b.tagcontent like '%'||'년차'||'%' 
+					 
+					intersect
+					
+					select distinct d.tagcontent
+					  from(select regexp_substr(c.tagcontent, '[^ ]+', 1, level) as tagcontent
+			                 from (select b.tagcontent
+			                         from work a, hashtag b
+					        where a.wcode = b.hashno
+							  and a.eno = #{eno}
+							  and a.classcode = 'B102') c
+							     <![CDATA[
+						  connect by level <= length(regexp_replace(c.tagcontent, '[^ ]+','')) + 1) d
+						   ]]>
+					 where not d.tagcontent like '%'||'년차'||'%') e
+			 where f.hashno = g.wcode
+			   and g.wcode = h.wcode
+			   and f.tagcontent like '%'||e.tagcontent||'%')
+	</select>
+
+	<select id="selectWorkManagerList" resultType="workmanager">
+		SELECT
+		    a.wmstep
+		   ,a.wcode
+		   ,a.eno
+		   ,a.isafter
+		   ,a.answer
+		   ,a.wcheck
+		   ,c.dname
+		   ,b.birth
+		   ,b.email
+		   ,b.name
+		   ,b.photo
+		   ,d.ppsname
+		   ,b.job
+		   ,b.phone
+		   ,b.call
+		   ,b.hiredate
+		   ,b.enabled
+		   ,b.mbti
+		   ,b.address
+		   ,b.retiredate
+		   ,b.retirereason
+		   ,b.pwd
+		   ,b.ipaddress
+		   ,b.signtype
+		   ,b.signpath
+		   ,b.condition
+		   ,b.year
+		FROM
+		    workmanager a, employee b, department c, postposition d
+		WHERE a.eno = b.eno
+		  AND b.ppscode = d.ppscode
+		  AND b.dno = c.dno
+		  AND a.wcode = #{wcode}
+	</select>
+	
+	<select id="selectWorkRequestBy" resultType="employee">
+		SELECT
+		    b.eno
+		   ,c.dname
+		   ,b.birth
+		   ,b.email
+		   ,b.name
+		   ,b.photo
+		   ,d.ppsname
+		   ,b.job
+		   ,b.phone
+		   ,b.call
+		   ,b.hiredate
+		   ,b.enabled
+		   ,b.mbti
+		   ,b.address
+		   ,b.retiredate
+		   ,b.retirereason
+		   ,b.pwd
+		   ,b.ipaddress
+		   ,b.signtype
+		   ,b.signpath
+		   ,b.condition
+		   ,b.year
+		FROM
+		    work a, employee b, department c, postposition d
+		WHERE a.eno = b.eno
+		  AND b.dno = c.dno
+		  AND b.ppscode = d.ppscode
+		  AND a.wcode = #{wcode}
+	</select>
+
+
+</mapper>
+

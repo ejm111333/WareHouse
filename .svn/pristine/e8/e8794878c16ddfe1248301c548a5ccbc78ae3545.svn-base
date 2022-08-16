@@ -1,0 +1,212 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
+<script>
+
+	function communityInfo(cmno){
+		var data = {
+				"cmno" : cmno
+		}
+
+
+		$.ajax({
+			url : '<%=request.getContextPath()%>/community/communityInfo.do',
+			data : data,
+			type : 'post',
+			success: function(res){
+				printWorkData(res, $('#custom-tabs-one-mana'), $('#communityInfo-template'));
+			},
+			error:function(error){
+				AjaxErrorSecurityRedirectHandler(error.status);
+			}
+		});
+	}
+	
+
+	  function commuModifyGo(){
+// 		  console.log("asd");
+	 	  
+	 	  var data = {
+				'cmno' : $('input[name="cmno"]').val(),
+				'cname' : $('input[name="cname"]').val(),
+				'intro' : $('textarea[name="intro"]').val(),
+				'open' : $('input[name=open]:checked').val()
+				
+			}
+
+
+         $.ajax({
+             type: "post",
+             url: '<%=request.getContextPath()%>/community/commuModify.do',
+             data: data,
+             success: function (data) {
+                 alert(data);
+                 communityInfo('${cmno}');
+             },
+             error: function (error) {
+            	 AjaxErrorSecurityRedirectHandler(error.status);
+            	 alert(error.status);
+             }
+         });
+	  }
+	  
+	function setCommuBoard(cmno){
+		var data = {
+				"cmno" : cmno
+		}
+
+
+		$.ajax({
+			url : '<%=request.getContextPath()%>/community/setCommuBoard.do',
+			data : data,
+			type : 'post',
+			success: function(res){
+				printWorkData(res, $('#custom-tabs-one-mana'), $('#setCommuBoard-template'));
+// 				printWorkData(res, $('#custom-tabs-one-mana'), $('#setCommuBoard-template'));
+			},
+			error:function(error){
+				AjaxErrorSecurityRedirectHandler(error.status);
+			}
+		});
+	}
+
+	
+	function printWorkData(dataList, target, templateObject){
+		var template = Handlebars.compile(templateObject.html());
+		var html = template(dataList);
+		target.html(html);
+	}
+
+	
+
+</script>
+
+<script type="text/x-handlebars-template"  id="communityInfo-template">
+	<div class="row m-auto">
+		<div class="col-12">
+			<span style="font-size: 1.2em;">정보</span>
+			<button class="btn btn-info mb-2" style="float: right;"
+				onclick="javascript:commuModifyGo();">저장</button>
+		</div>
+	</div>
+
+		<div class="row m-auto">
+			<input type="hidden" name="cmno" value={{cmno}}>
+			<label class="col-2">커뮤니티 명</label> <input
+				class="form-control col-10" type="text" id="" name='cname'
+				class="form-control" value="{{cname}}"> <label
+				class="col-2 mt-3">소개글</label>
+			<textarea class="form-control col-10 mt-3" name="intro" rows="5" cols="">{{intro}}
+					</textarea>
+	
+			<label class="col-2 mt-3">공개 여부</label>
+			<div class="custom-control custom-radio col-1 mt-3">
+				<input class="custom-control-input" type="radio" id="open"
+					name="open" value="0" {{openCheck open '0'}}> <label for="open"
+					class="custom-control-label ">공개</label>
+			</div>
+			<div class="custom-control custom-radio col-9 mt-3">
+				<input class="custom-control-input" type="radio" id="notOpen"
+					name="open" value="1" {{openCheck open '1'}}> <label for="notOpen"
+					class="custom-control-label">비공개</label>
+			</div>
+			<div class="col-2"></div>
+			<div class="col-10">
+				<small><strong>*비공개로 설정 할 경우 전체 커뮤니티 목록에 보이지
+						않습니다.</strong></small><br /> <small><strong>*비공개로 설정 할 경우
+						초대로만 가입이 가능합니다.</strong></small>
+			</div>
+		</div>
+</script>
+
+<script type="text/x-handlebars-template"  id="setCommuBoard-template">
+	<div class="row m-auto"> 
+			<div class="col-12">
+				<span style="font-size: 1.2em;">게시판</span>
+				<button type="button" class="btn btn-info mb-2" style="float: right;" data-toggle="modal"data-target="#modal-board">추가</button>
+			</div>
+		</div>
+<table class="table table-hover text-nowrap"
+			style="padding: 10px;">
+			<tbody>
+{{#each .}}
+				<tr>
+					<td id="{{cboardNo}}">
+						<input type="hidden" name="cbName" value="{{cbName}}">
+						<input type="hidden" name="cbIntro" value="{{cbIntro}}">
+						<input type="hidden" name="replyOpen" value="{{replyOpen}}">
+						{{cbName}}
+					</td>
+					<td>
+						<button type="button" class="btn btn-xs btn-info" style="float: right;" data-toggle="modal"data-target="#modal-set" onclick="boardModify_go('{{cboardNo}}')">설정</button>
+					</td>
+				</tr>
+{{/each}}
+			</tbody>
+		</table>
+</script>
+
+
+<script>
+	Handlebars.registerHelper({
+		"formatDate" : function(regDate){
+			var dateObj = new Date(regDate);
+			var year = dateObj.getFullYear();
+			var month = ('0' + (dateObj.getMonth() + 1)).slice(-2); 
+			var date = ('0' + dateObj.getDate()).slice(-2);
+			return year + "-" + month + "-" + date;
+		},
+		"authorityCheck" : function(authority){
+			var str = ""
+			
+			if(authority == 2){
+				str = "<i class='fas fa-crown'></i>";
+			}
+			
+			return new Handlebars.SafeString(str);
+		},
+		"title" : function(title) {
+			return new Handlebars.SafeString(title);
+		},
+		"openCheck" : function(open, val){
+			str = "";
+			console.log('open : ' + open + ' / val : ' + val);
+			if(open == val) {
+				str ="checked"
+				return new Handlebars.SafeString(str);
+			}
+			
+			return new Handlebars.SafeString(str);
+		}
+
+
+	});
+	
+	function boardModify_go(cboardNo){
+		console.log($('td#'+cboardNo +' input[name="cbName"]').val())
+		$('#boardName').val($('td#'+cboardNo +' input[name="cbName"]').val());
+	}
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

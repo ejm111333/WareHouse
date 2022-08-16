@@ -1,0 +1,41 @@
+package kr.or.warehouse.dao;
+
+import java.sql.SQLException;
+import java.util.List;
+
+import org.apache.ibatis.session.RowBounds;
+import org.apache.ibatis.session.SqlSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import kr.or.warehouse.dto.EmployeeVO;
+import kr.or.warehouse.dto.WorkManagerVO;
+import kr.or.warehouse.dto.WorkVO;
+
+@Repository
+public class KnowhowDAOImpl implements KnowhowDAO {
+
+	@Autowired
+	private SqlSession session;
+	
+	@Override
+	public List<WorkVO> selectRecommendWorkList(int eno,RowBounds rowBounds) throws SQLException {
+		return session.selectList("Knowhow-Mapper.selectRecommendWorkList",eno,rowBounds);
+	}
+
+	@Override
+	public int selectRecommendWorkListCount(int eno) throws SQLException {
+		return session.selectOne("Knowhow-Mapper.selectRecommendWorkListCount",eno);
+	}
+
+	@Override
+	public List<WorkManagerVO> selectWorkManagerList(String wcode) throws SQLException {
+		return session.selectList("Work-Mapper.selectWorkManagerList", wcode);
+	}
+
+	@Override
+	public EmployeeVO selectWorkRequestBy(String wcode) throws SQLException {
+		return session.selectOne("Work-Mapper.selectWorkRequestBy", wcode);
+	}
+
+}

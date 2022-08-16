@@ -1,0 +1,15 @@
+package kr.or.warehouse.service;
+
+import java.util.Map;
+
+import kr.or.warehouse.command.Criteria;
+import kr.or.warehouse.dto.EmployeeVO;
+
+public interface SignalService {
+
+	Map<String, Object> getSignalList(Criteria cri, int eno) throws Exception;
+	
+	void read(String signalNo) throws Exception;
+	
+//	EmployeeVO getEmpForFrom(int eno) throws Exception;
+}

@@ -1,0 +1,73 @@
+package kr.or.warehouse.dto;
+
+import java.util.Date;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
+public class MentoringVO {
+	private String mtno;
+	private Date startDate;
+	private int mento;
+	private int smno;
+
+	private String name; //멘티이름
+	private String ppsName; //멘티직위
+	private int count; //멘티수
+	private String condition;
+
+	public String getCondition() {
+		return condition;
+	}
+	public void setCondition(String condition) {
+		this.condition = condition;
+	}
+	public int getCount() {
+		return count;
+	}
+	public void setCount(int count) {
+		this.count = count;
+	}
+	public String getPpsName() {
+		return ppsName;
+	}
+	public void setPpsName(String ppsName) {
+		this.ppsName = ppsName;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public int getSmno() {
+		return smno;
+	}
+	public void setSmno(int smno) {
+		this.smno = smno;
+	}
+	public String getMtno() {
+		return mtno;
+	}
+	public void setMtno(String mtno) {
+		this.mtno = mtno;
+	}
+	public Date getStartDate() {
+		return startDate;
+	}
+	public void setStartDate(Date startDate) {
+		this.startDate = startDate;
+	}
+	public int getMento() {
+		return mento;
+	}
+	public void setMento(int mento) {
+		this.mento = mento;
+	}
+
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this, ToStringStyle.JSON_STYLE);
+	}
+
+}

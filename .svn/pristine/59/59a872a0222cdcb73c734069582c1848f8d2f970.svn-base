@@ -1,0 +1,528 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<link rel="stylesheet" href="<%=request.getContextPath() %>/resources/bootstrap/plugins/summernote/summernote-bs4.min.css">
+
+
+<style type="text/css">
+body, img, p {
+	margin: 0;
+	padding: 0
+}
+
+span.editor_span {
+	display: block;
+	width: auto !important;
+	margin: 5px
+}
+
+span.editor_span table {
+	word-break: normal
+}
+
+span.editor_span, span.editor_span table, span.editor_span p, span.editor_span span
+	{
+	font-size: 12px;
+	font-family: dotum;
+	line-height: 1.5
+}
+
+.editor_span td {
+	padding: 0 !important
+}
+
+.editor_span ol, .editor_span ul {
+	list-style-position: inside;
+	padding-left: 40px
+}
+
+img {
+	border: 0
+} /* sign_type1 */
+div.sign_type1 {
+	display: inline-block;
+	margin-right: -1px;
+	font-size: 12px;
+}
+
+div.sign_type1.last table.tb_sign_type1 {
+	border-left: 0
+}
+
+div.sign_type1 table.tb_sign_type1, table.sign_member {
+	border-spacing: 0;
+	border-collapse: collapse;
+	width: 60px
+}
+
+div.sign_type1 table.tb_sign_type1 {
+	border: 1px solid #666
+}
+
+div.sign_type1 table.tb_sign_type1 tbody tr th {
+	width: 20px;
+	background: #eee;
+	padding: 4px;
+	text-align: center;
+	word-break: break-word;
+	white-space: normal
+}
+
+div.sign_type1 table.tb_sign_type1 tbody tr td {
+	border-left: 1px solid #666;
+	padding: 0 !important
+}
+
+div.sign_type1 table.tb_sign_type1 tbody tr td table.sign_member tbody tr td
+	{
+	height: 26px;
+	border-left: 0;
+	border-bottom: 1px solid #666;
+	min-height: 26px;
+	vertical-align: middle
+}
+
+div.sign_type1 table.tb_sign_type1 tbody tr td table.sign_member tbody tr td.last
+	{
+	border-bottom: 0
+}
+
+div.sign_type1 table.tb_sign_type1 tbody tr td table.sign_member tbody tr td span
+	{
+	display: block;
+	text-align: center;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	width: 70px;
+	padding: 4px;
+	font-size: 12px
+}
+
+div.sign_type1 table.tb_sign_type1 tbody tr td table.sign_member tbody tr td span.sign_name
+	{
+	height: 36px
+}
+
+div.sign_type1 table.tb_sign_type1 tbody tr td table.sign_member tbody tr td span.arbitrary
+	{
+	background: url(../images/arbitrary.gif) no-repeat
+}
+
+div.sign_type1 table.tb_sign_type1 tbody tr td table.sign_member tbody tr td span img
+	{
+	width: auto;
+	height: 100%
+}
+
+div.sign_type1 table.tb_sign_type1 tbody tr td table.sign_member tbody tr td span.doc_return
+	{
+	padding: 0;
+} /* sign_type_new */
+div.sign_type_new {
+	display: inline-block;
+	margin-right: -1px;
+	font-size: 12px
+}
+
+div.sign_type_new.last table.tb_sign_type1 {
+	border-left: 0
+}
+
+div.sign_type_new table.tb_sign_type1 {
+	border: 1px solid #666
+}
+
+div.sign_type_new table.tb_sign_type1 tbody tr td table.sign_member tbody tr td span.sign_name
+	{
+	height: auto
+}
+
+div.sign_type_new table.tb_sign_type1 tbody tr th {
+	width: 15px;
+	background: #eee;
+	padding: 6px;
+	text-align: center;
+	word-break: break-word;
+	white-space: normal
+}
+
+div.sign_type_new table.tb_sign_type1 tbody tr td {
+	border-left: 1px solid #666;
+	padding: 0 !important
+}
+
+div.sign_type_new table.tb_sign_type1 tbody tr td table.sign_member tbody tr td
+	{
+	height: 26px;
+	border-left: 0;
+	border-bottom: 1px solid #666;
+	min-height: 26px
+}
+
+div.sign_type_new table.tb_sign_type1 tbody tr td table.sign_member tbody tr td.last
+	{
+	border-bottom: 0
+}
+
+div.sign_type_new table.tb_sign_type1 tbody tr td table.sign_member tbody tr td span
+	{
+	display: block;
+	text-align: center;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	width: 70px;
+	font-size: 12px;
+	padding: 2px 4px
+}
+
+div.sign_type_new table.tb_sign_type1 tbody tr td table.sign_member tbody tr td.wrap_name,
+	div.sign_type_new table.tb_sign_type1 tbody tr td table.sign_member tbody tr td.wrap_position,
+	div.sign_type_new table.tb_sign_type1 tbody tr td table.sign_member tbody tr td.wrap_rank,
+	div.sign_type_new table.tb_sign_type1 tbody tr td table.sign_member tbody tr td.wrap_type
+	{
+	height: 48px;
+	text-align: center
+}
+
+div.sign_type_new table.tb_sign_type1 tbody tr td table.sign_member tbody tr td.wrap_sign
+	{
+	height: 74px;
+	text-align: center;
+}
+
+div.sign_type_new table.tb_sign_type1 tbody tr td table.sign_member tbody tr td span.sign_stamp
+	{
+	height: 40px;
+	padding-bottom: 0
+}
+
+div.sign_type_new table.tb_sign_type1 tbody tr td table.sign_member tbody tr td span.sign_stamp img
+	{
+	width: auto;
+	height: 100%
+}
+
+div.sign_type_new table.tb_sign_type1 tbody tr td table.sign_member tbody tr td span.arbitrary
+	{
+	background: url(../images/arbitrary.gif) no-repeat;
+	height: 36px;
+	padding: 0
+}
+
+div.sign_type_new table.tb_sign_type1 tbody tr td table.sign_member tbody tr td.wrap_arbitrary
+	{
+	padding: 0
+}
+
+span.sign_type2 span.sign_member {
+	border: 1px solid #000;
+	padding: 4px;
+	display: block;
+	margin: 0 0 -1px
+}
+
+span.sign_type2 span.sign_member span.name {
+	color: #333
+}
+
+span.sign_type2 span.sign_member span.date {
+	margin: 0 !important
+}
+
+span.sign_type2 span.sign_member span.rank {
+	margin: 0 0 0 4px
+} /* sign_type1_iline */
+.sign_type1_inline {
+	position: relative;
+	display: inline-table !important;
+	border-collapse: separate;
+	border-spacing: 0;
+	white-space: normal;
+	font-size: 12px;
+	margin: 1px -1px 0 0;
+	padding-left: 26px;
+}
+
+.sign_type1_inline:after {
+	display: block;
+	clear: left;
+	overflow: hidden;
+	height: 0;
+	content: ''
+}
+
+.sign_type1_inline:empty {
+	padding-left: 0;
+}
+
+.sign_type1_inline .sign_tit_wrap {
+	position: absolute;
+	top: -1px;
+	left: 0;
+	bottom: 0;
+	vertical-align: middle;
+	border: 1px solid #000;
+	width: 24px;
+	background: #eee;
+	display: table-cell
+}
+
+.sign_type1_inline .sign_tit_wrap .sign_tit {
+	display: table;
+	padding: 0 2px;
+	text-align: center;
+	word-break: break-all;
+	white-space: normal;
+	height: 100%
+}
+
+.sign_type1_inline .sign_tit_wrap .sign_tit strong {
+	display: table-cell;
+	vertical-align: middle
+}
+
+.sign_type1_inline .sign_member_wrap {
+	vertical-align: top;
+	background: #fff;
+	display: table-cell;
+	float: left;
+	border: 1px solid #000;
+	border-left: 0;
+	margin: -1px 0 0 0
+}
+
+.sign_type1_inline .sign_member_wrap .sign_member {
+	width: 79px;
+	vertical-align: top;
+	display: table;
+	table-layout: fixed
+}
+
+.sign_type1_inline .sign_member_wrap .sign_member .sign_rank_wrap,
+	.sign_type1_inline .sign_member_wrap .sign_member .sign_date_wrap {
+	display: table-row
+}
+
+.sign_type1_inline .sign_member_wrap .sign_member .sign_rank,
+	.sign_type1_inline .sign_member_wrap .sign_member .sign_wrap,
+	.sign_type1_inline .sign_member_wrap .sign_member .sign_date {
+	display: table-cell;
+	vertical-align: middle;
+	text-align: center;
+	width: 79px
+}
+
+.sign_type1_inline .sign_member_wrap .sign_member .sign_rank {
+	height: 26px
+}
+
+.sign_type1_inline .sign_member_wrap .sign_member .sign_wrap {
+	height: 75px;
+	border-top: 1px solid #000
+}
+
+.sign_type1_inline strong {
+	font-weight: bold;
+}
+
+.sign_type1_inline .sign_member_wrap .sign_member .sign_wrap .arbitrary
+	{
+	background: url(../images/arbitrary.gif) no-repeat;
+	height: 40px;
+	width: 79px;
+	padding: 0;
+}
+
+.sign_type1_inline .sign_member_wrap .sign_member .sign_date {
+	height: 26px;
+	border-top: 1px solid #000
+}
+
+.sign_type1_inline .sign_member_wrap .sign_member .sign_stamp {
+	width: 79px;
+	height: 40px
+}
+
+.sign_type1_inline .sign_member_wrap .sign_member .sign_stamp img {
+	width: auto;
+	height: 100%;
+}
+
+.sign_type1_inline .sign_member_wrap .sign_member .sign_wrap>span {
+	padding: 2px 0;
+	display: block
+}
+
+.sign_type1_inline .sign_rank, .sign_type1_inline .sign_name,
+	.sign_type1_inline .sign_position, .sign_type1_inline .sign_type,
+	.sign_type1_inline .sign_date {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	max-width: 79px;
+}
+
+.sign_arbitrary {
+	background: url(../images/arbitrary.gif) no-repeat;
+	height: 40px;
+	width: 79px;
+	padding: 0;
+}
+
+.sign_type1_inline .txt_caution, .sign_type1 .txt_caution {
+	color: red
+}
+</style>
+	<span>
+		<table
+			style="border: 0px solid rgb(0, 0, 0); border-image: none;  font-family: malgun gothic, dotum, arial, tahoma; margin-top: 1px; border-collapse: collapse;">
+			<!-- Header -->
+			<colgroup>
+				<col width="310" />
+				<col width="490" />
+			</colgroup>
+			<tbody>
+				<tr>
+					<td
+						style="background: white; padding: 0px !important; border: 0px currentColor; border-image: none; height: 90px; text-align: center; color: black; font-size: 36px; font-weight: bold; vertical-align: middle;"
+						colspan="2" class="">업 무 기 안</td>
+				</tr>
+				<tr>
+					<td
+						style="background: white; padding: 0px !important; border: currentColor; border-image: none; text-align: left; color: black; font-size: 12px; font-weight: normal; vertical-align: top;"><span
+						class="sign_type1_inline" data-group-seq="3" data-group-name="합의"
+						data-group-max-count="1" data-group-type="type1"
+						data-is-agreement="true" id="agreementWrap"></span> <!-- 에디터 &nbsp; 버그. 개행과 공백을 최소화 시키자. -->
+						<table
+							style="border: 1px solid rgb(0, 0, 0); border-image: none; font-family: malgun gothic, dotum, arial, tahoma; margin-top: 1px; border-collapse: collapse;">
+							<!-- User -->
+							<colgroup>
+								<col width="90" />
+								<col width="220" />
+							</colgroup>
+							<tbody>
+								<tr>
+									<td
+										style="background: rgb(221, 221, 221); padding: 5px; border: 1px solid black; border-image: none; height: 18px; text-align: center; color: rgb(0, 0, 0); font-size: 12px; font-weight: bold; vertical-align: middle;">
+										기안자</td>
+									<td
+										style="background: rgb(255, 255, 255); padding: 5px; border: 1px solid black; border-image: none; text-align: left; color: rgb(0, 0, 0); font-size: 12px; font-weight: normal; vertical-align: middle;"><span
+										data-type="system" data-dsl="{{label:draftUser}}"
+										data-id="draftUser" data-name="draftUser" data-value="한성준"
+										data-require="false" data-maxlength="" data-width=""
+										data-defaultstr="" data-editable="true" data-select="한성준"
+										data-select-option="true" value="한성준">오지현</span></td>
+								</tr>
+								<tr>
+									<td
+										style="background: rgb(221, 221, 221); padding: 5px; border: 1px solid black; border-image: none; height: 18px; text-align: center; color: rgb(0, 0, 0); font-size: 12px; font-weight: bold; vertical-align: middle;">
+										소속</td>
+									<td
+										style="background: rgb(255, 255, 255); padding: 5px; border: 1px solid black; border-image: none; text-align: left; color: rgb(0, 0, 0); font-size: 12px; font-weight: normal; vertical-align: middle;"><span
+										data-type="system" data-dsl="{{label:draftDept}}"
+										data-id="draftDept" data-name="draftDept" data-value="경영지원본부"
+										data-require="false" data-maxlength="" data-width=""
+										data-defaultstr="" data-editable="true" data-select="경영지원본부"
+										data-select-option="true" value="경영지원본부">경영지원본부</span></td>
+								</tr>
+								<tr>
+									<td
+										style="background: rgb(221, 221, 221); padding: 5px; border: 1px solid black; border-image: none; height: 18px; text-align: center; color: rgb(0, 0, 0); font-size: 12px; font-weight: bold; vertical-align: middle;">
+										기안일</td>
+									<td
+										style="background: rgb(255, 255, 255); padding: 5px; border: 1px solid black; border-image: none; text-align: left; color: rgb(0, 0, 0); font-size: 12px; font-weight: normal; vertical-align: middle;"><span
+										data-type="system" data-dsl="{{label:draftDate}}"
+										data-id="draftDate" data-name="draftDate"
+										data-value="2020-02-14(금)" data-require="false"
+										data-maxlength="" data-width="" data-defaultstr=""
+										data-editable="true" data-select="2020-02-14(금)"
+										data-select-option="true" value="2020-02-14(금)">2020-02-14(금)</span>
+									</td>
+								</tr>
+								<tr>
+									<td
+										style="background: rgb(221, 221, 221); padding: 5px; border: 1px solid black; border-image: none; height: 18px; text-align: center; color: rgb(0, 0, 0); font-size: 12px; font-weight: bold; vertical-align: middle;">
+										문서번호</td>
+									<td
+										style="background: rgb(255, 255, 255); padding: 5px; border: 1px solid black; border-image: none; text-align: left; color: rgb(0, 0, 0); font-size: 12px; font-weight: normal; vertical-align: middle;"><span
+										data-type="system" data-dsl="{{label:docNo}}" data-id="docNo"
+										data-name="docNo" data-value="다우그룹-2020-00001"
+										data-require="false" data-maxlength="" data-width=""
+										data-defaultstr="" data-editable="true" data-select=""
+										data-select-option="true" value="다우그룹-2020-00001">POJO그룹-2020-00001</span>
+									</td>
+								</tr>
+							</tbody>
+						</table></td>
+					<td
+						style="text-align:right;   background: white; padding: 0px !important; border: currentColor; border-image: none;  color: black; font-size: 12px; font-weight: normal; vertical-align: top;"><span
+						class="sign_type1_inline" data-group-seq="0" data-group-name="신청"
+						data-group-max-count="1" data-group-type="type1"
+						data-is-reception=""><span class="sign_tit_wrap"><span
+								class="sign_tit"><strong>신청</strong></span></span><span
+							class="sign_member_wrap" id="activity_14264"><span
+								class="sign_member"><span class="sign_rank_wrap"><span
+										class="sign_rank">과장</span></span><span class="sign_wrap">
+										<span class="sign_stamp"><img src="http://tour.daouoffice.com:80/resources/images/stamp_approved.png"></span>
+										<span
+										class="sign_name"> <strong> 강정인 </strong>
+									</span></span><span class="sign_date_wrap"><span class="sign_date "
+										id="date_14264"></span></span></span></span></span> <!-- 에디터 &nbsp; 버그. 개행과 공백을 최소화 시키자. -->
+						<span class="sign_type1_inline" data-group-seq="1"
+						data-group-name="승인" data-group-max-count="7"
+						data-group-type="type1" data-is-reception=""><span
+							class="sign_tit_wrap"><span class="sign_tit"><strong>승인</strong></span></span><span
+							class="sign_member_wrap" id="activity_14265"><span
+								class="sign_member"><span class="sign_rank_wrap"><span
+										class="sign_rank">차장</span></span><span class="sign_wrap"><span
+										class="sign_name"> <strong> 서난희 </strong>
+									</span></span><span class="sign_date_wrap"><span class="sign_date "
+										id="date_14265"></span></span></span></span></span> <!-- 에디터 &nbsp; 버그. 개행과 공백을 최소화 시키자. -->
+					<!-- 결재선 추가 넣을 곳 -->
+				</tr>
+			</tbody>
+		</table>
+		<table
+			style="border: 0px solid rgb(0, 0, 0); border-image: none;  font-family: malgun gothic, dotum, arial, tahoma; margin-top: 10px; border-collapse: collapse;">
+			<!-- Draft -->
+			<colgroup>
+				<col width="120" />
+				<col width="230" />
+				<col width="120" />
+				<col width="330" />
+			</colgroup>
+			<tbody>
+				<tr>
+					<td
+						style="background: rgb(221, 221, 221); padding: 5px; border: 1px solid black; border-image: none; height: 25px; text-align: center; color: rgb(0, 0, 0); font-size: 14px; font-weight: bold; vertical-align: middle; ">
+						제목</td>
+					<td
+						style="background: rgb(255, 255, 255); padding: 5px; border: 1px solid black; border-image: none; text-align: left; color: rgb(0, 0, 0); font-size: 14px; font-weight: normal; vertical-align: middle;"
+						colspan="3">
+						<!-- <span data-type="text"
+						data-dsl="{{text$require$:subject}}" data-id="subject"
+						data-name="subject" data-value="다우오피스 고객사 대상 만족도 조사 이벤트 진행의 건"
+						data-require="true" data-maxlength="" data-width=""
+						data-defaultstr="" data-editable="true"
+						data-select="다우오피스 고객사 대상 만족도 조사 이벤트 진행의 건"
+						data-select-option="true">다우오피스 고객사 대상 만족도 조사 이벤트 진행의 건</span> -->
+						<input type="text" style="width: 100%; height: 100%;border: 0;" >
+					</td>
+				</tr>
+				<tr>
+					<td colspan='5'>
+						<textarea class="form-control" name="WorkContent" id="WorkContent" rows="5" cols=""
+						placeholder="" ></textarea>
+
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</span>
+
+<script>
+$(function(){
+   summernote_go($('textarea[name="WorkContent"]'),'<%=request.getContextPath()%>');
+});
+</script>

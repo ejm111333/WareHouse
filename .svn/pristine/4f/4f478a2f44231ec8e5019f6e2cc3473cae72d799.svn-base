@@ -1,0 +1,137 @@
+package kr.or.warehouse.dto;
+
+import java.io.Serializable;
+import java.util.Date;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
+@SuppressWarnings("serial")
+public class HrVO implements Serializable{
+	private String hrcode;
+	private int eno;
+	private int state;
+	private String hrTime;
+	private String overTime;
+	private String stdTime;
+	private Date onTime;
+	private Date offTime;
+	private String onTimeStr;
+	private String offTimeStr;
+	private String hrDate;
+	private int reqChange;
+	
+	private String weekDate;
+	
+	public String getHrcode() {
+		return hrcode;
+	}
+
+	public void setHrcode(String hrcode) {
+		this.hrcode = hrcode;
+	}
+
+	public String getStdTime() {
+		return stdTime;
+	}
+
+	public void setStdTime(String stdTime) {
+		this.stdTime = stdTime;
+	}
+
+	public int getEno() {
+		return eno;
+	}
+
+	public void setEno(int eno) {
+		this.eno = eno;
+	}
+
+	public int getState() {
+		return state;
+	}
+
+	public void setState(int state) {
+		this.state = state;
+	}
+
+	public String getHrTime() {
+		return hrTime;
+	}
+
+	public void setHrTime(String hrTime) {
+		this.hrTime = hrTime;
+	}
+
+	public String getOverTime() {
+		return overTime;
+	}
+
+	public void setOverTime(String overTime) {
+		this.overTime = overTime;
+	}
+
+	public Date getOnTime() {
+		return onTime;
+	}
+
+	public void setOnTime(Date onTime) {
+		this.onTime = onTime;
+	}
+
+	public Date getOffTime() {
+		return offTime;
+	}
+
+	public void setOffTime(Date offTime) {
+		this.offTime = offTime;
+	}
+
+	public String getOnTimeStr() {
+		return onTimeStr;
+	}
+
+	public void setOnTimeStr(String onTimeStr) {
+		this.onTimeStr = onTimeStr;
+	}
+
+	public String getOffTimeStr() {
+		return offTimeStr;
+	}
+
+	public void setOffTimeStr(String offTimeStr) {
+		this.offTimeStr = offTimeStr;
+	}
+
+	public String getHrDate() {
+		return hrDate;
+	}
+
+	public void setHrDate(String hrDate) {
+		this.hrDate = hrDate;
+	}
+
+	public int getReqChange() {
+		return reqChange;
+	}
+
+	public void setReqChange(int reqChange) {
+		this.reqChange = reqChange;
+	}
+
+	public String getWeekDate() {
+		return weekDate;
+	}
+
+	public void setWeekDate(String weekDate) {
+		this.weekDate = weekDate;
+	}
+
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this, ToStringStyle.JSON_STYLE);
+	}
+
+
+
+}

@@ -1,0 +1,72 @@
+package kr.or.warehouse.service;
+
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+
+import kr.or.warehouse.command.Criteria;
+import kr.or.warehouse.controller.view.OrganizationNode;
+import kr.or.warehouse.dto.AttachVO;
+import kr.or.warehouse.dto.DepartmentVO;
+import kr.or.warehouse.dto.FieldVO;
+import kr.or.warehouse.dto.SignDocVO;
+import kr.or.warehouse.dto.SignLineGrVO;
+
+public interface NewApprovalService {
+
+	// 관련문서
+	Map<String, Object> getRelatedDocList(Criteria cri, String sformno) throws SQLException;
+
+	// 참조자 리스트
+	Map<String, Object> getRefLineList(Criteria cri) throws SQLException;
+
+	// 조직도
+	public List<OrganizationNode> organization(List<DepartmentVO> depList) throws Exception;
+
+	// 조직도 부서
+	Map<String, Object> getDeptName(Criteria cri, int eno) throws SQLException;
+
+	// 로그인한 사원 정보
+	Map<String, Object> getContactList(Criteria cri, int eno) throws SQLException;
+
+	// 문서정보
+	Map<String, Object> getSignDocNo() throws SQLException;
+
+	// 결재문서 저장
+	void registSignDoc(SignDocVO signDoc, List<String> signerMemberList) throws SQLException, Exception;
+
+	// 결재선 리스트
+	Map<String, Object> getSignLineList(Criteria cri, int dno) throws SQLException;
+
+	// 개인결재선 그룹 저장
+	String registSignGr(SignLineGrVO signLineGr, int eno, List<String> signerMemberList) throws SQLException;
+
+	// 개인결재선 그룹 리스트
+	Map<String, Object> getSignLineGr(int eno) throws SQLException;
+
+	// 개인결재선 그룹에 속한 사원리스트
+	Map<String, Object> getMySignMemberList(String signGroupNo) throws SQLException;
+
+	// 개인결재선 그룹 삭제
+	void removeSignGr(String signGroupNo) throws SQLException;
+
+	// 첨부파일
+	// 첨부파일 조회
+	AttachVO getMailAttachByMaNo(String maNo) throws SQLException;
+
+	// 문서함 필드설정
+	List<FieldVO> getFieldSetting(int eno) throws SQLException;
+	void insertFieldSetting(FieldVO field) throws SQLException;
+	void deleteField(int eno) throws SQLException;
+	
+
+	// 결재문서함 리스트
+	Map<String, Object> getApproveList(Criteria cri, int eno, int state) throws SQLException;
+	
+	// 기안문서함 리스트
+	Map<String, Object> getDraftList(Criteria cri, int eno, int state) throws SQLException;
+	
+	// 기안문서함 리스트
+	Map<String, Object> getTempList(Criteria cri, int eno, int state) throws SQLException;
+
+}

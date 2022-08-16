@@ -1,0 +1,93 @@
+package kr.or.warehouse.dto;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
+public class WorkReplyVO {
+
+	private String wrno      ;
+	private String wrContent ;
+	private String wrRegdate ;
+	private String updateDate;
+	private String wcode     ;
+	private String eno       ;
+	private String wrRno     ;
+
+
+	public String getWrno() {
+		return wrno;
+	}
+
+
+	public void setWrno(String wrno) {
+		this.wrno = wrno;
+	}
+
+
+	public String getWrContent() {
+		return wrContent;
+	}
+
+
+	public void setWrContent(String wrContent) {
+		this.wrContent = wrContent;
+	}
+
+
+	public String getWrRegdate() {
+		return wrRegdate;
+	}
+
+
+	public void setWrRegdate(String wrRegdate) {
+		this.wrRegdate = wrRegdate;
+	}
+
+
+	public String getUpdateDate() {
+		return updateDate;
+	}
+
+
+	public void setUpdateDate(String updateDate) {
+		this.updateDate = updateDate;
+	}
+
+
+	public String getWcode() {
+		return wcode;
+	}
+
+
+	public void setWcode(String wcode) {
+		this.wcode = wcode;
+	}
+
+
+	public String getEno() {
+		return eno;
+	}
+
+
+	public void setEno(String eno) {
+		this.eno = eno;
+	}
+
+
+	public String getWrRno() {
+		return wrRno;
+	}
+
+
+	public void setWrRno(String wrRno) {
+		this.wrRno = wrRno;
+	}
+
+
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this, ToStringStyle.JSON_STYLE);
+	}
+
+
+}

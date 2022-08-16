@@ -1,0 +1,73 @@
+package kr.or.warehouse.controller.view;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+
+import kr.or.warehouse.command.Criteria;
+import kr.or.warehouse.dto.EmployeeVO;
+import kr.or.warehouse.dto.MentoringVO;
+import kr.or.warehouse.dto.SubMentoringVO;
+import kr.or.warehouse.service.EmployeeService;
+import kr.or.warehouse.service.HrService;
+import kr.or.warehouse.service.MentoringService;
+
+
+@Controller
+@RequestMapping("/mentoring")
+public class MentoringController {
+	@Autowired
+	private MentoringService mentoringService;
+	@Autowired
+	private HrService hrService;
+
+
+		@RequestMapping("/main")
+		public ModelAndView main(Criteria cri, ModelAndView mnv, HttpServletRequest request)throws Exception{
+			String url="mentoring/main";
+
+			HttpSession session = request.getSession();
+			EmployeeVO loginUser = (EmployeeVO)session.getAttribute("loginUser");
+			int eno = loginUser.getEno();
+
+			EmployeeVO employee=hrService.getEmp(eno);
+//			Map<String, Object> mentoList = mentoringService.getMyMentoList(cri,eno);
+//			Map<String, Object> menteeList = mentoringService.getMyMenteeList(cri, eno);
+			List<SubMentoringVO> mentoList = mentoringService.getMyMentoList(eno);
+			List<MentoringVO> menteeList = mentoringService.getMyMenteeList(eno);
+			List<MentoringVO> rankList = mentoringService.getMentoRank();
+
+			mnv.addObject("employee", employee);
+			mnv.addObject("mentoList", mentoList);
+			mnv.addObject("menteeList", menteeList);
+			mnv.addObject("rankList", rankList);
+			mnv.setViewName(url);
+
+			return mnv;
+		}
+
+		@RequestMapping("/registForm")
+		public String registForm()throws Exception{
+			String url="mentoring/apply";
+			return url;
+		}
+
+		@RequestMapping("/mento")
+		public void mento(){
+		}
+		@RequestMapping("/mentoDetail")
+		public void mentoDetail(){
+		}
+
+		@RequestMapping("/mentee")
+		public void mentee(){
+		}
+	}
+

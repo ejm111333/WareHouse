@@ -1,0 +1,66 @@
+package kr.or.warehouse.dto;
+
+import java.util.Date;
+
+public class CommunityVO {
+	private String cmno;
+	private String cname;
+	private String intro;
+	private int open;
+	private int eno;
+	private int approve;
+	private Date regDate;
+	private String name;
+	
+	
+	public String getCmno() {
+		return cmno;
+	}
+	public void setCmno(String cmno) {
+		this.cmno = cmno;
+	}
+	public String getCname() {
+		return cname;
+	}
+	public void setCname(String cname) {
+		this.cname = cname;
+	}
+	public String getIntro() {
+		return intro;
+	}
+	public void setIntro(String intro) {
+		this.intro = intro;
+	}
+	public int getOpen() {
+		return open;
+	}
+	public void setOpen(int open) {
+		this.open = open;
+	}
+	public int getEno() {
+		return eno;
+	}
+	public void setEno(int eno) {
+		this.eno = eno;
+	}
+	public int getApprove() {
+		return approve;
+	}
+	public void setApprove(int approve) {
+		this.approve = approve;
+	}
+	public Date getRegDate() {
+		return regDate;
+	}
+	public void setRegDate(Date regDate) {
+		this.regDate = regDate;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	
+}

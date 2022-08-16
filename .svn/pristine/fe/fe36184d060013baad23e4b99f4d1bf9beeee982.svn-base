@@ -1,0 +1,171 @@
+package kr.or.warehouse.controller.view;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import kr.or.warehouse.command.Criteria;
+import kr.or.warehouse.controller.rest.GetAttachesByMultipartFileAdatpter;
+import kr.or.warehouse.dto.AttachVO;
+import kr.or.warehouse.dto.EmployeeVO;
+import kr.or.warehouse.dto.MailVO;
+import kr.or.warehouse.dto.MtoVO;
+import kr.or.warehouse.service.MailService;
+
+@Controller
+@RequestMapping("/mail")
+public class MailController {
+
+	@Autowired
+	private MailService mailService;
+
+	@Resource(name = "fileUploadPath")
+	private String fileUploadPath;
+
+	@RequestMapping("/main")
+	public ModelAndView mail(Criteria cri, ModelAndView mnv, HttpServletRequest request) throws Exception {
+		String url = "/mail/main";
+
+		// session에서 eno 가져오기
+		HttpSession session = request.getSession();
+		EmployeeVO loginUser = (EmployeeVO) session.getAttribute("loginUser");
+		int eno = loginUser.getEno();
+
+		Map<String, Object> dataMap = mailService.getMailList(cri, eno);
+		mnv.addObject("dataMap", dataMap);
+		mnv.setViewName(url);
+
+		return mnv;
+	}
+
+	@RequestMapping("/sendMail")
+	public ModelAndView sendMail(Criteria cri, ModelAndView mnv, HttpServletRequest request) throws Exception {
+		String url = "/mail/sendMail";
+
+		// session에서 eno 가져오기
+		HttpSession session = request.getSession();
+		EmployeeVO loginUser = (EmployeeVO) session.getAttribute("loginUser");
+		int eno = loginUser.getEno();
+
+		Map<String, Object> dataMap = mailService.getSendMailList(cri, eno);
+//		System.out.println(dataMap.get("SendMailList"));
+		mnv.addObject("dataMap", dataMap);
+		mnv.setViewName(url);
+
+		return mnv;
+	}
+
+	@RequestMapping("/tempMail")
+	public ModelAndView tempMail(Criteria cri, ModelAndView mnv, HttpServletRequest request) throws Exception {
+		String url = "/mail/tempMail";
+
+		// session에서 eno 가져오기
+		HttpSession session = request.getSession();
+		EmployeeVO loginUser = (EmployeeVO) session.getAttribute("loginUser");
+		int eno = loginUser.getEno();
+
+		Map<String, Object> dataMap = mailService.getTempMailList(cri, eno);
+//		System.out.println(dataMap.get("imporMailList"));
+		mnv.addObject("dataMap", dataMap);
+		mnv.setViewName(url);
+
+		return mnv;
+	}
+
+	@RequestMapping("/importantMail")
+	public ModelAndView importantMail(Criteria cri, ModelAndView mnv, HttpServletRequest request) throws Exception {
+		String url = "/mail/importantMail";
+
+		// session에서 eno 가져오기
+		HttpSession session = request.getSession();
+		EmployeeVO loginUser = (EmployeeVO) session.getAttribute("loginUser");
+		int eno = loginUser.getEno();
+
+		Map<String, Object> dataMap = mailService.getImporMailList(cri, eno);
+//		System.out.println(dataMap.get("imporMailList"));
+		mnv.addObject("dataMap", dataMap);
+		mnv.setViewName(url);
+
+		return mnv;
+	}
+
+	@RequestMapping("/trash")
+	public ModelAndView trash(Criteria cri, ModelAndView mnv, HttpServletRequest request) throws Exception {
+		String url = "/mail/trash";
+
+		// session에서 eno 가져오기
+		HttpSession session = request.getSession();
+		EmployeeVO loginUser = (EmployeeVO) session.getAttribute("loginUser");
+		int eno = loginUser.getEno();
+
+		Map<String, Object> dataMap = mailService.getTrashMailList(cri, eno);
+//		System.out.println(dataMap.get("trashMailList"));
+		mnv.addObject("dataMap", dataMap);
+		mnv.setViewName(url);
+
+		return mnv;
+	}
+
+	@RequestMapping("/toMeMail")
+	public ModelAndView toMeMail(Criteria cri, ModelAndView mnv, HttpServletRequest request) throws Exception {
+		String url = "/mail/toMeMail";
+
+		// session에서 eno 가져오기
+		HttpSession session = request.getSession();
+		EmployeeVO loginUser = (EmployeeVO) session.getAttribute("loginUser");
+		int eno = loginUser.getEno();
+
+		Map<String, Object> dataMap = mailService.getToMeMailList(cri, eno);
+//		System.out.println(dataMap.get("toMeMailList"));
+		mnv.addObject("dataMap", dataMap);
+		mnv.setViewName(url);
+
+		return mnv;
+	}
+
+	@RequestMapping("/registFormGo")
+	public String send() throws Exception {
+		String url = "/mail/registForm";
+		return url;
+	}
+
+	@RequestMapping(value = "/regist", method = RequestMethod.POST, produces = "text/plain; charset=utf-8")
+	public String regist(MailVO mail, MtoVO mto, HttpServletRequest request, RedirectAttributes rttr) throws Exception {
+		System.out.println("regist");
+		String url = "redirect:/mail/main.do";
+		
+		// session에서 eno 가져오기
+		HttpSession session = request.getSession();
+		EmployeeVO loginUser = (EmployeeVO) session.getAttribute("loginUser");
+		int eno = loginUser.getEno();
+		
+		// 발신자에 eno 넣어주기
+		mail.setmFrom(eno);
+		
+		String savePath = this.fileUploadPath;
+		List<AttachVO> attachList = GetAttachesByMultipartFileAdatpter.save(mail.getUploadFile(), savePath);
+		
+		mail.setTitle((String) request.getAttribute("XSSmailTitle"));
+		mail.setAttachList(attachList);
+		mailService.regist(mail, mto);
+
+		rttr.addFlashAttribute("from", "regist");
+
+		return url;
+	}
+	
+	@RequestMapping("/detail")
+	public void detail() throws Exception {
+	}
+
+}

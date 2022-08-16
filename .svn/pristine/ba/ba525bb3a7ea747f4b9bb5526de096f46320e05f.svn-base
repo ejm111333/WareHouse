@@ -1,0 +1,43 @@
+package kr.or.warehouse.dto;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
+public class PopularHashtagVO {
+	private String hashTag;
+	private int knowHowCnt;
+	private int ApprovalCnt;
+	private int cnt;
+	
+	public String getHashTag() {
+		return hashTag;
+	}
+	public void setHashTag(String hashTag) {
+		this.hashTag = hashTag;
+	}
+	public int getKnowHowCnt() {
+		return knowHowCnt;
+	}
+	public void setKnowHowCnt(int knowHowCnt) {
+		this.knowHowCnt = knowHowCnt;
+	}
+	public int getApprovalCnt() {
+		return ApprovalCnt;
+	}
+	public void setApprovalCnt(int approvalCnt) {
+		ApprovalCnt = approvalCnt;
+	}
+	public int getCnt() {
+		return cnt;
+	}
+	public void setCnt(int cnt) {
+		this.cnt = cnt;
+	}
+	
+	@Override
+	public String toString() {
+	      return ToStringBuilder.reflectionToString(this, ToStringStyle.JSON_STYLE);
+	}
+	
+	
+}

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Mentoring-Mapper">
+
+	<select id="selectMyMentee" parameterType="int" resultType="mentoring">
+		select
+			b.name, d.ppsname, b.condition
+		from
+			mentoring a, employee b, submentoring c, postposition d
+		where a.smno=c.smno
+		and c.eno=b.eno
+		and b.ppscode=d.ppscode
+		and a.mento=#{mento}
+        and a.approve=1
+	</select>
+
+	<select id="selectMyMenteeCount" resultType="int">
+		select
+			count(c.eno) as menteeCount
+		from
+			mentoring a, submentoring c, employee b
+		where a.smno=c.smno
+		and c.eno=b.eno
+		and a.mento=#{mento}
+		and a.approve=1
+	</select>
+
+	<select id="selectMyMento" parameterType="int" resultType="submentoring">
+		select
+			b.name, d.ppsname, b.condition
+		from
+			mentoring a, employee b, submentoring c, postposition d
+		where a.smno=c.smno
+		and a.mento=b.eno
+		and b.ppscode=d.ppscode
+		and c.eno=#{eno}
+        and a.approve=1
+	</select>
+
+	<select id="selectMyMentoCount" resultType="int">
+		select
+			count(b.eno) as mentoCount
+		from
+			mentoring a, submentoring c, employee b
+		where a.smno=c.smno
+		and a.mento=b.eno
+		and c.eno=#{eno}
+		and a.approve=1
+	</select>
+
+	<select id="selectMentoRank" resultType="mentoring">
+		select
+            count(a.mento) as count, b.name, c.ppsname, b.condition
+        from
+            mentoring a, employee b, postposition c
+        where a.mento = b.eno
+        and b.ppscode=c.ppscode
+        group by a.mento, b.name, c.ppsname, b.condition
+        order by count(a.mento) desc
+	</select>
+
+	<select id="subMentoringList" parameterType="int" resultType="submentoring">
+		select
+			b.name, d.ppsname, c.regDate
+		from
+			mentoring a, employee b, submentoring c, postposition d
+		where a.smno=c.smno
+		and c.eno=b.eno
+		and b.ppscode=d.ppscode
+		and a.mento=#{eno}
+	</select>
+
+	<select id="subMentoringListCount" resultType="int">
+		select
+			count(c.eno)
+		from
+			mentoring a, submentoring c
+		where a.smno=c.smno
+		and a.mento=#{eno}
+	</select>
+
+	<select id="endMentoringList" resultType="mentoring" parameterType="int">
+		select
+			b.name, d.ppsname, b.condition, a.startDate
+		from
+			mentoring a, employee b, submentoring c, postposition d
+		where a.smno=c.smno
+		and c.eno=b.eno
+		and b.ppscode=d.ppscode
+		and a.mento=#{mento}
+        and a.approve=1
+        union all
+        select
+			b.name, d.ppsname, b.condition, a.startDate
+		from
+			mentoring a, employee b, submentoring c, postposition d
+		where a.smno=c.smno
+		and a.mento=b.eno
+		and b.ppscode=d.ppscode
+		and c.eno=#{eno}
+        and a.approve=1
+	</select>
+
+	<select id="endMentoringListCount" resultType="int">
+		select
+			count(b.eno)
+		from
+			mentoring a, submentoring c, employee b
+		where a.mento=b.eno
+        and c.eno=b.eno
+		and a.mento=#{eno}
+		and c.eno=#{eno}
+	</select>
+
+
+</mapper>
+

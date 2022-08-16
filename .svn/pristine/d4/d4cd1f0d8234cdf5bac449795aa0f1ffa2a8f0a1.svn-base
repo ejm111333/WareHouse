@@ -1,0 +1,163 @@
+package kr.or.warehouse.dao;
+
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.session.RowBounds;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import kr.or.warehouse.command.Criteria;
+import kr.or.warehouse.dto.BoardVO;
+import kr.or.warehouse.dto.ContactgrVO;
+import kr.or.warehouse.dto.EmployeeVO;
+import kr.or.warehouse.dto.MycontactVO;
+
+@Repository
+public class ContactDAOImpl implements ContactDAO{
+
+	@Autowired
+	private SqlSession session;
+
+
+	@Override
+	public List<EmployeeVO> selectSearchContactList(Map<String, String> paramMap,RowBounds rowBounds) throws SQLException {
+		return session.selectList("Contact-Mapper.selectSearchContactList", paramMap,rowBounds);
+	}
+
+	@Override
+	public List<EmployeeVO> selectTeamContactList(Criteria cri, String dname) throws SQLException {
+		return session.selectList("Contact-Mapper.selectTeamContactList",dname);
+	}
+
+	@Override
+	public List<EmployeeVO> selectGroupInfoList(Criteria cri,String cogroupcode) throws SQLException {
+		return session.selectList("Contact-Mapper.selectGroupInfoList",cogroupcode);
+	}
+
+	@Override
+	public int selectSearchContactListCount(Criteria cri) throws SQLException {
+		return session.selectOne("Contact-Mapper.selectSearchContactListCount",cri);
+	}
+
+
+	//Gr
+
+	@Override
+	public String selectContactGrNo() throws SQLException {
+		return session.selectOne("Contact-Mapper.selectContactGrNo");
+	}
+
+
+	@Override
+	public void insertGroup(ContactgrVO contactgr) throws SQLException {
+		session.insert("Contact-Mapper.insertGroup",contactgr);
+	}
+
+	@Override
+	public void insertGrInfo(MycontactVO mycontact) throws SQLException {
+		session.insert("Contact-Mapper.insertGrInfo",mycontact);
+	}
+
+	@Override
+	public int selectEno(String cogroupcode) throws SQLException {
+		return session.selectOne("Contact-Mapper.selectEno",cogroupcode);
+	}
+
+
+	@Override
+	public List<EmployeeVO> selectGroupList(Criteria cri) throws SQLException {
+		return session.selectList("Contact-Mapper.selectGroupList", cri);
+	}
+
+
+	@Override
+	public List<EmployeeVO> selectPersonalList(Map<String, String> paramMap, RowBounds rowBounds) throws SQLException {
+		return session.selectList("Contact-Mapper.selectPersonalList", paramMap,rowBounds);
+	}
+
+	@Override
+	public void deleteGrEmployee(MycontactVO mycontact) throws SQLException {
+		 session.delete("Contact-Mapper.deleteGrEmployee",mycontact);
+	}
+
+	@Override
+	public void deleteGr(String cogroupcode) throws SQLException {
+		session.delete("Contact-Mapper.deleteGr",cogroupcode);
+	}
+
+	
+	
+	@Override
+	public List<EmployeeVO> selectDepartment(Map<String, Object> paramMap, RowBounds rowBounds) throws SQLException {
+		return session.selectList("Contact-Mapper.selectDepartment",paramMap,rowBounds);
+	}
+
+
+	//--------------------------  초성    ------------------------------
+
+	@Override
+	public List<EmployeeVO> selectGirstList(Criteria cri) throws SQLException {
+		return session.selectList("Contact-Mapper.selectGirstList");
+	}
+	@Override
+	public List<EmployeeVO> selectNirstList(Criteria cri) throws SQLException {
+		return session.selectList("Contact-Mapper.selectNirstList");
+	}
+	@Override
+	public List<EmployeeVO> selectDirstList(Criteria cri) throws SQLException {
+		return session.selectList("Contact-Mapper.selectDirstList");
+	}
+	@Override
+	public List<EmployeeVO> selectRirstList(Criteria cri) throws SQLException {
+		return session.selectList("Contact-Mapper.selectRirstList");
+	}
+	@Override
+	public List<EmployeeVO> selectMirstList(Criteria cri) throws SQLException {
+		return session.selectList("Contact-Mapper.selectMirstList");
+	}
+	@Override
+	public List<EmployeeVO> selectBirstList(Criteria cri) throws SQLException {
+		return session.selectList("Contact-Mapper.selectBirstList");
+	}
+	@Override
+	public List<EmployeeVO> selectXirstList(Criteria cri) throws SQLException {
+		return session.selectList("Contact-Mapper.selectXirstList");
+	}
+	@Override
+	public List<EmployeeVO> selectOirstList(Criteria cri) throws SQLException {
+		return session.selectList("Contact-Mapper.selectOirstList");
+	}
+	@Override
+	public List<EmployeeVO> selectJirstList(Criteria cri) throws SQLException {
+		return session.selectList("Contact-Mapper.selectJirstList");
+	}
+	@Override
+	public List<EmployeeVO> selectCirstList(Criteria cri) throws SQLException {
+		return session.selectList("Contact-Mapper.selectCirstList");
+	}
+	@Override
+	public List<EmployeeVO> selectCairstList(Criteria cri) throws SQLException {
+		return session.selectList("Contact-Mapper.selectCairstList");
+	}
+	@Override
+	public List<EmployeeVO> selectTirstList(Criteria cri) throws SQLException {
+		return session.selectList("Contact-Mapper.selectTirstList");
+	}
+	@Override
+	public List<EmployeeVO> selectPirstList(Criteria cri) throws SQLException {
+		return session.selectList("Contact-Mapper.selectPirstList");
+	}
+	@Override
+	public List<EmployeeVO> selectHirstList(Criteria cri) throws SQLException {
+		return session.selectList("Contact-Mapper.selectHirstList");
+	}
+
+
+
+
+
+}

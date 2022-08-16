@@ -1,0 +1,10 @@
+file.upload=c:/warehouse/file/upload
+#member.picture.upload=c:/member/picture/upload/
+#error.log=c:/error_log/
+summernote.img=c:/warehouse/summernote/images
+login.user.log=c:/warehouse/log/loginUser
+hr.user.log=c:/warehouse/log/hr
+#pds.user.save=../webapp/file/pds/user
+#pds.allEmp.save=../webapp/file/pds/allEmp
+pds.user.save=c:/warehouse/pds/user
+pds.allEmp.save=c:/warehouse/pds/allEmp

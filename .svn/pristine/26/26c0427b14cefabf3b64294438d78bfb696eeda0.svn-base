@@ -1,0 +1,74 @@
+package kr.or.warehouse.controller.view;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+
+import kr.or.warehouse.dto.CommunityVO;
+import kr.or.warehouse.service.CommunityService;
+
+@Controller
+@RequestMapping("/community")
+public class CommnuityConrtoller {
+
+	@Autowired
+	private CommunityService communityService;
+	
+	@RequestMapping("/main")
+	public void main()throws Exception{}
+
+	@RequestMapping("/detail")
+	public ModelAndView detail(String cmno, int eno, ModelAndView mnv)throws Exception{
+		String url ="/community/detail";
+		
+		CommunityVO community = communityService.getCommunity(cmno,eno);
+		
+		mnv.addObject("community", community);
+		mnv.setViewName(url);
+		
+		return mnv;
+		
+	}
+
+	@RequestMapping("/commuRegistGo")
+	public void commuRegistGo()throws Exception{}
+
+	@RequestMapping("/commuApproval")
+	public void commuApproval()throws Exception{}
+
+	@RequestMapping("/commuSub")
+	public String commuSub(){
+		String url = "/community/commuSub";
+		return url;
+	}
+
+	@RequestMapping("/commuInviteForm")
+	public void commuInviteForm(){}
+
+	@RequestMapping("/boardGo")
+	public String boardGo(){
+		String url = "/community/board";
+		return url;
+	}
+
+	@RequestMapping("/boardRegistForm")
+	public void boardRegistForm()throws Exception{}
+
+	@RequestMapping("/boardDetail")
+	public void boardDetail()throws Exception{}
+
+	@RequestMapping("/boardModifyForm")
+	public void boardModifyForm()throws Exception{}
+
+	@RequestMapping("/management")
+	public void management()throws Exception{}
+
+	@RequestMapping("/organizationForm")
+	public String organization()throws Exception{
+		String url = "/community/organization";
+		return url;
+
+	}
+
+}

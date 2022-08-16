@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="NewApproval-Mapper">
+
+	<!-- 관련문서 리스트-->
+	<select id="selectRelatedDocList" resultType="signDoc">
+
+		select
+		    b.name
+		   ,a.title
+		   ,c.ppsname
+		   ,b.photo
+		from
+		    signdoc a, employee b, postposition c, signform d
+		where a.eno = b.eno
+		and b.ppscode = c.ppscode
+		and a.sformno = d.sformno
+		<!-- and a.sformno = 'SF000002'  문서 양식 종류-->
+	</select>
+
+
+
+	<!-- 참조자 -->
+	<select id="selectRefLineList" resultType="employee">
+		select  c.name,
+		        d.dname,
+		        e.ppsname,
+		        c.photo
+
+		from  signref a, signdoc b, employee c, department d, postposition e
+		where a.signno = b.signno
+		and a.eno = c.eno
+		and c.dno =d.dno
+		and c.ppscode = e.ppscode
+	</select>
+
+
+
+  <!-- 모달 조직도 부서 이름 찾기 -->
+	<select id="selectDeptName" resultType="signDoc">
+		select
+                b.eno,
+			   b.name ,
+			   c.ppsname,
+			   a.dname
+
+		FROM department a, employee b,  postposition c
+		where a.dno = b.dno
+		and b.PPSCODE = c.PPSCODE
+		and b.eno = #{eno}
+	</select>
+
+
+	<!-- 결재양식코드 -->
+	<select id="selectSignForm" resultType="signForm">
+		select
+		    sformno
+		   ,formtext
+		FROM
+		    signform
+		where sformno=#{sformno}
+	</select>
+
+
+	
+  <!-- 결재선 번호  -->
+	<select id="selectSignLineNo" resultType="String">
+		SELECT 'SL' ||
+		trim(nvl(max(to_char(to_number(substr(SIGNLINENO,3))+1,'000000')),'000001'))
+		as SIGNLINENO
+		from SIGNLINE
+
+		union
+
+		select nvl(null,'SL000001') as SIGNLINENO
+		from
+		dual
+		where not exists (select SIGNLINENO
+		from SIGNLINE)
+	</select>
+	
+	<!-- 결재선 리스트 -->
+	<select id="selectSignLineList" resultType="signline">
+
+		 SELECT
+			 d.name
+			,d.photo
+			,e.ppsname
+			,f.dname
+			,a.signstate
+			,a.signrank
+		
+		FROM 	signer a, signline b, signdoc c, employee d,postposition e, department f
+		where	 a.signlineno = b.signlineno
+		and		 b.signno = c.SIGNNO
+		and		 a.eno = d.eno
+		and 	d.PPSCODE = e.PPSCODE
+		and 	d.dno = f.dno
+		and	 c.sformno = #{sFormNo}
+		and	 f.dno = #{dno}
+		order by a.signrank desc
+	</select>
+
+
+
+
+
+  <!-- 결재선 저장 -->
+  <update id="insertSignLine" parameterType="signline">
+  	insert into signline (
+    signlineno,
+    signrank,
+    eno,
+    signno,
+    state,
+    signdate
+	) values (
+	   #{signlineno},#{signrank},#{eno},#{signno},0,''
+	)
+  </update>
+	
+</mapper>

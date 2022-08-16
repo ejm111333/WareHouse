@@ -1,0 +1,80 @@
+package kr.or.warehouse.dao;
+
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+
+import kr.or.warehouse.command.Criteria;
+import kr.or.warehouse.dto.MentoringVO;
+import kr.or.warehouse.dto.SubMentoringVO;
+import kr.or.warehouse.dto.WorkVO;
+
+public interface MentoringDAO {
+	String selectPhoto(int eno) throws SQLException;
+
+	//나의 멘토목록
+	List<SubMentoringVO> selectMyMento(int eno) throws Exception; //main(동기)
+	List<SubMentoringVO> selectMyMento(Criteria cri, int eno) throws Exception;//(비동기)
+	int selectMyMentoCount(Criteria cri, int eno) throws Exception;
+	int selectMyMentoCount(int eno) throws Exception;
+
+	//나의 멘티목록
+	List<SubMentoringVO> selectMyMentee(int eno) throws Exception;//main(동기)
+	List<SubMentoringVO> selectMyMentee(Criteria cri, int eno) throws Exception;//(비동기)
+	int selectMyMenteeCount(Criteria cri, int eno) throws Exception;
+	MentoringVO selectMenteeDate(int eno) throws Exception;
+
+	//인기멘토목록
+	List<SubMentoringVO> selectMentoRank() throws Exception;
+
+	//나를 멘토로 신청한 목록
+	List<SubMentoringVO> subMentoringList(Criteria cri, int eno) throws Exception;
+	int subMentoringListCount(Criteria cri, int eno) throws Exception;
+	SubMentoringVO subMenteeDetail(String smno)throws Exception;
+
+	//멘토링 수락
+	void acceptMentoring(MentoringVO mentoring) throws Exception;
+	String selectMtno() throws Exception;
+
+	//만료직전 멘토링
+	List<SubMentoringVO> endMentoringList(Criteria cri, int eno) throws Exception;
+	int endMentoringListCount(Criteria cri, int eno) throws Exception;
+	void exdateApply(SubMentoringVO subMentoring)throws Exception;
+
+	//나의 업무 목록
+	List<WorkVO> myWorkList(int eno) throws Exception;
+
+	//멘토링 신청
+	void applyMentoring(SubMentoringVO subMentoring) throws Exception;
+	int subMentoring(int mento, int mentee) throws Exception;
+	String selectSmno() throws Exception;
+
+	//나의 멘토 업무 목록
+	List<SubMentoringVO> myMentoWorkList(Criteria cri, int eno) throws Exception;
+	int myMentoWorkListCount(Criteria cri, int eno) throws Exception;
+
+	//나의 멘토 결재문서 목록
+	List<SubMentoringVO> myMentoDocList(Criteria cri, int eno) throws Exception;
+	int myMentoDocListCount(Criteria cri, int eno) throws Exception;
+
+	//멘토링 종료
+	void endMentoring(String mtno) throws Exception;
+
+	//나의 멘티 업무 목록
+	List<SubMentoringVO> myMenteeWorkList(Criteria cri, int eno) throws Exception;
+	int myMenteeWorkListCount(Criteria cri, int eno) throws Exception;
+
+	//나의 멘티 결재문서 목록
+	List<SubMentoringVO> myMenteeDocList(Criteria cri, int eno) throws Exception;
+	int myMenteeDocListCount(Criteria cri, int eno) throws Exception;
+
+	//나의 멘토업무 등록 목록
+	List<SubMentoringVO> sysdateMentoWork(int eno) throws Exception;
+
+	//나의 멘티업무 등록 목록
+	List<SubMentoringVO> sysdateMenteeWork(int eno) throws Exception;
+
+	List<SubMentoringVO> sysdateMentoringAllWork(int eno) throws Exception;
+
+
+}

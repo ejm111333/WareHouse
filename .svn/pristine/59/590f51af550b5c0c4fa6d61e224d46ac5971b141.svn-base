@@ -1,0 +1,76 @@
+package kr.or.warehouse.dao;
+
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.session.RowBounds;
+import org.apache.ibatis.session.SqlSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import kr.or.warehouse.command.Criteria;
+import kr.or.warehouse.dto.EmployeeVO;
+import kr.or.warehouse.dto.SignDocVO;
+import kr.or.warehouse.dto.SignFormVO;
+import kr.or.warehouse.dto.SignLineVO;
+
+@Repository
+public class NewApprovalDAOImpl implements NewApprovalDAO{
+
+	@Autowired
+	private SqlSession session;
+
+	//관련문서
+	@Override
+	public List<SignDocVO> selectRelatedDocList(Map<String, String> paramMap, RowBounds rowBounds) throws SQLException {
+		return session.selectList("NewApproval-Mapper.selectRelatedDocList", paramMap, rowBounds);
+	}
+
+	//참조자 리스트
+	@Override
+	public List<EmployeeVO> selectRefLineList(Map<String, String> paramMap, RowBounds rowBounds) throws SQLException {
+		return session.selectList("NewApproval-Mapper.selectRefLineList", paramMap,rowBounds);
+	}
+
+	//조직도 부서 찾기
+	@Override
+	public List<SignDocVO> selectDeptName(Criteria cri, int eno) throws SQLException {
+		return session.selectList("NewApproval-Mapper.selectDeptName", eno);
+	}
+	
+	//결재선 리스트
+	@Override
+	public List<SignLineVO> selectSignLineList(Map<String, Object> paramMap) throws SQLException {
+		return session.selectList("NewApproval-Mapper.selectSignLineList", paramMap);
+	}
+	
+		
+		
+	
+	
+	
+
+	//결재양식 코드
+	@Override
+	public List<SignFormVO> selectSignForm(Map<String, Object> sformno) throws SQLException {
+		return session.selectList("NewApproval-Mapper.selectSignForm", sformno);
+	}
+		
+	
+	
+		
+		
+	//결재선 저장
+	@Override
+	public void insertSignLine(SignLineVO signLine) throws SQLException {
+		session.insert("NewApproval-Mapper.insertSignLine",signLine);
+	}
+
+
+	
+
+	
+
+
+}

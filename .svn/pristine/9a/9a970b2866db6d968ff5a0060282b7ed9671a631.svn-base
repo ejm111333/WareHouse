@@ -1,0 +1,50 @@
+package kr.or.warehouse.dao;
+
+import java.sql.SQLException;
+import java.util.List;
+
+import org.apache.ibatis.session.SqlSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import org.springframework.web.bind.annotation.SessionAttribute;
+
+import kr.or.warehouse.command.Criteria;
+import kr.or.warehouse.dto.ContactgrVO;
+import kr.or.warehouse.dto.EmployeeVO;
+
+@Repository
+public class ContactgrDAOImpl implements ContactgrDAO{
+
+	@Autowired
+	private SqlSession session;
+
+	@Override
+	public String selectContactGrNo() throws SQLException {
+		return session.selectOne("Contact-Mapper.selectContactGrNo");
+	}
+
+
+	@Override
+	public void insertGroup(ContactgrVO contactgr) throws SQLException {
+		System.out.println("contagr dao");
+		session.insert("Contact-Mapper.insertGroup",contactgr);
+
+	}
+
+	@Override
+	public int selectEno(String cogroupcode) throws SQLException {
+		System.out.println("congroupcode");
+		return session.selectOne("Contact-Mapper.selectEno",cogroupcode);
+	}
+
+
+	@Override
+	public List<EmployeeVO> selectGroupList(Criteria cri) throws SQLException {
+		return session.selectList("Contact-Mapper.selectGroupList", cri);
+	}
+
+
+
+
+
+}

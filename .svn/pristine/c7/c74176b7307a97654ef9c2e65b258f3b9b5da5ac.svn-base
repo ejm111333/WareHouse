@@ -1,0 +1,182 @@
+package kr.or.warehouse.controller.view;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import kr.or.warehouse.command.Criteria;
+import kr.or.warehouse.dto.EmployeeVO;
+import kr.or.warehouse.dto.HrTypeVO;
+import kr.or.warehouse.dto.HrVO;
+import kr.or.warehouse.dto.PostPositionVO;
+import kr.or.warehouse.dto.VacationVO;
+import kr.or.warehouse.service.HrService;
+
+@Controller
+@RequestMapping("/ehr")
+public class EhrController {
+
+	@Autowired
+	private HrService hrService;
+
+	@RequestMapping("/main")
+	public ModelAndView main(ModelAndView mnv, HttpSession session) throws Exception {
+		String url = "ehr/main";
+
+		EmployeeVO loginUser = (EmployeeVO)session.getAttribute("loginUser");
+		int eno = loginUser.getEno();
+
+		List<HrVO> hrList = null;
+		HrTypeVO hrType = null;
+		Map<String, Object> calcHr = null;
+		EmployeeVO employee = null;
+
+		hrType = hrService.getHrType(eno);
+		calcHr = hrService.calcHr(eno);
+		employee = hrService.getEmp(eno);
+
+		mnv.addObject("hrType", hrType);
+		mnv.addObject("calcHr", calcHr);
+		mnv.addObject("standardDate", new Date());
+		mnv.addObject("employee", employee);
+		mnv.setViewName(url);
+
+		return mnv;
+	}
+
+	@RequestMapping("/teamList")
+	public void teamList() {}
+
+	@RequestMapping("/vacation")
+	public ModelAndView vacation(ModelAndView mnv, HttpServletRequest request, HttpSession session) throws Exception {
+		String url = "/ehr/vacation";
+
+		EmployeeVO loginUser = (EmployeeVO) session.getAttribute("loginUser");
+		int eno = loginUser.getEno();
+
+		EmployeeVO employee = hrService.getEmp(eno);
+
+		VacationVO vacation = null;
+		vacation = hrService.getVacation(eno);
+
+		List<Map<String, Date>> vacationPeriod = hrService.selectVacationPeriod(eno);
+
+
+		mnv.addObject("employee", employee);
+		mnv.addObject("vacation", vacation);
+		mnv.addObject("vacationPeriod", vacationPeriod);
+		mnv.setViewName(url);
+
+		return mnv;
+	}
+
+	@RequestMapping("/teamVacationList")
+	public void teamVacationList() {}
+
+	@RequestMapping("/teamHrList")
+	public ModelAndView teamHrList(Criteria cri, @RequestParam(defaultValue = "") String condition, ModelAndView mnv, HttpSession session)throws Exception {
+		String url="ehr/teamHrList";
+
+		System.out.println("condition : " + condition);
+		EmployeeVO loginUser = (EmployeeVO)session.getAttribute("loginUser");
+
+		Map<String, Object> dataMap = hrService.getSelectTeamHrList(cri, loginUser.getDno(), condition);
+
+		Map<String, Integer> countMap = new HashMap<String, Integer>();
+		int workingCount = hrService.selectTeamHrListCount(loginUser.getDno(), "업무중");
+		int workoffCount = hrService.selectTeamHrListCount(loginUser.getDno(), "업무종료");
+		int outCount = hrService.selectTeamHrListCount(loginUser.getDno(), "자리비움");
+
+		int allCount = hrService.selectTeamHrListAllCount(loginUser.getDno());
+
+		System.out.println("여기 : "+ workingCount + workoffCount + outCount);
+		countMap.put("workingCount", workingCount);
+		countMap.put("workoffCount", workoffCount);
+		countMap.put("outCount", outCount);
+
+		mnv.addObject("dataMap", dataMap);
+		mnv.addObject("countMap", countMap);
+		mnv.addObject("condition", condition);
+		mnv.addObject("allCount", allCount);
+		mnv.setViewName(url);
+		return mnv;
+	}
+
+	@RequestMapping("/teamHrDetail")
+	public ModelAndView teamHrCard(ModelAndView mnv, int eno)throws Exception {
+		String url="ehr/teamHrCard";
+
+		EmployeeVO hrDetail = hrService.getEmp(eno);
+		mnv.addObject("hrDetail",hrDetail);
+		mnv.setViewName(url);
+		return mnv;
+	}
+
+	@RequestMapping("/hrModifyForm")
+	public ModelAndView hrModifyForm(int eno, ModelAndView mnv)throws Exception{
+		String url="ehr/teamHrCardModify";
+
+		EmployeeVO hrDetail = hrService.getEmp(eno);
+
+		mnv.addObject("hrDetail",hrDetail);
+		mnv.setViewName(url);
+
+		return mnv;
+	}
+
+	@RequestMapping(value="/hrModify",method=RequestMethod.POST)
+	public String hrModify(EmployeeVO employee,HttpServletRequest request, RedirectAttributes rttr) throws Exception{
+
+		System.out.println("hrmodify con : " + employee);
+		String url = "redirect:/ehr/teamHrDetail.do";
+
+
+		hrService.modifyHr(employee);
+
+		rttr.addFlashAttribute("from","modify");
+		rttr.addAttribute("eno",employee.getEno());
+
+		return url;
+	}
+
+	@RequestMapping("/test")
+	public void test() {}
+
+	@RequestMapping("/hrCard")
+	public ModelAndView hrCard(ModelAndView mnv,  HttpServletRequest request) throws Exception{
+		String url = "ehr/hrCard";
+
+		HttpSession session = request.getSession();
+		EmployeeVO loginUser = (EmployeeVO)session.getAttribute("loginUser");
+		int eno = loginUser.getEno();
+
+		EmployeeVO emp = hrService.getEmp(eno);
+		List<PostPositionVO> postPostionList = hrService.getPostPositionList();
+
+		mnv.addObject("emp", emp);
+		mnv.addObject("postPostionList", postPostionList);
+		mnv.setViewName(url);
+
+		return mnv;
+	}
+
+	@RequestMapping("/workTypeForm")
+	public String workTypeForm() {
+		String url = "ehr/workType";
+
+		return url;
+	}
+
+}

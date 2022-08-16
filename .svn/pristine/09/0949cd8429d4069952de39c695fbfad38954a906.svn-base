@@ -1,0 +1,22 @@
+package kr.or.warehouse.dao;
+
+import java.sql.SQLException;
+
+import org.apache.ibatis.session.SqlSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import kr.or.warehouse.dto.ReportVO;
+
+@Repository
+public class ReportDAOImpl implements ReportDAO{
+
+	@Autowired
+	private SqlSession session;
+
+	@Override
+	public void insertReport(ReportVO report) throws SQLException {
+		session.insert("Report-Mapper.insertReport", report);
+	}
+
+}

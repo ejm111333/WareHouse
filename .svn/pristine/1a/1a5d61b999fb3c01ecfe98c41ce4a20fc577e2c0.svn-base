@@ -1,0 +1,12 @@
+package kr.or.warehouse.service;
+
+import java.sql.SQLException;
+
+import kr.or.warehouse.dto.EmployeeVO;
+
+public interface EmployeeService {
+	public EmployeeVO getEmployee(int eno) throws SQLException;
+
+	//void login(String eno, String pwd) throws NotFoundIdException, InvalidPasswordException, SQLException;
+
+}

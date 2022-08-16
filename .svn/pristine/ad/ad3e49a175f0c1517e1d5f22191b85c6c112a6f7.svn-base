@@ -1,0 +1,17 @@
+package kr.or.warehouse.dao;
+
+import java.sql.SQLException;
+import java.util.List;
+
+import kr.or.warehouse.dto.WorkVO;
+
+public interface HomeDAO {
+
+	public List<WorkVO> selectWaitMyWork(int eno) throws SQLException;
+	public List<WorkVO> selectCooperReqToMeList(int eno) throws SQLException;
+	public List<WorkVO> selectProxyReqToMeList(int eno) throws SQLException;
+
+	public List<WorkVO> selectToReqCooperReqList(int eno) throws SQLException;
+	public List<WorkVO> selectToReqProxyReqList(int eno) throws SQLException;
+	public List<WorkVO>selectToReqObjectionList(int eno) throws SQLException;
+}

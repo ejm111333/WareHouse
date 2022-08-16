@@ -1,0 +1,22 @@
+package kr.or.warehouse.service;
+
+import java.util.List;
+
+import kr.or.warehouse.dto.MentoringVO;
+import kr.or.warehouse.dto.SubMentoringVO;
+
+public interface MentoringService {
+	//나의 멘토목록
+	List<SubMentoringVO> getMyMentoList(int eno) throws Exception;
+	//나의 멘티목록
+	List<MentoringVO> getMyMenteeList(int eno) throws Exception;
+
+	//나를 멘토로 신청한 목록
+	List<SubMentoringVO> getSubMentoringList(int eno) throws Exception;
+
+	//인기멘토목록
+	List<MentoringVO> getMentoRank() throws Exception;
+
+
+
+}

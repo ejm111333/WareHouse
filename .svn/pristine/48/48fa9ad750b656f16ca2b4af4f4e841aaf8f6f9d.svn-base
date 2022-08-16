@@ -1,0 +1,305 @@
+<%@page import="java.util.List"%>
+<%@page import="kr.or.warehouse.dto.CalendarVO"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>	
+
+<c:set var="calendarList" value="${calendarList}" />
+	
+<head>
+<link href='/warehouse/resources/lib/main.css' rel='stylesheet' />
+<script src='/warehouse/resources/lib/main.js'></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src='https://cdn.jsdelivr.net/npm/moment@2.27.0/min/moment.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/@fullcalendar/moment@5.5.0/main.global.min.js'></script>
+<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/css/calendar.css">
+
+<style>
+.ko_event{
+	background: red !important;
+	border: none !important;
+}
+
+/* .fc-event-time{ */
+/* 	display: none; */
+/* } */
+
+.fc-day-sat a{
+	color: blue !important;
+}
+
+.fc-day-sun a{
+	color: red !important;
+}
+</style>
+
+<script>
+
+	document.addEventListener('DOMContentLoaded', function() {
+	    var calendarEl = document.getElementById('calendar');
+	    var calendar = new FullCalendar.Calendar(calendarEl, {
+            googleCalendarApiKey : 'AIzaSyAKpAiy1cDozwlaTgRSaWsrEUOoqFgxYpI',
+            
+	    	expandRows: true, // 화면에 맞게 높이 재설정        
+	    	slotMinTime: '00:00', // Day 캘린더에서 시작 시간        
+	    	slotMaxTime: '24:00', // Day 캘린더에서 종료 시간    
+// 	      	customButtons: { 
+// 	            myCustomButton: { 
+// 	                text: '', 
+// 	                click: function(event) { 
+// 	                  onSelectEvent(event); 
+// 	                } 
+// 	            } 
+// 	    	}, 
+	      	headerToolbar: { // 헤더에 표시할 툴바
+				start: 'dayGridMonth,timeGridWeek,timeGridDay,today',
+		        center: 'prev,title,next',
+ 		    	end: 'myCustomButton'
+	      	},
+	      	buttonText: { // 버튼 글자 커스텀
+	      		month : '월간',
+	      		week : '주간',
+	      		day : '일간'
+	      	},
+// 	      	locale : 'ko', // 한국어 설정
+// 			displayEventTime:false,//제목에 시간 같이 display 안되게 설정하는
+	      	initialView: 'dayGridMonth', // 초기 로드 될때 보이는 캘린더 화면(기본 설정: 달)
+	      	//initialDate: '2022-07-01', // 초기 날짜 설정 (설정하지 않으면 오늘 날짜가 보인다.)
+	      	navLinks: true, // 날짜를 선택하면 Day 캘린더나 Week 캘린더로 링크
+	      	selectable: true, // 달력 일자 드래그 설정 가능
+	      	dayMaxEvents: true, // 이벤트가 오버되면 높이 제한 (+ 몇 개식으로 표현)
+	      	nowIndicator: true, // 현재 시간 마크
+	      	droppable : true, 
+			editable : false, // 마우스 드래그로 일정 이동
+	      	selectMirror: true, // timeGrid view에서만 작동
+	      	titleFormat: 'YYYY - MM',
+	      	allDaySlot: true,
+	      	allDayText: '종일',
+	      	eventOrder: 'title',
+
+	      	select: function(arg) { // 캘린더에서 드래그로 이벤트 생성
+	      		// 날짜 가져오기
+	      		var sdate = new Date(arg.start);
+	      		console.log(sdate);
+	      		var formatted_date = sdate.getFullYear() + "/" + (sdate.getMonth() + 1) + "/" + sdate.getDate() + " " + sdate.getHours() + ":" + sdate.getMinutes();
+	      		
+	      		var year = sdate.getFullYear();
+	      		var month = sdate.getMonth() + 1;
+	      		if(month < 10){
+	      			month = '0' + month;
+	      		}
+	      		var date = sdate.getDate();
+	      		if(date < 10){
+	      			date = '0' + date;
+	      		}
+	      		var hour = sdate.getHours();
+	      		if(hour < 10){
+	      			hour = '0' + hour;
+	      		}
+	      		var minute = sdate.getMinutes();
+	      		if(minute < 10){
+	      			minute = '0' + minute;
+	      		}
+	      		
+	      		var result = year + "/" + month + "/" + date + " " + hour + ":" + minute;
+	      		console.log(result);
+	      		
+	      		
+	      		window.open('registForm.do?sdate='+result, '일정 등록',"scrollbars=yes,width=940, height=715, top=100, left=400, resizable=1, status=yes" );
+	      	},
+	      	
+// 			eventDrop : function(info) { // 이벤트를 드래그를 해 손을 놓았을 때
+// 				if (confirm("수정하시겠습니까?")) {
+// 					var msg = updateFunc(info);
+// 					alert(msg);
+// 				} else {
+// 					info.revert(); // 취소 시키기(없을 경우 무조건 이동이 이뤄진다.)
+// 				}
+// 			},
+	      	
+ 	      	eventClick: function(arg) {  
+ 	      		var ccode = arg.event.id;
+ 	      		window.open('detail.do?ccode=' + ccode,'일정 수정',"scrollbars=yes,width=940, height=715, top=100, left=400, resizable=1, status=yes" );
+	      	}, 
+	      	
+	      	events: [
+	      		$.ajax({
+	        		url: '<%=request.getContextPath()%>/calendar/getCalendar?eno=${loginUser.eno}',
+	        		type: "GET",
+	        		success: function(list){
+	        			for(var i = 0; i < list.length; i++){
+// 							if(list[i].catecode == 2)
+//                              	$('#company').val('#ffc107');
+// 							if(list[i].catecode == 3)
+//                              	$('#dept').val('#28a745');
+// 							if(list[i].catedetail == 1)
+//                             	 $('#company').val('rgb(197, 47, 247)');
+// 							if(list[i].catedetail == 2)
+//                             	 $('#company').val('#007bff');
+// 							if(list[i].catedetail == 3)
+//                             	 $('#company').val('#6c757d');
+                    
+	        				calendar.addEvent({
+// 	        					className : 'bar' //클래스 속성 부여
+	        					id : list[i].ccode,
+	        					title : list[i].title,
+	        					start : list[i].start,
+	        					end : list[i].end,
+	        					color : list[i].catecode == 2 ? '#ffc107' : list[i].catecode == 3 ? '#28a745' : '#007bff' 
+// 	        					color : list[i].catecode == 2 ? '#ffc107' : list[i].catecode == 3 ? '#28a745' : list[i].catedetail == 1 ? 'rgb(197, 47, 247)' : list[i].catedetail == 2 ? '#007bff' : '#6c757d'
+// 	        					,eventOrder  : list[i].important == 1 ? '1' : '0'
+	        				});
+	        			}
+	        			var event = calendar.getEvents();
+	        		}
+        	    })
+	      	],
+	      	
+            eventSources : [ // 한국 기념일 ko.south_korea 추가 
+                 { googleCalendarId : 'ko.south_korea#holiday@group.v.calendar.google.com'
+                , className : 'ko_event' } 
+            ],
+            
+            eventTimeFormat: { // like '14:30:00'
+                hour: '2-digit',
+                minute: '2-digit',
+                meridiem: false
+            },
+	    });
+	    calendar.render();
+	  });
+
+</script>
+
+
+</head>
+<body>
+<div class="wrapper" >
+	 <section class="content-header">
+		<div class="container-fluid">
+			<div class="row md-2">
+				<div class="col-sm-6">
+					<h3>내 일정</h3>
+				</div>
+			</div>
+		</div>
+	</section>
+	
+  	<!-- Main content -->
+    <section class="content container-fluid">
+		<div class="row justify-content-center">
+			<div class="col-md-12" >
+				<div class="card card-navy card-outline">
+					<div class="card-header">
+						<div class ="card-tools">
+							<div class="input-group input-group-sm" style="width: 200px; float: right;">
+								<input class="form-control" type="text" name="keyword" placeholder="검색어를 입력하세요" value="">
+								<span class="input-group-append">
+									<button class=" btn btn-dark" type="button" onclick="" data-card-widget="search">
+										<i class="fa fa-fw fa-search"></i>
+									</button>
+								</span>
+							</div>
+						</div>
+					</div><!--end card-header  -->
+					
+					<div class="card-body pad">
+						<div id='calendar'></div>
+					</div><!--end card-body  -->
+					<div class="card-footer" style="display:none">
+					
+					</div><!--end card-footer  -->
+				</div><!-- end card -->				
+			</div><!-- end col-md-12 -->
+		</div><!-- end row -->
+    </section>
+    <!-- /.content -->
+
+
+<input type="hidden" id="company" >
+<input type="hidden" id="dept">
+<input type="hidden" id="home">
+<input type="hidden" id="semina">
+<input type="hidden" id="lecture">
+
+</div>
+
+<script type="text/javascript">
+	
+	$(document).on('click', 'body > aside > div > ul > li:nth-child(2) > a', function(){
+		$(this).attr("href", "#");
+		regist();
+	})
+	
+	$('click', 'body > aside > div > ul > li:nth-child(2) > a').ready(function(){
+		var tmp = "";
+		tmp += "<div class='subCalendar'>";
+		tmp += "<ul class='checkCalendar' data-widget='treeview' role='menu' data-accordion='false'>";        
+		tmp += "<li style='margin-bottom: 10px;'><input class='form-check-input' type='checkbox' name='catecode3' id='catecode3' value='3' checked>회사일정";        
+		tmp += "<span class='bottom-0 end-0 badge rounded-circle bg-success p-1 ml-1' style='width:15px; height: 15px;'><span class='visually-hidden'></span></span></li>";  
+		tmp += "<li style='margin-bottom: 10px;'><input class='form-check-input' type='checkbox' name='catecode2' id='catecode2' value='2' checked>부서일정"; 
+		tmp += "<span class='bottom-0 end-0 badge rounded-circle bg-warning p-1 ml-1' style='width:15px; height: 15px;'><span class='visually-hidden'></span></span></li>";  
+		tmp += "<li style='margin-bottom: 10px;'><input class='form-check-input' type='checkbox' name='catecode1' id='catecode1' value='1' checked>개인일정"; 
+		tmp += "<span class='bottom-0 end-0 badge rounded-circle bg-primary p-1 ml-1' style='width:15px; height: 15px;'><span class='visually-hidden'></span></span></li>";  
+		
+// 		tmp += "<li style='margin-bottom: 10px;margin-left: -20px;'><button type='button' id='btn1'><i class='fas fa-chevron-up'></i></button>개인일정</li>";
+		
+// 		tmp += "<div class='subCalendar2' style='margin-left: 20px;'> ";
+// 		tmp += "<ul>";
+// 		tmp += "<li style='margin-bottom: 10px;'><input class='form-check-input' type='checkbox'  onchange='test1(this)' name='catecode1' id='catecode1' value='1' checked>재택근무";        
+// 		tmp += "<span class='bottom-0 end-0 badge rounded-circle p-1 ml-1' style='width:15px; height: 15px; background: purple;'><span class='visually-hidden'></span></span></li>";  
+// 		tmp += "<li style='margin-bottom: 10px;'><input class='form-check-input' type='checkbox'  onchange='test1(this)' name='catecode1' id='catecode1' value='1' checked>세미나";        
+// 		tmp += "<span class='bottom-0 end-0 badge rounded-circle bg-primary p-1 ml-1' style='width:15px; height: 15px;'><span class='visually-hidden'></span></span></li>";  
+// 		tmp += "<li style='margin-bottom: 10px;'><input class='form-check-input' type='checkbox'  onchange='test1(this)' name='catecode1' id='catecode1' value='1' checked>특강";        
+// 		tmp += "<span class='bottom-0 end-0 badge rounded-circle bg-secondary p-1 ml-1' style='width:15px; height: 15px;'><span class='visually-hidden'></span></span></li>";  
+// 		tmp += "</ul></div>";
+		
+		tmp += "</ul>"; 
+		tmp += "</div>";        
+		        
+		$('body > aside > div > ul ').after(tmp);
+		
+	})
+	
+	// 좌측 체크박스 
+	if($('input:checkbox[id="home"]').is(":checked") == true){
+	}
+
+ 	$(document).on('click','#btn1', function(){
+ 		if($(".fas").hasClass("fa-chevron-up") == true){
+			document.getElementById("btn1").innerHTML = "<i class='fas fa-chevron-down'></i>";
+			$('.subCalendar2').hide();
+ 		}else{ 			
+ 			document.getElementById("btn1").innerHTML = "<i class='fas fa-chevron-up'></i>";
+			$('.subCalendar2').show();
+ 		}
+ 		
+	})
+	
+	function regist() {
+		window.open('registForm.do','일정 등록',"scrollbars=yes,width=940, height=715, top=100, left=400, resizable=1, status=yes" );
+	}
+ 	
+ 	
+//  	var cateList = [];
+//  	$(".form-check-input").change(function(){
+//  		if($("input[type='checkbox']:checked").each(function(index){
+//  			console.log("aa");
+//  			var cate = $(".catecode").val();
+//  			cateList.append(cate);
+//  			console.log(cateList);
+//  			})
+//  		)
+//  	})
+	
+</script>
+
+<c:if test="${from eq 'regist'}" >
+	<script>
+		alert("등록되었습니다.");
+		window.close();
+ 		window.opener.location.reload();
+	</script>
+</c:if>
+
+</body>

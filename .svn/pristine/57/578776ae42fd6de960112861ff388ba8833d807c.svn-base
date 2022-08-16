@@ -1,0 +1,24 @@
+package kr.or.warehouse.dao;
+
+import java.sql.SQLException;
+import java.util.List;
+
+import org.apache.ibatis.session.SqlSessionException;
+
+import kr.or.warehouse.command.Criteria;
+import kr.or.warehouse.dto.EmployeeVO;
+
+public interface ContactDAO {
+
+	List<EmployeeVO> selectSearchContactList(Criteria cri) throws SQLException;
+
+	List<EmployeeVO> selectTeamContactList(Criteria cri, String dname) throws SQLException;
+
+
+	int selectSearchContactListCount(Criteria cri) throws SQLException;
+
+	//개인주소록 그룹 리스트 사원정보
+	List<EmployeeVO> selectGroupInfoList(Criteria cri, String cogroupcode) throws SQLException;
+
+
+}

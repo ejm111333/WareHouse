@@ -1,0 +1,24 @@
+package kr.or.warehouse.dao;
+
+import java.sql.SQLException;
+import java.util.List;
+
+import kr.or.warehouse.command.Criteria;
+import kr.or.warehouse.dto.ContactgrVO;
+import kr.or.warehouse.dto.EmployeeVO;
+
+public interface ContactgrDAO {
+
+
+	// 그룹 등록
+	void insertGroup(ContactgrVO contactgr) throws SQLException;
+	int selectEno(String cogroupcode)throws SQLException;
+
+	// 그룹 기본키 생성
+	String selectContactGrNo() throws SQLException;
+
+
+
+	//그룹 리스트
+	List<EmployeeVO> selectGroupList(Criteria cri) throws SQLException;
+}

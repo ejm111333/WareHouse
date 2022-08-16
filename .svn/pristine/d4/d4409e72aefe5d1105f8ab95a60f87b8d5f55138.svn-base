@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="Home-Mapper">
+  	<select id="selectWaitMyWork" resultType="work">
+  		SELECT
+			    a.wcode
+			    ,a.wtitle
+			    ,a.wdate
+			    ,a.wend
+			    ,a.wopen
+			    ,a.walarm
+			    ,a.wstatus
+			    ,a.wprogress
+			    ,a.classcode
+			    ,a.wcontent
+			    ,a.manager
+			    ,a.managerphoto
+			    ,b.eno as requestereno
+			    ,listagg(b.name||'('||c.dname||') '||d.ppsname, ',') WITHIN GROUP(ORDER BY rownum) as requester
+			    ,b.photo as requesterphoto
+			FROM (SELECT
+						     b.wcode as wcode
+						    ,b.wtitle as wtitle
+						    ,b.wdate as wdate
+						    ,b.wend as wend
+						    ,b.wopen as wopen
+						    ,b.walarm as walarm
+						    ,b.wprogress as wprogress
+						    ,b.wstatus as wstatus
+						    ,b.classcode as classcode
+						    ,b.wcontent as wcontent
+						    ,b.requester as requester
+						    ,listagg(c.name||'('||d.dname||') '||e.ppsname, ',') WITHIN GROUP(ORDER BY rownum) as manager
+						    ,listagg(c.photo, ',') WITHIN GROUP(ORDER BY rownum) as managerphoto
+						FROM workmanager a, (SELECT
+						                        a.wcode as wcode
+						                       ,a.wtitle as wtitle
+						                       ,a.wdate as wdate
+						                       ,a.wend as wend
+						                       ,a.wopen as wopen
+						                       ,a.walarm as walarm
+						                       ,a.eno as requester
+						                       ,a.wprogress as wprogress
+						                       ,a.wstatus as wstatus
+						                       ,a.classcode as classcode
+						                       ,a.wcontent as wcontent
+						                       FROM work a, workmanager b
+						                        WHERE a.wcode = b.wcode
+						                         AND b.eno = #{eno}
+						                         AND b.answer = '대기'
+						                         AND a.wstatus = '대기')b, employee c, department d, POSTPOSITION e
+						WHERE a.wcode = b.wcode
+						AND a.eno = c.eno
+						AND c.dno = d.dno
+						AND c.ppscode = e.ppscode
+						GROUP BY b.wcode,b.wtitle,b.wdate,b.wend ,b.wopen,b.walarm,b.requester,b.wprogress,b.wstatus,b.classcode
+						    ,b.wcontent
+						ORDER BY b.wend) a, employee b, department c, postposition d
+			WHERE a.requester = b.eno
+			AND b.dno = c.dno
+			AND b.ppscode = d.ppscode
+			group by a.wcode, a.wtitle, a.wdate, a.wend, a.wopen,
+			a.walarm, a.wstatus, a.classcode, a.wcontent, a.manager,a.wprogress,
+			a.managerphoto, b.eno, b.photo
+  	</select>
+
+  	<select id="selectCooperReqToMeList" resultType="work">
+  		SELECT
+			    a.wcode
+			    ,a.wtitle
+			    ,a.wdate
+			    ,a.wend
+			    ,a.wopen
+			    ,a.walarm
+			    ,a.wstatus
+			    ,a.wprogress
+			    ,a.classcode
+			    ,a.wcontent
+			    ,a.manager
+			    ,a.managerphoto
+			    ,b.eno as requestereno
+			    ,listagg(b.name||'('||c.dname||') '||d.ppsname, ',') WITHIN GROUP(ORDER BY rownum) as requester
+			    ,b.photo as requesterphoto
+			FROM (SELECT
+						     b.wcode as wcode
+						    ,b.wtitle as wtitle
+						    ,b.wdate as wdate
+						    ,b.wend as wend
+						    ,b.wopen as wopen
+						    ,b.walarm as walarm
+						    ,b.wprogress as wprogress
+						    ,b.wstatus as wstatus
+						    ,b.classcode as classcode
+						    ,b.wcontent as wcontent
+						    ,b.requester as requester
+						    ,listagg(c.name||'('||d.dname||') '||e.ppsname, ',') WITHIN GROUP(ORDER BY rownum) as manager
+						    ,listagg(c.photo, ',') WITHIN GROUP(ORDER BY rownum) as managerphoto
+						FROM workmanager a, (SELECT
+						                        a.wcode as wcode
+						                       ,a.wtitle as wtitle
+						                       ,a.wdate as wdate
+						                       ,a.wend as wend
+						                       ,a.wopen as wopen
+						                       ,a.walarm as walarm
+						                       ,a.eno as requester
+						                       ,a.wprogress as wprogress
+						                       ,a.wstatus as wstatus
+						                       ,a.classcode as classcode
+						                       ,a.wcontent as wcontent
+						                       FROM work a, workmanager b
+						                        WHERE a.wcode = b.wcode
+						                         AND b.eno = #{eno}
+						                         AND b.answer = '대기'
+						                         AND a.wstatus = '협업요청')b, employee c, department d, POSTPOSITION e
+						WHERE a.wcode = b.wcode
+						AND a.eno = c.eno
+						AND c.dno = d.dno
+						AND c.ppscode = e.ppscode
+						GROUP BY b.wcode,b.wtitle,b.wdate,b.wend ,b.wopen,b.walarm,b.requester,b.wprogress,b.wstatus,b.classcode
+						    ,b.wcontent
+						ORDER BY b.wend) a, employee b, department c, postposition d
+			WHERE a.requester = b.eno
+			AND b.dno = c.dno
+			AND b.ppscode = d.ppscode
+			group by a.wcode, a.wtitle, a.wdate, a.wend, a.wopen,
+			a.walarm, a.wstatus, a.classcode, a.wcontent, a.manager,a.wprogress,
+			a.managerphoto, b.eno, b.photo
+  	</select>
+
+  	<select id="selectProxyReqToMeList" resultType="work">
+  		SELECT
+			    a.wcode
+			    ,a.wtitle
+			    ,a.wdate
+			    ,a.wend
+			    ,a.wopen
+			    ,a.walarm
+			    ,a.wstatus
+			    ,a.wprogress
+			    ,a.classcode
+			    ,a.wcontent
+			    ,a.manager
+			    ,a.managerphoto
+			    ,b.eno as requestereno
+			    ,listagg(b.name||'('||c.dname||') '||d.ppsname, ',') WITHIN GROUP(ORDER BY rownum) as requester
+			    ,b.photo as requesterphoto
+			FROM (SELECT
+						     b.wcode as wcode
+						    ,b.wtitle as wtitle
+						    ,b.wdate as wdate
+						    ,b.wend as wend
+						    ,b.wopen as wopen
+						    ,b.walarm as walarm
+						    ,b.wprogress as wprogress
+						    ,b.wstatus as wstatus
+						    ,b.classcode as classcode
+						    ,b.wcontent as wcontent
+						    ,b.requester as requester
+						    ,listagg(c.name||'('||d.dname||') '||e.ppsname, ',') WITHIN GROUP(ORDER BY rownum) as manager
+						    ,listagg(c.photo, ',') WITHIN GROUP(ORDER BY rownum) as managerphoto
+						FROM workmanager a, (SELECT
+						                        a.wcode as wcode
+						                       ,a.wtitle as wtitle
+						                       ,a.wdate as wdate
+						                       ,a.wend as wend
+						                       ,a.wopen as wopen
+						                       ,a.walarm as walarm
+						                       ,a.eno as requester
+						                       ,a.wprogress as wprogress
+						                       ,a.wstatus as wstatus
+						                       ,a.classcode as classcode
+						                       ,a.wcontent as wcontent
+						                       FROM work a, workmanager b
+						                        WHERE a.wcode = b.wcode
+						                         AND b.eno = #{eno}
+						                         AND b.answer = '대기'
+						                         AND a.wstatus = '대리요청')b, employee c, department d, POSTPOSITION e
+						WHERE a.wcode = b.wcode
+						AND a.eno = c.eno
+						AND c.dno = d.dno
+						AND c.ppscode = e.ppscode
+						GROUP BY b.wcode,b.wtitle,b.wdate,b.wend ,b.wopen,b.walarm,b.requester,b.wprogress,b.wstatus,b.classcode
+						    ,b.wcontent
+						ORDER BY b.wend) a, employee b, department c, postposition d
+			WHERE a.requester = b.eno
+			AND b.dno = c.dno
+			AND b.ppscode = d.ppscode
+			group by a.wcode, a.wtitle, a.wdate, a.wend, a.wopen,
+			a.walarm, a.wstatus, a.classcode, a.wcontent, a.manager,a.wprogress,
+			a.managerphoto, b.eno, b.photo
+  	</select>
+
+  	<select id="selectToReqCooperReqList" resultType="work">
+  		SELECT
+			    a.wcode
+			    ,a.wtitle
+			    ,a.wdate
+			    ,a.wend
+			    ,a.wopen
+			    ,a.walarm
+			    ,a.wstatus
+			    ,a.wprogress
+			    ,a.classcode
+			    ,a.wcontent
+			    ,a.manager
+			    ,a.managerphoto
+			    ,b.eno as requestereno
+			    ,listagg(b.name||'('||c.dname||') '||d.ppsname, ',') WITHIN GROUP(ORDER BY rownum) as requester
+			    ,b.photo as requesterphoto
+			FROM (SELECT
+						     b.wcode as wcode
+						    ,b.wtitle as wtitle
+						    ,b.wdate as wdate
+						    ,b.wend as wend
+						    ,b.wopen as wopen
+						    ,b.walarm as walarm
+						    ,b.wprogress as wprogress
+						    ,b.wstatus as wstatus
+						    ,b.classcode as classcode
+						    ,b.wcontent as wcontent
+						    ,b.requester as requester
+						    ,listagg(c.name||'('||d.dname||') '||e.ppsname, ',') WITHIN GROUP(ORDER BY rownum) as manager
+						    ,listagg(c.photo, ',') WITHIN GROUP(ORDER BY rownum) as managerphoto
+						FROM workmanager a, (SELECT
+						                        a.wcode as wcode
+						                       ,a.wtitle as wtitle
+						                       ,a.wdate as wdate
+						                       ,a.wend as wend
+						                       ,a.wopen as wopen
+						                       ,a.walarm as walarm
+						                       ,a.eno as requester
+						                       ,a.wprogress as wprogress
+						                       ,a.wstatus as wstatus
+						                       ,a.classcode as classcode
+						                       ,a.wcontent as wcontent
+						                       FROM work a, workmanager b, cooperreq c
+						                        WHERE a.wcode = b.wcode
+                                                 AND a.wcode = c.wcode
+						                         AND a.eno = #{eno}
+						                         AND c.result = 0
+						                         AND a.wstatus = '협업요청')b, employee c, department d, POSTPOSITION e
+						WHERE a.wcode = b.wcode
+						AND a.eno = c.eno
+						AND c.dno = d.dno
+						AND c.ppscode = e.ppscode
+						GROUP BY b.wcode,b.wtitle,b.wdate,b.wend ,b.wopen,b.walarm,b.requester,b.wprogress,b.wstatus,b.classcode
+						    ,b.wcontent
+						ORDER BY b.wend) a, employee b, department c, postposition d
+			WHERE a.requester = b.eno
+			AND b.dno = c.dno
+			AND b.ppscode = d.ppscode
+			group by a.wcode, a.wtitle, a.wdate, a.wend, a.wopen,
+			a.walarm, a.wstatus, a.classcode, a.wcontent, a.manager,a.wprogress,
+			a.managerphoto, b.eno, b.photo
+  	</select>
+
+  	<select id="selectToReqProxyReqList" resultType="work">
+  		SELECT
+			    a.wcode
+			    ,a.wtitle
+			    ,a.wdate
+			    ,a.wend
+			    ,a.wopen
+			    ,a.walarm
+			    ,a.wstatus
+			    ,a.wprogress
+			    ,a.classcode
+			    ,a.wcontent
+			    ,a.manager
+			    ,a.managerphoto
+			    ,b.eno as requestereno
+			    ,listagg(b.name||'('||c.dname||') '||d.ppsname, ',') WITHIN GROUP(ORDER BY rownum) as requester
+			    ,b.photo as requesterphoto
+			FROM (SELECT
+						     b.wcode as wcode
+						    ,b.wtitle as wtitle
+						    ,b.wdate as wdate
+						    ,b.wend as wend
+						    ,b.wopen as wopen
+						    ,b.walarm as walarm
+						    ,b.wprogress as wprogress
+						    ,b.wstatus as wstatus
+						    ,b.classcode as classcode
+						    ,b.wcontent as wcontent
+						    ,b.requester as requester
+						    ,listagg(c.name||'('||d.dname||') '||e.ppsname, ',') WITHIN GROUP(ORDER BY rownum) as manager
+						    ,listagg(c.photo, ',') WITHIN GROUP(ORDER BY rownum) as managerphoto
+						FROM workmanager a, (SELECT
+						                        a.wcode as wcode
+						                       ,a.wtitle as wtitle
+						                       ,a.wdate as wdate
+						                       ,a.wend as wend
+						                       ,a.wopen as wopen
+						                       ,a.walarm as walarm
+						                       ,a.eno as requester
+						                       ,a.wprogress as wprogress
+						                       ,a.wstatus as wstatus
+						                       ,a.classcode as classcode
+						                       ,a.wcontent as wcontent
+						                       FROM work a, workmanager b, proxyreq c
+						                        WHERE a.wcode = b.wcode
+                                                 AND a.wcode = c.wcode
+						                         AND a.eno = #{eno}
+						                         AND c.result = 0
+						                         AND a.wstatus = '대리요청')b, employee c, department d, POSTPOSITION e
+						WHERE a.wcode = b.wcode
+						AND a.eno = c.eno
+						AND c.dno = d.dno
+						AND c.ppscode = e.ppscode
+						GROUP BY b.wcode,b.wtitle,b.wdate,b.wend ,b.wopen,b.walarm,b.requester,b.wprogress,b.wstatus,b.classcode
+						    ,b.wcontent
+						ORDER BY b.wend) a, employee b, department c, postposition d
+			WHERE a.requester = b.eno
+			AND b.dno = c.dno
+			AND b.ppscode = d.ppscode
+			group by a.wcode, a.wtitle, a.wdate, a.wend, a.wopen,
+			a.walarm, a.wstatus, a.classcode, a.wcontent, a.manager,a.wprogress,
+			a.managerphoto, b.eno, b.photo
+  	</select>
+
+  	<select id="selectToReqObjectionList" resultType="work">
+  		SELECT
+			    a.wcode
+			    ,a.wtitle
+			    ,a.wdate
+			    ,a.wend
+			    ,a.wopen
+			    ,a.walarm
+			    ,a.wstatus
+			    ,a.wprogress
+			    ,a.classcode
+			    ,a.wcontent
+			    ,a.manager
+			    ,a.managerphoto
+			    ,b.eno as requestereno
+			    ,listagg(b.name||'('||c.dname||') '||d.ppsname, ',') WITHIN GROUP(ORDER BY rownum) as requester
+			    ,b.photo as requesterphoto
+			FROM (SELECT
+						     b.wcode as wcode
+						    ,b.wtitle as wtitle
+						    ,b.wdate as wdate
+						    ,b.wend as wend
+						    ,b.wopen as wopen
+						    ,b.walarm as walarm
+						    ,b.wprogress as wprogress
+						    ,b.wstatus as wstatus
+						    ,b.classcode as classcode
+						    ,b.wcontent as wcontent
+						    ,b.requester as requester
+						    ,listagg(c.name||'('||d.dname||') '||e.ppsname, ',') WITHIN GROUP(ORDER BY rownum) as manager
+						    ,listagg(c.photo, ',') WITHIN GROUP(ORDER BY rownum) as managerphoto
+						FROM workmanager a, (SELECT
+						                        a.wcode as wcode
+						                       ,a.wtitle as wtitle
+						                       ,a.wdate as wdate
+						                       ,a.wend as wend
+						                       ,a.wopen as wopen
+						                       ,a.walarm as walarm
+						                       ,a.eno as requester
+						                       ,a.wprogress as wprogress
+						                       ,a.wstatus as wstatus
+						                       ,a.classcode as classcode
+						                       ,a.wcontent as wcontent
+						                       FROM work a, workmanager b, objection c
+						                        WHERE a.wcode = b.wcode
+                                                 AND a.wcode = c.wcode
+						                         AND a.eno = #{eno}
+						                         AND c.result = 0
+						                         )b, employee c, department d, POSTPOSITION e
+						WHERE a.wcode = b.wcode
+						AND a.eno = c.eno
+						AND c.dno = d.dno
+						AND c.ppscode = e.ppscode
+						GROUP BY b.wcode,b.wtitle,b.wdate,b.wend ,b.wopen,b.walarm,b.requester,b.wprogress,b.wstatus,b.classcode
+						    ,b.wcontent
+						ORDER BY b.wend) a, employee b, department c, postposition d
+			WHERE a.requester = b.eno
+			AND b.dno = c.dno
+			AND b.ppscode = d.ppscode
+			group by a.wcode, a.wtitle, a.wdate, a.wend, a.wopen,
+			a.walarm, a.wstatus, a.classcode, a.wcontent, a.manager,a.wprogress,
+			a.managerphoto, b.eno, b.photo
+  	</select>
+  </mapper>

@@ -1,0 +1,68 @@
+package kr.or.warehouse.service;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import kr.or.warehouse.dao.HrDAO;
+import kr.or.warehouse.dto.EmployeeVO;
+import kr.or.warehouse.dto.HrTypeVO;
+import kr.or.warehouse.dto.HrVO;
+
+public class TaskHrServiceImpl extends HrServiceImpl implements HrService{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(TaskHrServiceImpl.class);
+
+	private HrDAO hrDAO;
+	public void setHrDAO(HrDAO hrDAO) {
+		this.hrDAO = hrDAO;
+	}
+
+	private String savePath = "c:\\log";
+	public void setSavePath(String savePath) {
+		this.savePath = savePath;
+	}
+
+	private String saveFileName = "hr_log.csv";
+	SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+	
+	@Override
+	public List<HrVO> getHrList(int eno) throws Exception {
+		List<HrVO> hrList = null;
+		hrList = hrDAO.selectHrList(eno);
+		return hrList;
+	}
+	
+	@Override
+	public List<EmployeeVO> getEmpForHrData(String day) throws Exception {
+		return hrDAO.selectEmpForHrData(day);
+	}
+	
+	@Override
+	public void writeAbsent(HrVO hr) throws Exception {
+		//다오로 그날의 마지막 코드 가져와서 뒤 3자리 자르고, 파스 인트 / null이면 0으로 초기화
+		int code = 0;
+		String hrcode = "";
+		List<String> selectHrcodeByHrDate = hrDAO.selectHrcodeByHrDate(hr.getHrDate());
+		System.out.println(selectHrcodeByHrDate.get(0));
+		if(selectHrcodeByHrDate != null) {
+			code = Integer.parseInt(selectHrcodeByHrDate.get(0).substring(8));
+		}
+		
+		//hrcode
+		code += 1;
+		hrcode = "hr"
+				+ hr.getHrDate().substring(2).replace("-", "")
+				+ String.format( "%1$03d" , code );
+		hr.setHrcode(hrcode);
+		hr.setHrTime("0h0m0s");
+		hr.setOverTime("0h0m0s");
+		hr.setReqChange(0);
+		hrDAO.insertHr(hr);
+	}
+}

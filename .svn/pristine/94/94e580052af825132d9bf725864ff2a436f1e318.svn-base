@@ -1,0 +1,23 @@
+package kr.or.warehouse.dao;
+
+import java.sql.SQLException;
+import java.util.List;
+
+import org.apache.ibatis.session.RowBounds;
+
+import kr.or.warehouse.command.Criteria;
+import kr.or.warehouse.dto.EmployeeVO;
+import kr.or.warehouse.dto.WorkManagerVO;
+import kr.or.warehouse.dto.WorkVO;
+
+public interface KnowhowDAO {
+	
+	public List<WorkVO> selectRecommendWorkList(int eno, RowBounds rowBounds) throws SQLException;
+	
+	public int selectRecommendWorkListCount(int eno) throws SQLException;
+	
+	public EmployeeVO selectWorkRequestBy(String wcode) throws SQLException;
+	public List<WorkManagerVO> selectWorkManagerList(String wcode) throws SQLException;
+	
+	public List<WorkVO> selectPopularEmpWorkList(int eno) throws SQLException;
+}

@@ -1,0 +1,178 @@
+package kr.or.warehouse.scheduler;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import kr.or.warehouse.dto.EmployeeVO;
+import kr.or.warehouse.dto.HrVO;
+import kr.or.warehouse.service.HrService;
+
+public class HrLogTaskScheduler {
+
+	private HrService hrService;
+	public void setHrService(HrService hrService) {
+		this.hrService = hrService;
+	}
+
+	private String savePath = "c:\\log";
+	public void setSavePath(String savePath) {
+		this.savePath = savePath;
+	}
+
+	private String fileName = "hr_log.csv";
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+
+
+	public void hrLogToDataBase() throws Exception{
+		File logFile = new File(savePath+File.separator+fileName);
+		if(!logFile.exists()) {
+			new File(savePath).mkdirs();
+			String logFilePath=savePath+File.separator+fileName;
+			BufferedWriter out=new BufferedWriter(new FileWriter(logFilePath,true));
+
+			out.write("");
+			out.close();
+		}
+
+		FileReader reader = new FileReader(savePath + File.separator + fileName);
+		BufferedReader in = new BufferedReader(reader);
+
+		//그릇 준비
+		String textLine = null;
+		Map<String, HrVO> logMap = new HashMap<String, HrVO>();
+
+		//기준일 계산
+		Date today = new Date();
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(today);
+		cal.add(Calendar.DATE, -1);
+		Date date = cal.getTime();
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		String strDate = format.format(date);
+		System.out.println(strDate);
+
+		//계산 시작
+		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+		try {
+			while((textLine = in.readLine()) != null) {
+				String[] logData =textLine.split(",");
+				System.out.println("dd"+logData.toString());
+				if(logData[5].split(" ")[0].equals(strDate)) { //필요한 날짜만 도출
+
+					String eno = logData[1];
+					System.out.println(eno);
+					if(logMap.get(eno) == null) {
+						logMap.put(eno, new HrVO());
+						logMap.get(eno).setEno(Integer.parseInt(eno));
+					}
+
+					logMap.get(eno).setHrDate(strDate);
+
+					if(logData[0].equals("[ontime]")) {
+						if(logMap.get(eno).getOnTime() == null
+								|| sdf.parse(logData[3]).before(sdf.parse(logMap.get(eno).getOnTime()))) {
+							logMap.get(eno).setOnTime(logData[3]);
+						}
+
+					} else if(logData[0].equals("[offtime]")) {
+						if(logMap.get(eno).getOffTime() == null
+								|| sdf.parse(logData[3]).after(sdf.parse(logMap.get(eno).getOffTime()))) {
+							logMap.get(eno).setOffTime(logData[3]);
+						}
+					}
+				}
+
+			}
+		} finally {
+			if(reader != null) reader.close();
+			if(in != null) in.close();
+		}
+
+		System.out.println(logMap);
+		hrService.write(logMap);
+		
+		String day = cal.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.KOREAN);
+//		String day = getDateDay(strDate, "yyyy-MM-dd");
+		System.out.println(day);
+		hrStateToDataBase(strDate, day);
+	}
+
+	public void hrStateToDataBase(String strDate, String day) throws Exception{
+		//service로 상태가 휴직(2), 퇴사(0)가 아니면서 근무상태가 휴가가 아닌 emp 찾고
+		//추가 - 근무 요일이 아닌
+		List<EmployeeVO> empList = hrService.getEmpForHrData(day);
+		System.out.println("empList : " +empList);
+		//찾은 eno로 오늘의 hr을 찾아서 없으면
+		if(empList != null) for(EmployeeVO emp : empList) {
+			boolean flag = false;
+			List<HrVO> hrList = hrService.getHrList(emp.getEno());
+			
+			if(hrList != null) for(HrVO hr : hrList) {
+				if(hr.getHrDate().equals(strDate)) flag = true;
+			}
+			//근무상태 입력 - 2:지각
+			if(!flag) {
+				HrVO temp = new HrVO();
+				temp.setEno(emp.getEno());
+				temp.setHrDate(strDate);
+				temp.setState(2);
+				temp.setOnTime("결근");
+				temp.setOffTime("-");
+				hrService.writeAbsent(temp);
+			}
+		}
+		
+		
+	}
+	
+	public String getDateDay(String date, String dateType) throws Exception {
+
+	    String day = "" ;
+	    SimpleDateFormat dateFormat = new SimpleDateFormat(dateType) ;
+	    Date nDate = dateFormat.parse(date) ;
+
+	    Calendar cal = Calendar.getInstance() ;
+	    cal.setTime(nDate);
+
+	    int dayNum = cal.get(Calendar.DAY_OF_WEEK) ;
+
+	    switch(dayNum){
+	        case 1:
+	            day = "일";
+	            break ;
+	        case 2:
+	            day = "월";
+	            break ;
+	        case 3:
+	            day = "화";
+	            break ;
+	        case 4:
+	            day = "수";
+	            break ;
+	        case 5:
+	            day = "목";
+	            break ;
+	        case 6:
+	            day = "금";
+	            break ;
+	        case 7:
+	            day = "토";
+	            break ;
+	    }
+
+	    return day ;
+
+	}
+}

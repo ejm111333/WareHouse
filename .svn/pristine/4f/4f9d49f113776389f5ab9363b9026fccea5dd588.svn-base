@@ -1,0 +1,267 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
+<script>
+
+page = 1;
+endPage = 1;
+
+function subMentoringListGo(startPage){
+	page = startPage
+	var data = {
+			'page' : page,
+			'eno' : ${loginUser.eno}
+	}
+
+	$.ajax({
+		url : '<%=request.getContextPath()%>/mentoring/main/subMentoring.do',
+		data : data,
+		type : 'post',
+		success: function(res){
+			console.log(res);
+			if(res.subMentoringList.length > 0){
+				printWorkData(res.subMentoringList, $('.subMentoringList'), $('#subMentoringList-template'));
+			}else{
+				var str = `
+					<tr>
+						<td colspan="6" style="text-align:center">
+							<strong>해당 내용이 없습니다.</strong>
+						</td>
+					</tr>
+				`;
+
+				$('.subMentoringList').html(str);
+			}
+
+			console.log('startpage : ' + res.pageMaker.startPage);
+			console.log('endpage : ' + res.pageMaker.endPage);
+			pageMakerData = {
+					pageMaker : res.pageMaker,
+					target : 'subMentoringListGo',
+					left : "javascript:subMentoringListGo("+(page -1)+")",
+					right : "javascript:subMentoringListGo("+(page+1)+")",
+					doubleLeft : "javascript:subMentoringListGo("+(1)+")",
+					doubleRight :"javascript:subMentoringListGo("+(res.pageMaker.endPage)+")"
+			}
+			printPageMaker(pageMakerData ,$('.subMentoringPage'), $('#pageMaker-template'));
+		},
+		error:function(error){
+			alert("error : " + error.status)
+		}
+	});
+}
+function endMentoringListGo(startPage){
+	endPage = startPage
+	var data = {
+			'page' : endPage,
+			'eno' : ${loginUser.eno}
+	}
+
+	$.ajax({
+		url : '<%=request.getContextPath()%>/mentoring/main/endMentoring.do',
+		data : data,
+		type : 'post',
+		success: function(res){
+			if(res.endMentoringList.length > 0){
+				console.log("res",res);
+				printWorkData(res.endMentoringList, $('.endMentoringList'), $('#endMentoringList-template'));
+			}else{
+				var str = `
+					<tr>
+						<td colspan="6" style="text-align:center">
+							<strong>해당 내용이 없습니다.</strong>
+						</td>
+					</tr>
+				`;
+
+				$('.endMentoringList').html(str);
+			}
+
+			console.log('startpage : ' + res.pageMaker.startPage);
+			console.log('endpage : ' + res.pageMaker.endPage);
+			pageMakerData = {
+					pageMaker : res.pageMaker,
+					target : 'endMentoringListGo',
+					left : "javascript:endMentoringListGo("+(page -1)+")",
+					right : "javascript:endMentoringListGo("+(page+1)+")",
+					doubleLeft : "javascript:endMentoringListGo("+(1)+")",
+					doubleRight :"javascript:endMentoringListGo("+(res.pageMaker.endPage)+")"
+			}
+			printPageMaker(pageMakerData ,$('.endMentoringPage'), $('#pageMaker-template'));
+		},
+		error:function(error){
+			alert("error : " + error.status)
+		}
+	});
+}
+
+function printWorkData(dataList, target, templateObject){
+	var template = Handlebars.compile(templateObject.html());
+	var html = template(dataList);
+	target.html(html);
+}
+
+function printPageMaker(data, target, templateObject){
+	var template = Handlebars.compile(templateObject.html());
+	var html = template(data);
+	target.html(html);
+}
+
+function applyModal_Go(mento){
+	//alert(mento);
+	$('div#modal div.modal-body div.row input:radio[name=radioName]:checked').val();
+	$('div#modal div.modal-header h4.modal-title').val(mento);
+}
+function exdateApply_Go(){
+	var mento=$('div#modal h4.modal-title').val();
+	var period=$('div#modal input:radio[name=radioName]:checked').val();
+	console.log(mento);
+
+	var sendData={
+			"mento":mento,
+			"period":period
+	}
+
+	$.ajax({
+		url:"<%=request.getContextPath()%>/mentoring/exdateApply.do",
+		type:"GET",
+		data:sendData,
+		success:function(result){
+			if(result){
+				alert("연장신청이 완료되었습니다.");
+				endMentoringListGo(1);
+			}
+		},
+		error:function(error){
+			AjaxErrorSecurityRedirectHandler(error.status);
+		}
+	});
+}
+</script>
+
+<script type="text/x-handlebars-template"  id="subMentoringList-template">
+{{#each .}}
+	<tr style='font-size: 0.9em; height: 65px; cursor: pointer;' onclick="OpenWindow('menteeDetail.do?smno={{smno}}', '멘토링 승낙', '600', '700')">
+
+		<td>
+		<div class="row">
+			<div class="col-1 pl-0">
+				<span class="info-box-icon">
+					<img src="" alt="User" width="40" height="40" class="rounded-circle" loading="lazy">
+				</span>
+			</div>
+			<div class="col-11">
+				<span><b>{{name }} {{ppsName }}이(가) 나를 멘토로 등록하고자 합니다.</b></span>&nbsp;<span class="right badge badge-danger">New</span><br>
+				<span class="text-muted">{{formatDate regDate }}</span>
+			</div>
+		</div>
+		</td>
+
+	</tr>
+{{/each}}
+</script>
+<script type="text/x-handlebars-template"  id="endMentoringList-template">
+{{#each .}}
+	<tr style='font-size: 0.9em; height: 65px;' onclick="">
+
+		<td style="width: 30%">
+			<img src="" alt="User" width="25" height="25" class="rounded-circle" loading="lazy">
+				<span><b>{{name }} {{ppsName }}</b></span>
+		</td>
+		<td style="width: 50%">
+			<span>만료일 : {{formatEDate endDate}}</span>&nbsp;&nbsp;&nbsp;<span class="right badge badge-danger">D-{{dDay}}</span><br>
+			<span class="text-muted">(시작일 : {{formatSDate startDate }})</span>
+		</td>
+		<td style="width: 20%">
+			<button type="button" style="{{buttonHidden mento}}" class="btn btn-info btn-sm" data-toggle="modal" data-target="#modal" onclick="applyModal_Go('{{mento}}');">연장신청</button>
+		</td>
+
+	</tr>
+{{/each}}
+</script>
+
+<script type="text/x-handlebars-template"  id="pageMaker-template">
+{{#if prev}}
+	<li class="page-item">
+		<a class="page-link" href="{{doubleLeft}}">
+			<i class="fas fa-angle-double-left"></i>
+		</a>
+	</li>
+	<li class="page-item">
+		<a class="page-link" href="{{left}}">
+			<i class="fas fa-angle-left"></i>
+		</a>
+	</li>
+{{/if}}
+		{{printPage this}}
+{{#if next}}
+	<li class="page-item">
+		<a class="page-link" href="{{right}}">
+			<i class="fas fa-angle-right"></i>
+		</a>
+	</li>
+	<li class="page-item">
+		<a class="page-link" href="{{doubleRight}}">
+			<i class="fas fa-angle-double-right"></i>
+		</a>
+	</li>
+{{/if}}
+</script>
+
+<script>
+	Handlebars.registerHelper({
+		"formatDate" : function(regDate){
+			var dateObj = new Date(regDate);
+			var year = dateObj.getFullYear();
+			var month = dateObj.getMonth() + 1;
+			var date = dateObj.getDate();
+			return year + "-" + month + "-" + date;
+		},
+		"formatSDate" : function(startDate){
+			var dateObj = new Date(startDate);
+			var year = dateObj.getFullYear();
+			var month = dateObj.getMonth() + 1;
+			var date = dateObj.getDate();
+			return year + "-" + month + "-" + date;
+		},
+		"formatEDate" : function(endDate){
+			var dateObj = new Date(endDate);
+			var year = dateObj.getFullYear();
+			var month = dateObj.getMonth() + 1;
+			var date = dateObj.getDate();
+			return year + "-" + month + "-" + date;
+		},
+		"buttonHidden" : function(mento){
+			var str = "";
+			if(mento == ${loginUser.eno}){
+				str = "display : none";
+			}
+			return str;
+
+		},
+		"printPage" : function(pageMakerData){
+			var pageMaker = pageMakerData.pageMaker;
+			var target;
+
+			if(pageMakerData.target == "subMentoringListGo"){
+				target = "subMentoringListGo";
+			}
+			if(pageMakerData.target == "endMentoringListGo"){
+				target = "endMentoringListGo";
+			}
+
+			var str = '';
+			for(i = pageMaker.startPage; i <= pageMaker.endPage; i++){
+				var active = i == pageMaker.cri.page ? 'active' : '';
+				str += '<li class="page-item ' + active + '">';
+				str += '<a class="page-link" href="javascript:'+target+'(' + i + ')">';
+				str += i
+				str += '</a>';
+				str += '</li>';
+			}
+			return new Handlebars.SafeString(str);
+		}
+	});
+</script>

@@ -1,0 +1,113 @@
+package kr.or.warehouse.service;
+
+import java.io.File;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.or.warehouse.dao.PdsDAO;
+import kr.or.warehouse.dto.PdsVO;
+
+@Service
+public class PdsServiceImpl implements PdsService {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(PdsServiceImpl.class);
+	
+	@Autowired
+	private PdsDAO pdsDAO;
+
+	@Override
+	public List<PdsVO> getPdsList(PdsVO pds) throws Exception {
+		List<PdsVO> pdsList = null;
+		pdsList = pdsDAO.selectPdsListByEno(pds);
+		return pdsList;
+	}
+
+	@Override
+	public void uploadFile(PdsVO pds) throws Exception {
+		//1.pno
+		String pno = pdsDAO.selectPdsSeqNext();
+		pds.setPno(pno);
+		
+		System.out.println(pds);
+		pdsDAO.insertFile(pds);
+	}
+
+	@Override
+	public PdsVO getPdsByPno(String pno) throws Exception {
+		PdsVO pds = null;
+		pds = pdsDAO.selectPdsByPno(pno);
+		pds.setContent(showFileList(pds.getUploadPath()+"/"+pds.getFileName()));
+		
+		File dir = new File(pds.getUploadPath()+"/"+pds.getFileName());
+		if(dir.isDirectory()) {
+			long folderSize = getFolderSize(dir);
+			pds.setFileSize(folderSize);
+		}
+		return pds;
+	}
+
+	@Override
+	public void removePdsByPno(String pno) throws Exception {
+		pdsDAO.deletePdsByPno(pno);
+	}
+	
+	
+	//----------------------
+	
+	//폴더 내 파일 용량 합계
+	private long getFolderSize(File folder) {
+	    long length = 0;
+	    length += folder.length();
+	    File[] files = folder.listFiles();
+	    int count = files.length;
+	    for (int i = 0; i < count; i++) {
+	        if (files[i].isFile()) {
+	            length += files[i].length();
+	        } else {
+	            length += getFolderSize(files[i]);
+	        }
+	    }
+	    return length;
+	}
+	
+	
+	//폴더 내 파일 개수 확인
+	public String showFileList(String path) throws Exception {
+		String result = "-";
+		File dir = new File(path);
+		if(dir.isFile()) return result;
+		
+		File[] files = dir.listFiles();
+		
+		int fileCnt = 0;		
+		int dirCnt = 0;
+	
+		for (int i = 0; i < files.length; i++) {
+			File file = files[i];
+
+			if (file.isFile()) {
+				fileCnt++;// 파일 개수 				
+//				System.out.println("[File]" + file.getCanonicalPath().toString());				
+//				System.out.println("[Directory CNT]" + file.getCanonicalPath().toString()+"  " +fileCnt);
+				
+			} else if (file.isDirectory()) {
+				dirCnt++;
+//				System.out.println("[Directory]" + file.getCanonicalPath().toString());
+				
+				try {
+					showFileList(file.getCanonicalPath().toString());
+				} catch (Exception e) {
+					
+				}
+			}
+		}		
+//		System.out.println(dir.getCanonicalPath().toString()+"  file :"+fileCnt+"  dirCnt:"+dirCnt);
+		result = "폴더 "+dirCnt+",  파일 "+fileCnt;
+		return result;
+	}
+
+}

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Pds-Mapper">
+
+	<!-- 개인자료실 자료 select -->
+	<select id="selectPdsListByEno" parameterType="int" resultType="pds">
+		SELECT 
+			 pno
+			,eno
+			,fileName
+			,uploadPath
+			,fileType
+			,fileSize
+			,regDate
+			,dist
+			,delYn
+			,delDate
+		FROM
+			PDS
+		WHERE
+			eno=#{eno}
+	</select>	
+	
+	<update id="insertFile" parameterType="pds">
+		INSERT INTO 
+			PDS (pno, eno, fileName, uploadPath, fileType, fileSize, regDate, dist)
+		VALUES
+			(#{pno}, #{eno}, #{fileName}, #{uploadPath}, #{fileType}, #{fileSize}, sysdate, '개인자료실')
+	</update>
+
+	<select id="selectPdsSeqNext" resultType="str">
+		select 'PD'||trim(TO_CHAR(pds_seq.nextval,'000000')) as pno from dual
+	</select>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

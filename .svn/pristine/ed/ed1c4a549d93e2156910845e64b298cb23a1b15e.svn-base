@@ -1,0 +1,697 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="NewApproval-Mapper">
+
+	<sql id="search">
+		<if test="searchType == 't'.toString()">
+			and title like '%'||#{keyword}||'%'
+		</if>
+		
+		<if test="searchType == 'w'.toString()">
+			and a.eno like '%'||#{keyword}||'%'
+		</if>
+		
+	</sql>
+
+	<sql id="stateCheck">
+		<if test="state != '0'.toString()">
+			and state = #{state}
+		</if>
+	</sql>
+
+
+	<sql id="signForm">
+		<if test="signForm == '업무기안'.toString()">
+			and d.sFormNo = 'SF000001'
+		</if>
+		
+		<if test="signForm == '업무협조'.toString()">
+			and d.sFormNo = 'SF000002'
+		</if>
+		
+		<if test="signForm == '보고서'.toString()">
+			and d.sFormNo = 'SF000004'
+		</if>
+		
+		<if test="signForm == '휴가신청'.toString()">
+			and d.sFormNo = 'SF000005'
+		</if>
+		
+		<if test="signForm == '해외출장'.toString()">
+			and d.sFormNo = 'SF000003'
+		</if>
+		
+	</sql>
+
+	<!-- 관련문서 리스트-->
+	<select id="selectRelatedDocList" resultType="signDoc">
+
+		select
+		    b.name
+		   ,a.title
+		   ,c.ppsname
+		   ,b.photo
+		   ,d.sformno
+		   ,d.formText
+		from
+		    signdoc a, employee b, postposition c, signform d
+		where a.eno = b.eno
+		and b.ppscode = c.ppscode
+		and a.sformno = d.sformno
+		and a.sformno=#{sFormNo}
+	</select>
+
+
+
+	<!-- 참조자 -->
+	<select id="selectRefLineList" resultType="employee">
+		select  c.name,
+		        d.dname,
+		        e.ppsname,
+		        c.photo
+
+		from  signref a, signdoc b, employee c, department d, postposition e
+		where a.signno = b.signno
+		and a.eno = c.eno
+		and c.dno =d.dno
+		and c.ppscode = e.ppscode
+	</select>
+
+
+
+  <!-- 모달 조직도 부서 이름 찾기 -->
+	<select id="selectDeptName" resultType="signDoc">
+		select
+                b.eno,
+			   b.name ,
+			   c.ppsname,
+			   a.dname,
+			   b.photo
+
+		FROM department a, employee b,  postposition c
+		where a.dno = b.dno
+		and b.PPSCODE = c.PPSCODE
+		and b.eno = #{eno}
+	</select>
+
+
+	<!-- 결재양식코드 -->
+	<select id="selectSignForm" resultType="signForm">
+		select
+		    sformno
+		   ,formClass
+		   ,formtext
+		FROM
+		    signform
+		where sformno=#{sformno}
+	</select>
+
+
+	
+  <!-- 결재선 번호  -->
+	<select id="selectSignLineNo" resultType="String">
+		SELECT 'SL' ||
+		trim(nvl(max(to_char(to_number(substr(SIGNLINENO,3))+1,'000000')),'000001'))
+		as SIGNLINENO
+		from SIGNLINE
+
+		union
+
+		select nvl(null,'SL000001') as SIGNLINENO
+		from
+		dual
+		where not exists (select SIGNLINENO
+		from SIGNLINE)
+	</select>
+	
+	
+	<!-- 문서번호 -->
+	<select id="selectSignDocNo" resultType="String">
+		SELECT 'SN' ||
+		trim(nvl(max(to_char(to_number(substr(SIGNNO,3))+1,'000000')),'000001'))
+		as SIGNNO
+		from SIGNDOC
+
+		union
+
+		select nvl(null,'SN000001') as SIGNNO
+		from
+		dual
+		where not exists (select SIGNNO
+		from SIGNDOC)
+	</select>
+	
+
+	
+	<!-- 결재선 리스트 -->
+	<select id="selectSignLineList" resultType="signline">
+
+	select 
+		a.MANAGER, 
+		b.name, 
+		a.dname,
+		b.photo,
+		c.ppsname,
+		b.eno
+		
+	from department a, employee b,postposition c
+	where a.MANAGER =b.eno
+	and b.PPSCODE = c.PPSCODE
+	and a.dno = #{dno}
+
+	<!-- 	 SELECT
+			 d.name
+			,d.photo
+			,e.ppsname
+			,f.dname
+			,a.signstate
+			,a.signrank
+			,d.eno
+			,c.sformno
+		
+		FROM 	signer a, 
+				signline b, 
+				signdoc c, 
+				employee d,
+				postposition e,
+				department f
+				 
+		where	 a.signlineno = b.signlineno
+		and		 b.signno = c.SIGNNO
+		and		 a.eno = d.eno
+		and 	d.PPSCODE = e.PPSCODE
+		and 	d.dno = f.dno
+		and	 c.sformno = #{sFormNo}
+		and	 f.dno = #{dno}
+		order by a.signrank  -->
+		
+		
+	</select>
+
+
+
+<!-- 로그인한 사원의 정보 -->
+	<select id="selectSearchContactList" resultType="employee">
+
+		SELECT
+		b.eno,
+		b.name ,
+		b.email,
+		b.phone,
+		b.call,
+		b.condition,
+		c.ppsname,
+		a.dname,
+		b.year
+
+		FROM department a, employee b,  postposition c
+		where a.dno = b.dno
+		and b.PPSCODE = c.PPSCODE
+		and b.eno = #{eno}
+	</select>
+
+
+<!-- 결재선 -->
+<update id="insertSignLine" parameterType="signline">
+	INSERT INTO signline (
+	    signlineno
+	   ,signno
+	) VALUES (
+	    #{signLineNo}
+	   ,#{signNo}
+	)
+</update>
+
+<!-- 결재자 저장 -->
+<update id="insertSigner" parameterType="signer">
+	insert into signer (
+	    SIGNLINENO,
+	    ENO,
+	    SIGNRANK,
+	    SIGNSTATE,
+	    SIGNDATE
+	) values (
+	    #{signLineno},
+	    #{eno},
+	    #{signRank},
+	    0,
+	    ''
+	)
+</update>
+
+<!-- 결재선의 순위 -->
+<select id="selectRankCode" resultType="str">
+	select 
+       case when  a.ppscode ='PPS001' then '1'
+             when  a.ppscode ='PPS002' then '2'
+             when  a.ppscode ='PPS003' then '3'
+             when  a.ppscode ='PPS004' then '4'
+             when  a.ppscode ='PPS005' then '5'
+             when  a.ppscode ='PPS006' then '6'
+             when  a.ppscode ='PPS007' then '7'
+             when  a.ppscode ='PPS008' then '8'
+             when  a.ppscode ='PPS009' then '9'
+             when  a.ppscode ='PPS0010' then '10'               
+            else '0'
+          end as  signRank
+
+from employee a, POSTPOSITION b
+where a.PPSCODE =b.PPSCODE
+and a.eno=#{eno}
+
+</select>
+
+<!-- 결재문서 저장 -->
+<update id="insertSignDoc" parameterType="signDoc">
+	INSERT INTO signdoc (
+	    signno
+	   ,eno
+	   ,dno
+	   ,sformno
+	   ,classcode
+	   ,ddate
+	   ,emergency
+	   ,title
+	   ,edate
+	   ,sopen
+	   ,signcontent
+	   ,tempsave
+	   ,state
+	   ,takeover
+	) VALUES (
+	    #{signNo}
+	   ,#{eno}
+	   ,#{dno}
+	   ,#{sFormNo}
+	   ,'C101'
+	   ,SYSDATE
+	   ,#{emergency}
+	   ,#{title}
+	   ,#{eDate}
+	   ,#{sOpen}
+	   ,#{signContent}
+	   ,#{tempSave}
+	   ,0
+	   ,1
+	)
+</update>
+
+	<!-- 결재그룹 코드 -->
+	<select id="selectSignGroupNo" resultType="String">
+		SELECT 'SG' ||
+		trim(nvl(max(to_char(to_number(substr(signGroupNo,3))+1,'000000')),'000001'))
+		as signgroupno
+		from signLineGr
+
+		union
+
+		select nvl(null,'SG000001') as signGroupNo
+		from
+		dual
+		where not exists (select signGroupNo
+		from signLineGr)
+	</select>
+	
+
+	<!-- 결재선 그룹 저장 -->
+	<update id="insertSignLineGr" parameterType="signLineGr">
+		 INSERT INTO signlinegr (
+								    signGroupNo
+								   ,signgroupname
+								   ,eno
+								) VALUES (
+								    #{signGroupNo}
+								   ,#{signGroupName}
+								   ,#{eno}
+								)  
+	</update>
+
+	<!-- 개인결재선  사원 저장 -->
+	<update id="insertMySignLine" parameterType="mySignLine">
+		INSERT INTO mysignline (
+								    eno
+								   ,signgroupno
+								   ,signrank
+								) VALUES (
+								    #{eno}
+								   ,#{signGroupNo}
+								   ,#{signRank}
+								)
+	</update> 
+
+
+	<!-- 개인결재선 그룹 리스트 -->
+	<select id="selectSignLineGr" resultType="signLineGr">
+	
+		SELECT
+		    a.signgroupno
+		   ,a.signgroupname
+		   ,a.eno
+		FROM
+		    signlinegr a, employee b 
+		where a.eno = b.eno
+		and a.eno = #{eno}
+		order by signgroupname
+	</select>
+	
+	
+	<!-- 개인결재선 그룹에 속한 사원 리스트 -->	
+	<select id="selectMySignMemberList" resultType="mySignLine">
+	
+		SELECT
+		    a.eno
+		   ,a.signgroupno
+		   ,a.signrank
+		   ,b.name
+		   ,c.dname
+		   ,d.PPSNAME
+		FROM
+		    mysignline a, employee b, department c, POSTPOSITION d
+		where a.eno = b.eno
+		and b.dno = c.dno
+		and b.PPSCODE = d.PPSCODE
+		and a.signgroupno =#{signGroupNo} 
+	</select>	
+	
+	
+	<!-- 개인결재선 그룹 삭제 -->
+	<update id="deleteSignGr" parameterType="str">
+		DELETE FROM signlinegr
+		WHERE signgroupno = #{signGroupNo}
+	</update>
+	
+	
+<!-- 파일 시작 -->
+	<!-- 첨부파일 번호 -->
+	<select id="selectSignAttachNo" resultType="str">
+	
+		SELECT 'SA' ||
+		trim(nvl(max(to_char(to_number(substr(signAno,3))+1,'000000')),'000001'))
+		as attachno
+		from SignAttach
+
+		union
+
+		select nvl(null,'SA000001') as attachno
+		from
+		dual
+		where not exists (select signAno
+		from SignAttach)
+	</select>	
+	
+	
+	<select id="selectSignAttachBySianNo" resultType="attach">
+		select
+		signano as attachNo
+	    ,uploadPath
+	    ,fileName
+	    ,fileType
+	    ,signno as refNo
+		from signattach
+		where signNO = #{refNo}
+	</select>
+	
+	
+	<select id="selectSignAttachBySianAttachNo" resultType="attach">
+		select
+		signano as attachNo
+	    ,uploadPath
+	    ,fileName
+	    ,fileType
+	    ,signno as refNo
+		from signattach
+		where signano = #{attachNo}
+	</select>
+	
+	
+	
+	<!-- 파일 저장  -->
+	<update id="insertSignAttach">
+		INSERT INTO signattach (
+								    signano
+								   ,uploadpath
+								   ,filename
+								   ,filetype
+								   ,signno
+								) VALUES (
+								   #{attachNo}
+								   ,#{uploadPath}
+								   ,#{fileName}
+								   ,#{fileType}
+								   ,#{refNo}
+								)
+	</update>
+	
+	
+
+	<!-- 해시태그 -->
+	<update id="insertApprovalHashTag" parameterType="SignDoc">
+		INSERT INTO hashtag(
+			 tagcontent
+			,classcode
+			,hashno
+		) VALUES (
+			#{hashTag},
+			'C101',
+			#{signNo}
+		)	
+	</update>
+	
+	<!-- 문서함 필드설정  -->
+	<select id="selectFieldSetting" resultType="field">
+		select
+		    eno
+		   ,field
+		from
+		    field
+		where eno = #{eno}
+	</select>	
+	
+	<update id="insertFieldSetting" parameterType="field">
+		insert into field (
+		    eno
+		   ,field
+		) values (
+		    #{eno}
+		    ,#{field}
+		)
+	</update>
+	
+	<update id="deleteField">
+		delete from field
+		where eno = #{eno}
+	</update>
+	
+	<!-- 미확인 문서 -->
+	<select id="signReader" resultType="int">
+		select
+			count(*)
+		from
+			signreader
+		where signno = #{signNo}
+		  and eno = #{eno}
+	</select>
+	
+	
+	
+	<!-- 결재문서함 -->
+	<select id="selectApproveList" resultType="signDoc">
+		select
+		    a.signno
+		   ,c.eno
+           ,e.dname
+		   ,a.dno
+		   ,a.sformno
+		   ,classcode
+		   ,ddate
+		   ,emergency
+		   ,title
+		   ,edate
+		   ,sopen
+		   ,signcontent
+		   ,tempsave
+		   ,state
+		   ,takeover
+		   ,d.formtext
+		from
+		    signdoc a, signline b, signer c, signform d, department e
+		where a.signno = b.signno
+		  and b.signlineno = c.signlineno
+		  and a.sformno = d.sformno
+          and a.dno = e.dno
+		  and c.eno = #{eno}
+		  <include refid="search" />
+		  <include refid="stateCheck"/>
+		  <include refid="signForm"/>
+	</select>
+	
+	<select id="selectApproveListCount" resultType="int">
+		select
+		    count(*)
+		from
+		    signdoc a, signline b, signer c, signform d, department e
+		where a.signno = b.signno
+		  and b.signlineno = c.signlineno
+		  and a.sformno = d.sformno
+          and a.dno = e.dno
+		  and c.eno = #{eno}
+		  <include refid="search" />
+		  <include refid="stateCheck"/>
+		  <include refid="signForm"/>
+	</select>
+	
+	<!-- 기안문서함 -->
+	<select id="selectDraftList" resultType="signDoc">
+		select
+		    signno
+		   ,a.eno
+		   ,a.dno
+           ,e.dname
+		   ,a.sformno
+		   ,classcode
+		   ,a.ddate
+		   ,emergency
+		   ,title
+		   ,edate
+		   ,sopen
+		   ,signcontent
+		   ,tempsave
+		   ,state
+		   ,takeover
+           ,formtext
+		from
+		    signdoc a, signform d, department e
+		where a.sformno = d.sformno
+          and a.dno = e.dno
+          and eno = #{eno}
+		<include refid="search" />
+		<include refid="stateCheck"/>
+		<include refid="signForm"/>
+	</select>
+	
+	<select id="selectDraftListCount" resultType="int">
+		select
+		   count(*)
+		from
+		    signdoc a, signform d, department e
+		where a.sformno = d.sformno
+          and a.dno = e.dno
+          and eno = #{eno}
+		<include refid="search" />
+		<include refid="stateCheck"/>
+		<include refid="signForm"/>
+	</select>
+	
+	<!-- 임시문서함 -->
+	<select id="selectTempList" resultType="signDoc">
+		select
+		    signno
+		   ,a.eno
+		   ,a.dno
+           ,e.dname
+		   ,a.sformno
+		   ,classcode
+		   ,ddate
+		   ,emergency
+		   ,title
+		   ,edate
+		   ,sopen
+		   ,signcontent
+		   ,tempsave
+		   ,state
+		   ,takeover
+           ,formtext
+		from
+		    signdoc a, signform d, department e
+		where a.sformno = d.sformno
+          and a.dno = e.dno
+          and tempsave = 1
+          and eno = #{eno}
+		<include refid="search" />
+		<include refid="stateCheck"/>
+		<include refid="signForm"/>
+	</select>
+	
+	<select id="selectTempListCount" resultType="int">
+		select
+		   count(*)
+		from
+		    signdoc a, signform d, department e
+		where a.sformno = d.sformno
+          and a.dno = e.dno
+          and tempsave = 1
+          and eno = #{eno}
+		<include refid="search" />
+		<include refid="stateCheck"/>
+		<include refid="signForm"/>
+	</select>
+	
+	<!-- 참조문서함 -->
+	<select id="selectViewerList" resultType="signDoc">
+		select
+		    c.signno
+		   ,c.eno
+		   ,a.dno
+           ,e.dname
+		   ,a.sformno
+		   ,classcode
+		   ,ddate
+		   ,emergency
+		   ,title
+		   ,edate
+		   ,sopen
+		   ,signcontent
+		   ,tempsave
+		   ,state
+		   ,takeover
+           ,formtext
+		from
+		    signdoc a, signform d, signref c, department e
+		where a.sformno = d.sformno
+          and a.signno = c.signno
+          and a.dno = e.dno
+          and c.eno = #{eno}
+        <include refid="search" />
+		<include refid="stateCheck"/>
+		<include refid="signForm"/>
+	</select>
+		
+	<select id="selectViewerListCount" resultType="int">
+		select
+		   count(*)
+		from
+		    signdoc a, signform d, signref c, department e
+		where a.sformno = d.sformno
+          and a.signno = c.signno
+          and a.dno = e.dno
+          and c.eno = #{eno}
+		<include refid="search" />
+		<include refid="stateCheck"/>
+		<include refid="signForm"/>
+	</select>
+	
+	<!-- 참조자 저장 -->
+	<update id="insertsignRef" parameterType="signDoc">
+		INSERT INTO signref (
+						    signno
+						   ,eno
+						) VALUES (
+						   #{signNo}
+						   ,#{eno}
+						)
+	</update>
+	
+	<!-- 열람자 저장 -->
+	<update id="insertSignViewer" parameterType="signDoc">
+		INSERT INTO signviewer (
+							    signno
+							   ,eno
+							) VALUES (
+							   #{signNo}
+							   ,#{eno}
+							)
+	</update>
+</mapper>

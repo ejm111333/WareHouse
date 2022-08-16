@@ -1,0 +1,36 @@
+package kr.or.warehouse.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.session.SqlSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import kr.or.warehouse.dto.PdsVO;
+
+@Repository
+public class PdsDAOImpl implements PdsDAO {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(PdsDAOImpl.class);
+	
+	@Autowired
+	private SqlSession session;
+
+	@Override
+	public List<PdsVO> selectPdsListByEno(int eno) throws Exception {
+		return session.selectList("Pds-Mapper.selectPdsListByEno", eno);
+	}
+
+	@Override
+	public void insertFile(PdsVO pds) throws Exception {
+		session.selectList("Pds-Mapper.insertFile", pds);
+	}
+
+	@Override
+	public String selectPdsSeqNext() throws Exception {
+		return session.selectOne("Pds-Mapper.selectPdsSeqNext");
+	}
+
+}

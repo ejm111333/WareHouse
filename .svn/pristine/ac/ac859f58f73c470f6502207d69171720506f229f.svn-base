@@ -1,0 +1,406 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
+<script>
+
+menteePage = 1;
+workPage=1;
+docPage=1;
+
+function myMenteeListGo(startPage){
+	menteePage = startPage;
+	var data = {
+			'page' : menteePage,
+			'eno' : ${loginUser.eno}
+	}
+
+	$.ajax({
+		url : '<%=request.getContextPath()%>/mentoring/main/myMenteeList.do',
+		data : data,
+		type : 'post',
+		success: function(res){
+			console.log("mento",res);
+			if(res.menteeList.length > 0){
+				printWorkData(res.menteeList, $('.myMenteeList'), $('#myMenteeList-template'));
+			}else{
+				var str = `
+					<tr style="height: 45px;">
+						<td colspan="6" style="text-align:center">
+							<strong>해당 내용이 없습니다.</strong>
+						</td>
+					</tr>
+				`;
+
+				$('.myMenteeList').html(str);
+			}
+
+			console.log('startpage : ' + res.pageMaker.startPage);
+			console.log('endpage : ' + res.pageMaker.endPage);
+// 			pageMakerData = {
+// 					pageMaker : res.pageMaker,
+// 					target : 'myMenteeListGo',
+// 					left : "javascript:myMenteeListGo("+(page -1)+")",
+// 					right : "javascript:myMenteeListGo("+(page+1)+")",
+// 					doubleLeft : "javascript:myMenteeListGo("+(1)+")",
+// 					doubleRight :"javascript:myMenteeListGo("+(res.pageMaker.endPage)+")"
+// 			}
+			printPageMaker(res.pageMaker ,$('.myMenteePage'), $('#pageMaker-template'));
+		},
+		error:function(error){
+			alert("error mento : " + error.status)
+		}
+	});
+}
+
+function myMenteeWorkListGo(startPage){
+	workPage = startPage;
+	var data = {
+			'page' : workPage,
+			'eno' : ${loginUser.eno}
+	}
+
+	$.ajax({
+		url : '<%=request.getContextPath()%>/mentoring/mentee/myMenteeWorkList.do',
+		data : data,
+		type : 'post',
+		success: function(res){
+			if(res.myMenteeWorkList.length > 0){
+				printWorkData(res.myMenteeWorkList, $('.myMenteeWorkList'), $('#myMenteeWorkList-template'));
+			}else{
+				var str = `
+					<tr style="height: 45px;">
+						<td colspan="6" style="text-align:center">
+							<strong>해당 내용이 없습니다.</strong>
+						</td>
+					</tr>
+				`;
+
+				$('.myMenteeWorkList').html(str);
+			}
+
+			console.log('startpage : ' + res.pageMaker.startPage);
+			console.log('endpage : ' + res.pageMaker.endPage);
+			printPageMaker(res.pageMaker ,$('.myMenteeWorkPage'), $('#workPageMaker-template'));
+		},
+		error:function(error){
+			alert("error mento : " + error.status)
+		}
+	});
+}
+
+function myMenteeDocListGo(startPage){
+	docPage = startPage;
+	var data = {
+			'page' : docPage,
+			'eno' : ${loginUser.eno}
+	}
+
+	$.ajax({
+		url : '<%=request.getContextPath()%>/mentoring/mentee/myMenteeDocList.do',
+		data : data,
+		type : 'post',
+		success: function(res){
+			if(res.myMenteeDocList.length > 0){
+				printWorkData(res.myMenteeDocList, $('.myMenteeDocList'), $('#myMenteeDocList-template'));
+			}else{
+				var str = `
+					<tr style="height: 45px;">
+						<td colspan="6" style="text-align:center">
+							<strong>해당 내용이 없습니다.</strong>
+						</td>
+					</tr>
+				`;
+
+				$('.myMenteeDocList').html(str);
+			}
+
+			console.log('startpage : ' + res.pageMaker.startPage);
+			console.log('endpage : ' + res.pageMaker.endPage);
+			printPageMaker(res.pageMaker ,$('.myMenteeDocPage'), $('#docPageMaker-template'));
+		},
+		error:function(error){
+			alert("error mento : " + error.status)
+		}
+	});
+}
+
+function printWorkData(dataList, target, templateObject){
+	var template = Handlebars.compile(templateObject.html());
+	var html = template(dataList);
+	target.html(html);
+}
+
+function printPageMaker(pageMaker, target, templateObject){
+	var pageNumArray = new Array(pageMaker.endPage - pageMaker.startPage+1);
+	for(var i=0;i<pageMaker.endPage-pageMaker.startPage+1;i++){
+		pageNumArray[i]=pageMaker.startPage+i;
+	}
+
+	pageMaker.pageNum=pageNumArray;
+	pageMaker.prevPageNum=pageMaker.startPage-1;
+	pageMaker.nextPageNum=pageMaker.endPage+1;
+
+
+	var template = Handlebars.compile(templateObject.html());
+	var html = template(pageMaker);
+	target.html(html);
+}
+
+function detail_go(wstatus,wcode){
+	if(wstatus == "대기" || wstatus == "이의신청"){
+		OpenWindow('waitDetail.do?wcode=' + wcode, '업무상세', '1000', '800');
+	}else{
+		goDetail('<%= request.getContextPath()%>/work/workDetailGo.do?wcode=' + wcode, '${menu.mcode}');
+	}
+}
+
+function remove_go(mtno){
+ 	console.log("mtno",mtno);
+	var res = confirm("멘토링을 종료하시면 해당 멘토에게 다시 신청을 받을 수 없습니다. \n멘토링을 정말 종료하시겠습니까?");
+	if(!res){
+		return false;
+	}
+	$.ajax({
+		url:"<%=request.getContextPath()%>/mentoring/removeMentoring.do?mtno="+mtno,
+		type:"POST",
+		success:function(res){
+			console.log("res",res);
+			if(res=="OK"){
+				alert("멘토링이 종료되었습니다.");
+				myMenteeListGo(1);
+			}
+		},
+		error:function(error){
+			AjaxErrorSecurityRedirectHandler(error.status);
+		}
+	})
+}
+
+</script>
+
+<script type="text/x-handlebars-template"  id="myMenteeList-template">
+{{#each .}}
+	<tr style="cursor: pointer;">
+		<td><img class="table-avatar emp_profile" src="{{photo}}" data-name="최민규 팀장">&nbsp;&nbsp;{{name }} {{ppsName }}</td>
+		<td>{{dname}}</td>
+		<td>{{job}}</td>
+		<td>{{formatSDate startDate}} ~ {{formatEDate endDate}}</td>
+		<td><button class="btn btn-xs btn-secondary" type="button" onclick="remove_go('{{mtno}}');">멘토링 종료</button></td>
+	</tr>
+{{/each}}
+</script>
+
+<script type="text/x-handlebars-template"  id="pageMaker-template">
+	<li class="page-item">
+		<a class="page-link" href="javascript:myMenteeListGo('1')">
+			<i class="fas fa-angle-double-left"></i>
+		</a>
+	</li>
+	<li class="page-item">
+		<a class="page-link" href="{{#if prev}} javascript:myMenteeListGo('{{prevPageNum}}{{/if}}')">
+			<i class="fas fa-angle-left"></i>
+		</a>
+	</li>
+{{#each pageNum}}
+<li class="paginate_button page-item {{signActive this}} ">
+	<a href="javascript:myMenteeListGo('{{this}}');" aria-controls="example2" data-dt-idx="1" tabindex="0" class="page-link">
+		{{this}}
+	</a>
+</li>
+{{/each}}
+	<li class="page-item">
+		<a class="page-link" href="{{#if next}} javascript:myMenteeListGo('{{nextPageNum}}{{/if}}')">
+			<i class="fas fa-angle-right"></i>
+		</a>
+	</li>
+	<li class="page-item">
+		<a class="page-link" href="javascript:myMenteeListGo('{{realEndPage}}')">
+			<i class="fas fa-angle-double-right"></i>
+		</a>
+	</li>
+</script>
+
+<script type="text/x-handlebars-template"  id="myMenteeWorkList-template">
+{{#each .}}
+	<tr onclick="detail_go('{{wstatus}}', '{{wcode }}')" style="cursor: pointer;">
+		<td>{{wtitle}}</td>
+		<td style="width: 20%;">
+		<div style="align-items: center; display: flex;">
+			<div>
+				<img class="table-avatar emp_profile" src="{{photo}}" data-name="최민규 팀장">
+			</div>&nbsp;
+			<div>
+				<span style="font-size:14px; font-weight:bold">{{name}} {{ppsName}}</span>
+				<div style="font-size:12px;">
+					<p>{{dname}}</p>
+				</div>
+			</div>
+		</div>
+		</td>
+		<td>{{formatDate wend}}</td>
+		<td class="project-state">
+			<span class="badge {{statusColor wstatus}}">{{wstatus}}</span>
+		</td>
+	</tr>
+{{/each}}
+</script>
+
+<script type="text/x-handlebars-template"  id="workPageMaker-template">
+	<li class="page-item">
+		<a class="page-link" href="javascript:myMenteeWorkListGo('1')">
+			<i class="fas fa-angle-double-left"></i>
+		</a>
+	</li>
+	<li class="page-item">
+		<a class="page-link" href="{{#if prev}} javascript:myMenteeWorkListGo('{{prevPageNum}}{{/if}}')">
+			<i class="fas fa-angle-left"></i>
+		</a>
+	</li>
+{{#each pageNum}}
+<li class="paginate_button page-item {{signActive this}} ">
+	<a href="javascript:myMenteeWorkListGo('{{this}}');" aria-controls="example2" data-dt-idx="1" tabindex="0" class="page-link">
+		{{this}}
+	</a>
+</li>
+{{/each}}
+	<li class="page-item">
+		<a class="page-link" href="{{#if next}} javascript:myMenteeWorkListGo('{{nextPageNum}}{{/if}}')">
+			<i class="fas fa-angle-right"></i>
+		</a>
+	</li>
+	<li class="page-item">
+		<a class="page-link" href="javascript:myMenteeWorkListGo('{{realEndPage}}')">
+			<i class="fas fa-angle-double-right"></i>
+		</a>
+	</li>
+</script>
+
+<script type="text/x-handlebars-template"  id="myMenteeDocList-template">
+{{#each .}}
+	<tr style="cursor: pointer;">
+		<td>{{title}}</td>
+		<td style="width: 20%;">
+			<div style="align-items: center; display: flex;">
+				<div>
+					<img class="table-avatar emp_profile" src="{{photo}}" data-name="최민규 팀장">
+				</div>&nbsp;
+				<div>
+					<span style="font-size:14px; font-weight:bold">{{name}} {{ppsName}}</span>
+					<div style="font-size:12px;">
+						<p>{{dname}}</p>
+					</div>
+				</div>
+			</div>
+		</td>
+		<td>{{formclass}}</td>
+		<td>{{formatDDate ddate}}</td>
+		<td class="project-state">
+		<span class="badge bg-info">{{state}}</span>
+		</td>
+	</tr>
+{{/each}}
+</script>
+
+<script type="text/x-handlebars-template"  id="docPageMaker-template">
+	<li class="page-item">
+		<a class="page-link" href="javascript:myMenteeDocListGo('1')">
+			<i class="fas fa-angle-double-left"></i>
+		</a>
+	</li>
+	<li class="page-item">
+		<a class="page-link" href="{{#if prev}} javascript:myMenteeDocListGo('{{prevPageNum}}{{/if}}')">
+			<i class="fas fa-angle-left"></i>
+		</a>
+	</li>
+{{#each pageNum}}
+<li class="paginate_button page-item {{signActive this}} ">
+	<a href="javascript:myMenteeDocListGo('{{this}}');" aria-controls="example2" data-dt-idx="1" tabindex="0" class="page-link">
+		{{this}}
+	</a>
+</li>
+{{/each}}
+	<li class="page-item">
+		<a class="page-link" href="{{#if next}} javascript:myMenteeDocListGo('{{nextPageNum}}{{/if}}')">
+			<i class="fas fa-angle-right"></i>
+		</a>
+	</li>
+	<li class="page-item">
+		<a class="page-link" href="javascript:myMenteeDocListGo('{{realEndPage}}')">
+			<i class="fas fa-angle-double-right"></i>
+		</a>
+	</li>
+</script>
+
+<script>
+	Handlebars.registerHelper({
+		"formatSDate" : function(startDate){
+			var dateObj = new Date(startDate);
+			var year = dateObj.getFullYear();
+			var month = dateObj.getMonth() + 1;
+			var date = dateObj.getDate();
+			return year + "-" + month + "-" + date;
+		},
+		"formatEDate" : function(endDate){
+			var dateObj = new Date(endDate);
+			var year = dateObj.getFullYear();
+			var month = dateObj.getMonth() + 1;
+			var date = dateObj.getDate();
+			return year + "-" + month + "-" + date;
+		},
+		"formatDate" : function(wend){
+			var dateObj = new Date(wend);
+			var year = dateObj.getFullYear();
+			var month = dateObj.getMonth() + 1;
+			var date = dateObj.getDate();
+			return year + "-" + month + "-" + date;
+		},
+		"formatDDate" : function(ddate){
+			var dateObj = new Date(ddate);
+			var year = dateObj.getFullYear();
+			var month = dateObj.getMonth() + 1;
+			var date = dateObj.getDate();
+			return year + "-" + month + "-" + date;
+		},
+		"signActive":function(pageNum){
+			if(pageNum == menteePage) return 'active';
+		},
+		"statusColor":function(wstatus){
+			var str = "";
+			if(wstatus == "대기"){
+				str = "bg-secondary";
+			}else if(wstatus == "진행"){
+				str = "bg-info";
+			}else if(wstatus == "완료"){
+				str = "bg-success";
+			}else if(wstatus == "이의신청"){
+				str = "bg-danger";
+			}else if(wstatus == "협업요청"){
+				str = "bg-primary";
+			}else{
+				str = "bg-warning";
+			}
+			return str;
+		}
+// 		"printPage" : function(pageMakerData){
+// 			var pageMaker = pageMakerData.pageMaker;
+// 			var target;
+
+// 			if(pageMakerData.target == "myMenteeListGo"){
+// 				target = "myMenteeListGo";
+// 			}
+
+// 			var str = '';
+// 			for(i = pageMaker.startPage; i <= pageMaker.endPage; i++){
+// 				var active = i == pageMaker.cri.page ? 'active' : '';
+// 				str += '<li class="page-item ' + active + '">';
+// 				str += '<a class="page-link" href="javascript:'+target+'(' + i + ')">';
+// 				str += i
+// 				str += '</a>';
+// 				str += '</li>';
+// 			}
+// 			return new Handlebars.SafeString(str);
+// 		}
+	});
+</script>

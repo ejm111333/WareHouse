@@ -1,0 +1,311 @@
+package kr.or.warehouse.controller.view;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import kr.or.warehouse.command.Criteria;
+import kr.or.warehouse.dto.EmployeeVO;
+import kr.or.warehouse.dto.HrTypeVO;
+import kr.or.warehouse.dto.HrVO;
+import kr.or.warehouse.dto.PostPositionVO;
+import kr.or.warehouse.dto.VacationVO;
+import kr.or.warehouse.service.HrService;
+
+@Controller
+@RequestMapping("/ehr")
+public class EhrController {
+
+	@Autowired
+	private HrService hrService;
+
+	@RequestMapping("/main")
+	public ModelAndView main(ModelAndView mnv, HttpSession session) throws Exception {
+		String url = "ehr/main";
+
+		EmployeeVO loginUser = (EmployeeVO)session.getAttribute("loginUser");
+		int eno = loginUser.getEno();
+
+		HrTypeVO hrType = null;
+		EmployeeVO employee = null;
+		
+		hrType = hrService.getHrType(eno);
+		employee = hrService.getEmp(eno);
+		
+		//주차 구하기
+		Calendar calendar = Calendar.getInstance();
+		String[] dates = "2022-07-25".split("-");
+		int year = Integer.parseInt(dates[0]);
+		int month = Integer.parseInt(dates[1]);
+		int day = Integer.parseInt(dates[2]);
+		calendar.set(year, month - 1, day);
+		calendar.setFirstDayOfWeek(Calendar.MONDAY);
+		int weekInt = calendar.get(Calendar.WEEK_OF_MONTH);
+		
+		mnv.addObject("hrType", hrType);
+		mnv.addObject("weekInt", weekInt);
+		mnv.addObject("standardDate", new Date());
+		mnv.addObject("employee", employee);
+		mnv.setViewName(url);
+
+		return mnv;
+	}
+
+	@RequestMapping("/teamList")
+	public void teamList() {}
+
+	@RequestMapping("/vacation")
+	public ModelAndView vacation(ModelAndView mnv, HttpServletRequest request, HttpSession session) throws Exception {
+		String url = "/ehr/vacation";
+
+		EmployeeVO loginUser = (EmployeeVO) session.getAttribute("loginUser");
+		int eno = loginUser.getEno();
+
+		EmployeeVO employee = hrService.getEmp(eno);
+
+		VacationVO vacation = null;
+		vacation = hrService.getVacation(eno);
+
+		List<Map<String, Date>> vacationPeriod = hrService.selectVacationPeriod(eno);
+
+
+		mnv.addObject("employee", employee);
+		mnv.addObject("vacation", vacation);
+		mnv.addObject("vacationPeriod", vacationPeriod);
+		mnv.setViewName(url);
+
+		return mnv;
+	}
+	
+	@Resource(name = "hrLogSavePath")
+	private String savePath = "c:\\log";
+
+	private String fileName = "hr_log.csv";
+	
+	@RequestMapping("/hrLogToDataBase")
+	public void hrLogToDataBase() throws Exception{
+		File logFile = new File(savePath+File.separator+fileName);
+		if(!logFile.exists()) {
+			new File(savePath).mkdirs();
+			String logFilePath=savePath+File.separator+fileName;
+			BufferedWriter out=new BufferedWriter(new FileWriter(logFilePath,true));
+
+			out.write("");
+			out.close();
+		}
+
+		FileReader reader = new FileReader(savePath + File.separator + fileName);
+		BufferedReader in = new BufferedReader(reader);
+
+		//그릇 준비
+		String textLine = null;
+		Map<String, HrVO> logMap = new HashMap<String, HrVO>();
+
+		//기준일 계산(오늘 -1)
+		Date today = new Date();
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(today);
+		cal.add(Calendar.DATE, -1);
+		Date date = cal.getTime();
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat format2 = new SimpleDateFormat("yyyy.M.d");
+		String strDate = format.format(date);
+		String strDate2 = format2.format(date);
+//		System.out.println(strDate2);
+
+		//계산 시작
+		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+		try {
+			while((textLine = in.readLine()) != null) {
+				String[] logData =textLine.split(",");
+//				System.out.println("eno"+logData[1]);
+//				System.out.println(logData[2]);
+//				System.out.println(logData[3]);
+//				System.out.println(logData[4]);
+//				System.out.println(logData[5]);
+				if(logData[2].equals(strDate2)) { //필요한 날짜만 도출
+
+					String eno = logData[1];
+//					System.out.println("eno"+eno);
+					if(logMap.get(eno) == null) {
+						logMap.put(eno, new HrVO());
+						logMap.get(eno).setEno(Integer.parseInt(eno));
+					}
+
+					logMap.get(eno).setHrDate(strDate);
+
+					if(logData[0].equals("[ontime]")) {
+						if(logMap.get(eno).getOnTime() == null
+								|| sdf.parse(logData[3]).before(sdf.parse(logMap.get(eno).getOnTimeStr()))) {
+							logMap.get(eno).setOnTimeStr(logData[3]);
+						}
+
+					} else if(logData[0].equals("[offtime]")) {
+						if(logMap.get(eno).getOffTime() == null
+								|| sdf.parse(logData[3]).after(sdf.parse(logMap.get(eno).getOffTimeStr()))) {
+							logMap.get(eno).setOffTimeStr(logData[3]);
+						}
+					}
+				}
+
+			}
+		} finally {
+			if(reader != null) reader.close();
+			if(in != null) in.close();
+		}
+
+		System.out.println(logMap);
+		hrService.write(logMap);
+		
+		String day = cal.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.KOREAN);
+//		String day = getDateDay(strDate, "yyyy-MM-dd");
+		System.out.println(day);
+		hrStateToDataBase(strDate, day);
+	}
+	
+	public void hrStateToDataBase(String strDate, String day) throws Exception{
+		//service로 상태가 휴직(2), 퇴사(0)가 아니면서 근무상태가 휴가가 아닌 emp 찾고
+		//추가 - 근무 요일이 아닌
+		List<EmployeeVO> empList = hrService.getEmpForHrData(day);
+		System.out.println("empList : " +empList);
+		//찾은 eno로 오늘의 hr을 찾아서 없으면
+		if(empList != null) for(EmployeeVO emp : empList) {
+			boolean flag = false;
+			List<HrVO> hrList = hrService.getHrList(emp.getEno());
+			
+			if(hrList != null) for(HrVO hr : hrList) {
+				if(hr.getHrDate().equals(strDate)) flag = true;
+			}
+			//근무상태 입력 - 2:지각
+			if(!flag) {
+				HrVO temp = new HrVO();
+				temp.setEno(emp.getEno());
+				temp.setHrDate(strDate);
+				temp.setState(2);
+				temp.setOnTimeStr("결근");
+				temp.setOffTimeStr("-");
+				hrService.writeAbsent(temp);
+			}
+		}
+		
+	}
+
+	@RequestMapping("/teamVacationList")
+	public void teamVacationList() {}
+
+	@RequestMapping("/teamHrList")
+	public ModelAndView teamHrList(Criteria cri, @RequestParam(defaultValue = "") String condition, ModelAndView mnv, HttpSession session)throws Exception {
+		String url="ehr/teamHrList";
+
+		System.out.println("condition : " + condition);
+		EmployeeVO loginUser = (EmployeeVO)session.getAttribute("loginUser");
+
+		Map<String, Object> dataMap = hrService.getSelectTeamHrList(cri, loginUser.getDno(), condition);
+
+		Map<String, Integer> countMap = new HashMap<String, Integer>();
+		int workingCount = hrService.selectTeamHrListCount(loginUser.getDno(), "업무중");
+		int workoffCount = hrService.selectTeamHrListCount(loginUser.getDno(), "업무종료");
+		int outCount = hrService.selectTeamHrListCount(loginUser.getDno(), "자리비움");
+
+		int allCount = hrService.selectTeamHrListAllCount(loginUser.getDno());
+
+		System.out.println("여기 : "+ workingCount + workoffCount + outCount);
+		countMap.put("workingCount", workingCount);
+		countMap.put("workoffCount", workoffCount);
+		countMap.put("outCount", outCount);
+
+		mnv.addObject("dataMap", dataMap);
+		mnv.addObject("countMap", countMap);
+		mnv.addObject("condition", condition);
+		mnv.addObject("allCount", allCount);
+		mnv.setViewName(url);
+		return mnv;
+	}
+
+	@RequestMapping("/teamHrDetail")
+	public ModelAndView teamHrCard(ModelAndView mnv, int eno)throws Exception {
+		String url="ehr/teamHrCard";
+
+		EmployeeVO hrDetail = hrService.getEmp(eno);
+		mnv.addObject("hrDetail",hrDetail);
+		mnv.setViewName(url);
+		return mnv;
+	}
+
+	@RequestMapping("/hrModifyForm")
+	public ModelAndView hrModifyForm(int eno, ModelAndView mnv)throws Exception{
+		String url="ehr/teamHrCardModify";
+
+		EmployeeVO hrDetail = hrService.getEmp(eno);
+
+		mnv.addObject("hrDetail",hrDetail);
+		mnv.setViewName(url);
+
+		return mnv;
+	}
+
+	@RequestMapping(value="/hrModify",method=RequestMethod.POST)
+	public String hrModify(EmployeeVO employee,HttpServletRequest request, RedirectAttributes rttr) throws Exception{
+
+		System.out.println("hrmodify con : " + employee);
+		String url = "redirect:/ehr/teamHrDetail.do";
+
+
+		hrService.modifyHr(employee);
+
+		rttr.addFlashAttribute("from","modify");
+		rttr.addAttribute("eno",employee.getEno());
+
+		return url;
+	}
+
+	@RequestMapping("/test")
+	public void test() {}
+
+	@RequestMapping("/hrCard")
+	public ModelAndView hrCard(ModelAndView mnv,  HttpServletRequest request) throws Exception{
+		String url = "ehr/hrCard";
+
+		HttpSession session = request.getSession();
+		EmployeeVO loginUser = (EmployeeVO)session.getAttribute("loginUser");
+		int eno = loginUser.getEno();
+
+		EmployeeVO emp = hrService.getEmp(eno);
+		List<PostPositionVO> postPostionList = hrService.getPostPositionList();
+
+		mnv.addObject("emp", emp);
+		mnv.addObject("postPostionList", postPostionList);
+		mnv.setViewName(url);
+
+		return mnv;
+	}
+
+	@RequestMapping("/workTypeForm")
+	public String workTypeForm() {
+		String url = "ehr/workType";
+
+		return url;
+	}
+
+}

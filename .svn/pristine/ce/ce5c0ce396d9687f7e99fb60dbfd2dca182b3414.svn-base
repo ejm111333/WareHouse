@@ -1,0 +1,24 @@
+package kr.or.warehouse.controller.view;
+
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping("/mypage")
+public class MypageController {
+
+	@RequestMapping("/profile")
+	public String profile() throws Exception{
+		String url="mypage/profile";
+		return url;
+	}
+
+	@RequestMapping("/activity")
+	public void activity() {
+	}
+
+	@RequestMapping("/work")
+	public void work() {
+	}
+}

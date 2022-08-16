@@ -1,0 +1,76 @@
+package kr.or.warehouse.service;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import kr.or.warehouse.command.Criteria;
+import kr.or.warehouse.controller.view.OrganizationNode;
+import kr.or.warehouse.dto.BoardVO;
+import kr.or.warehouse.dto.ContactgrVO;
+import kr.or.warehouse.dto.DepartmentVO;
+import kr.or.warehouse.dto.EmployeeVO;
+import kr.or.warehouse.dto.MycontactVO;
+
+public interface ContactService {
+
+	Map<String,Object> getContactList(Criteria cri)throws SQLException;
+
+	Map<String,Object> getTeamContactList(Criteria cri, String dname)throws SQLException;
+
+	Map<String, Object>getGroupInfoList(Criteria cri, String cogroupcode)throws SQLException;
+
+
+	//Gr
+
+	//그룹 등록
+	String regist(ContactgrVO contactgr)throws SQLException;
+
+	//그룹 사원들 등록
+	void registInfo(String cogroupcode, List<String>groupMember) throws SQLException;
+
+	// 그룹지정 등록
+	String registGroupAssign(String cogroupcode, List<String>groupMember) throws SQLException;
+
+	Map<String,Object> getContactGroupList(Criteria cri,int eno)throws SQLException;
+
+	//개인주소록 전체리스트
+	Map<String, Object>getPersonalList(Criteria cri,int eno)throws SQLException;
+
+	//개인주소록 그룹 안 사원 삭제
+	void remove(List<String> empList, String cogroupcode) throws SQLException;
+
+	//개인주소록 그룹 삭제
+	void removeGr(String cogroupcode) throws SQLException;
+
+	//부서주소록
+	Map<String,Object> getDepartmentList(Criteria cri, int dno)throws SQLException;
+
+
+	
+	// 초성-------------------------------------------------------------------------
+	Map<String,Object> getGiList(Criteria cri)throws SQLException;
+	Map<String,Object> getNiList(Criteria cri)throws SQLException;
+	Map<String,Object> getDiList(Criteria cri)throws SQLException;
+	Map<String,Object> getRiList(Criteria cri)throws SQLException;
+	Map<String,Object> getMiList(Criteria cri)throws SQLException;
+	Map<String,Object> getBiList(Criteria cri)throws SQLException;
+	Map<String,Object> getXiList(Criteria cri)throws SQLException;
+	Map<String,Object> getOiList(Criteria cri)throws SQLException;
+	Map<String,Object> getJiList(Criteria cri)throws SQLException;
+	Map<String,Object> getCiList(Criteria cri)throws SQLException;
+	Map<String,Object> getCaiList(Criteria cri)throws SQLException;
+	Map<String,Object> getTiList(Criteria cri)throws SQLException;
+	Map<String,Object> getPiList(Criteria cri)throws SQLException;
+	Map<String,Object> getHiList(Criteria cri)throws SQLException;
+
+	//조직도
+	public List<OrganizationNode> organization(List<DepartmentVO> depList) throws Exception;
+
+
+
+
+
+
+}

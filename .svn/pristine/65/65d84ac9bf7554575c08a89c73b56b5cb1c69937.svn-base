@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Employee-Mapper">
+
+	<select id="selectEmployeeByEno" parameterType="int" resultType="employee">
+		SELECT
+			*
+		FROM
+			employee
+		WHERE
+			eno=#{eno}
+	</select>
+
+	<select id="userAuthorities" parameterType="int" resultType="employee">
+		select aname from authority where eno = #{eno}
+	</select>
+	
+	<!-- 직위코드를 이용한 직위 select -->
+	<select id="selectPpsByPpscode" parameterType="str" resultType="postposition">
+		SELECT
+			ppsCode, ppSname, ppsPay
+		FROM
+			postposition
+		WHERE
+			ppsCode = #{ppsCode}
+	</select>
+</mapper>
+

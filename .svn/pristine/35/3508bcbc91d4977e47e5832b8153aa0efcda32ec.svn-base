@@ -1,0 +1,27 @@
+package kr.or.warehouse.dao;
+
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+
+import kr.or.warehouse.dto.MentoringVO;
+import kr.or.warehouse.dto.SubMentoringVO;
+
+public interface MentoringDAO {
+	//나의 멘토목록
+	List<SubMentoringVO> selectMyMento(int eno) throws Exception;
+	//나의 멘티목록
+	List<MentoringVO> selectMyMentee(int eno) throws Exception;
+
+	//나를 멘토로 신청한 목록
+	List<SubMentoringVO> subMentoringList(int eno) throws Exception;
+
+	//인기멘토목록
+	List<MentoringVO> selectMentoRank() throws Exception;
+
+
+
+
+	//String selectMentoName(int eno) throws Exception;
+
+}

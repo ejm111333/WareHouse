@@ -1,0 +1,33 @@
+package kr.or.warehouse.service;
+
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.or.warehouse.dao.PdsDAO;
+import kr.or.warehouse.dto.PdsVO;
+
+@Service
+public class PdsServiceImpl implements PdsService {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(PdsServiceImpl.class);
+	
+	@Autowired
+	private PdsDAO pdsDAO;
+
+	@Override
+	public List<PdsVO> getPdsList(int eno) throws Exception {
+		List<PdsVO> pdsList = null;
+		pdsList = pdsDAO.selectPdsListByEno(eno);
+		return pdsList;
+	}
+
+	@Override
+	public void uploadFile(PdsVO pds) throws Exception {
+		pdsDAO.insertFile(pds);
+	}
+
+}

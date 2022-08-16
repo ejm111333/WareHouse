@@ -1,0 +1,164 @@
+package kr.or.warehouse.service;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.session.RowBounds;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.or.warehouse.command.Criteria;
+import kr.or.warehouse.command.PageMaker;
+import kr.or.warehouse.controller.view.OrganizationNode;
+import kr.or.warehouse.dao.ContactDAO;
+import kr.or.warehouse.dao.NewApprovalDAO;
+import kr.or.warehouse.dto.DepartmentVO;
+import kr.or.warehouse.dto.EmployeeVO;
+import kr.or.warehouse.dto.SignDocVO;
+import kr.or.warehouse.dto.SignLineVO;
+
+@Service
+public class NewApprovalServiceImpl implements NewApprovalService {
+
+	@Autowired
+	private NewApprovalDAO newApprovalDAO;
+
+
+	//관련문서
+	@Override
+	public Map<String, Object> getRelatedDocList(Criteria cri) throws SQLException {
+
+		int offset=cri.getStartRowNum();//추가
+		int limit=cri.getPerPageNum();//추가
+		RowBounds rowBounds=new RowBounds(offset,limit); //추가
+
+		Map<String, String> paramMap = new HashMap<String, String>();
+		paramMap.put("searchType", cri.getSearchType());
+		paramMap.put("keyword", cri.getKeyword());
+
+		Map<String, Object>dataMap = new HashMap<String, Object>();
+		List<SignDocVO> myRelateDocList = newApprovalDAO.selectRelatedDocList(paramMap, rowBounds);
+
+		PageMaker pageMaker = new PageMaker();
+		pageMaker.setCri(cri);
+		pageMaker.setTotalCount(myRelateDocList.size());
+
+		dataMap.put("myRelateDocList", myRelateDocList);
+		dataMap.put("pageMaker", pageMaker);
+
+		return dataMap;
+
+	}
+
+	@Override
+	public Map<String, Object> getSignLineList(Criteria cri) throws SQLException {
+		int offset=cri.getStartRowNum();//추가
+		int limit=cri.getPerPageNum();//추가
+		RowBounds rowBounds=new RowBounds(offset,limit); //추가
+
+		Map<String, String> paramMap = new HashMap<String, String>();
+		paramMap.put("searchType", cri.getSearchType());
+		paramMap.put("keyword", cri.getKeyword());
+
+		Map<String, Object>dataSignLine = new HashMap<String, Object>();
+		List<SignLineVO> mySignLineList = newApprovalDAO.selectSignLineList(paramMap, rowBounds);
+
+		PageMaker pageMaker = new PageMaker();
+		pageMaker.setCri(cri);
+		pageMaker.setTotalCount(mySignLineList.size());
+
+		dataSignLine.put("mySignLineList", mySignLineList);
+		dataSignLine.put("pageMaker", pageMaker);
+
+		return dataSignLine;
+	}
+
+	@Override
+	public Map<String, Object> getRefLineList(Criteria cri) throws SQLException {
+		int offset=cri.getStartRowNum();//추가
+		int limit=cri.getPerPageNum();//추가
+		RowBounds rowBounds=new RowBounds(offset,limit); //추가
+
+		Map<String, String> paramMap = new HashMap<String, String>();
+		paramMap.put("searchType", cri.getSearchType());
+		paramMap.put("keyword", cri.getKeyword());
+
+		Map<String, Object>dataRefLine = new HashMap<String, Object>();
+		List<EmployeeVO> myRefLineList = newApprovalDAO.selectRefLineList(paramMap, rowBounds);
+
+		PageMaker pageMaker = new PageMaker();
+		pageMaker.setCri(cri);
+		pageMaker.setTotalCount(myRefLineList.size());
+
+		dataRefLine.put("myRefLineList", myRefLineList);
+		dataRefLine.put("pageMaker", pageMaker);
+
+		return dataRefLine;
+	}
+
+
+	//조직도
+	public List<OrganizationNode> organization(List<DepartmentVO> depList){
+	      List<OrganizationNode> nodeList = new ArrayList<OrganizationNode>();
+
+	      for(DepartmentVO dep : depList) {
+	         OrganizationNode node = new OrganizationNode();
+	         node.setId(Integer.toString(dep.getDno()));
+	         node.setText(dep.getDname());
+	         if(dep.getUpdno() == 0) {
+	            node.setParent("#");
+	         }else {
+	            node.setParent(Integer.toString(dep.getUpdno()));
+	         }
+
+	         if(dep.getEmpList().size() > 0) {
+	            List<EmployeeVO> empList = dep.getEmpList();
+	            for(EmployeeVO emp : empList) {
+	               OrganizationNode childNode = new OrganizationNode();
+	               childNode.setId(Integer.toString(emp.getEno()));
+	               childNode.setText(emp.getName());
+	               childNode.setParent(Integer.toString(dep.getDno()));
+	               childNode.setIcon("fas fa-user");
+	               nodeList.add(childNode);
+	            }
+	         }
+	         node.setIcon("fas fa-building");
+	         nodeList.add(node);
+	      }
+	      return nodeList;
+	   }
+
+
+	//조직도 부서
+	@Override
+	public Map<String, Object> getDeptName(Criteria cri, int eno) throws SQLException {
+		Map<String, Object> dataMap = new HashMap<String, Object>();
+		List<SignDocVO> myDepList = newApprovalDAO.selectDeptName(cri, eno);
+
+		PageMaker pageMaker = new PageMaker();
+		pageMaker.setCri(cri);
+		pageMaker.setTotalCount(myDepList.size());
+
+		dataMap.put("myDepList", myDepList);
+		dataMap.put("pageMaker", pageMaker);
+
+		return dataMap;
+		}
+
+	//결재선 저장
+	@Override
+	public void registSignLine(SignLineVO signLine, List<String> empList) {
+		/*
+		 * 	부장1
+			과장2
+			대리3
+			사원4
+			set 
+		 */
+	}
+
+
+}

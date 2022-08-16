@@ -1,0 +1,11 @@
+package kr.or.warehouse.service;
+
+import java.sql.SQLException;
+import java.util.Map;
+
+import kr.or.warehouse.command.Criteria;
+
+public interface ContactgrService {
+
+	Map<String,Object> getContactGroupList(Criteria cri)throws SQLException;
+}

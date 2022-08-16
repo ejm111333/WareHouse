@@ -1,0 +1,15 @@
+package kr.or.warehouse.dao;
+
+import java.sql.SQLException;
+import java.util.List;
+
+
+import kr.or.warehouse.dto.DepartmentVO;
+
+public interface DepartMentDAO {
+
+	public List<DepartmentVO> selectDepartMentList() throws SQLException;
+	
+	//dno로 부서정보 select
+	DepartmentVO selectDepartmentByDno(int dno) throws SQLException;
+}

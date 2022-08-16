@@ -1,0 +1,29 @@
+package kr.or.warehouse.service;
+
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.warehouse.command.Criteria;
+import kr.or.warehouse.controller.view.OrganizationNode;
+import kr.or.warehouse.dto.DepartmentVO;
+
+public interface NewApprovalService {
+
+	//관련문서
+	Map<String,Object> getRelatedDocList(Criteria cri)throws SQLException;
+
+	//결재선 리스트
+	Map<String,Object> getSignLineList(Criteria cri)throws SQLException;
+
+	//참조자 리스트
+	Map<String,Object> getRefLineList(Criteria cri)throws SQLException;
+
+	//조직도
+	public List<OrganizationNode> organization(List<DepartmentVO> depList) throws Exception;
+
+	//조직도 부서
+	Map<String,Object> getDeptName(Criteria cri, int eno)throws SQLException;
+}

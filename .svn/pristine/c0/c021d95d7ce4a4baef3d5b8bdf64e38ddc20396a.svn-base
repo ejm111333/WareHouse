@@ -1,0 +1,16 @@
+package kr.or.warehouse.service;
+
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+
+import kr.or.warehouse.command.Criteria;
+import kr.or.warehouse.dto.CommunityVO;
+
+public interface CommunityService {
+	
+	Map<String,Object> getCommunityList(Criteria cri)throws SQLException;
+	
+	List<CommunityVO> getJoinCommuList(int eno) throws SQLException;
+	
+}

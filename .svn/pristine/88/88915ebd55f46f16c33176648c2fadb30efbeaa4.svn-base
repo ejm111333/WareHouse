@@ -1,0 +1,21 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+
+
+<script>
+function testConfirm(){
+	var test = confirm("커뮤니티 가입을 승인하시겠습니까?");
+	
+	if(test){
+		alert("가입을 승인했습니다.");
+		var ref = document.referrer;
+// 		console.log(ref);
+		parent.location.href = ref;
+// 		history.go(-1);
+	}
+}
+</script>
+
+<script>
+testConfirm();
+</script>

@@ -1,0 +1,62 @@
+package kr.or.warehouse.dao;
+
+import java.sql.SQLException;
+import java.util.List;
+
+import org.apache.ibatis.session.RowBounds;
+import org.apache.ibatis.session.SqlSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import kr.or.warehouse.command.Criteria;
+import kr.or.warehouse.dto.CommunityVO;
+
+@Repository
+public class CommunityDAOImpl implements CommunityDAO{
+
+	@Autowired
+	private SqlSession session;
+	
+	@Override
+	public List<CommunityVO> selectSearchCommunityList(Criteria cri, RowBounds rowBounds) throws SQLException {
+		return session.selectList("Community-Mapper.selectSearchCommunityList", cri, rowBounds);
+	}
+
+	@Override
+	public int selectSearchCommunityListCount(Criteria cri) throws SQLException {
+		return session.selectOne("Community-Mapper.selectSearchCommunityListCount", cri);
+	}
+
+	@Override
+	public String selectName(CommunityVO community) throws SQLException {
+		return session.selectOne("Community-Mapper.selectName", community);
+	}
+
+	@Override
+	public int selectJoinCommuCount(String cmno) throws SQLException {
+		return session.selectOne("Community-Mapper.selectJoinCommuCount", cmno);
+	}
+
+	@Override
+	public List<CommunityVO> selectJoinCommuList(int eno) throws SQLException {
+		return session.selectList("Community-Mapper.selectJoinCommuList", eno);
+	}
+
+	@Override
+	public List<CommunityVO> selectSubCommuList(int eno) throws SQLException {
+		return session.selectList("Community-Mapper.selectSubCommuList", eno);
+	}
+
+	@Override
+	public List<CommunityVO> selectBestCommuList() throws SQLException {
+		return session.selectList("Community-Mapper.selectBestCommuList");
+	}
+
+	@Override
+	public List<CommunityVO> selectApproveCommuList(int eno) throws SQLException {
+		return session.selectList("Community-Mapper.selectApproveCommuList", eno);
+	}
+
+	
+
+}

@@ -1,0 +1,83 @@
+/* 초성  선택*/
+//'ㅎ'클릭
+function ajaxFunc(url,callback){
+	console.log("js파일 실행");
+
+	$.ajax({
+		url:url,
+		type:'get',
+		dataType : 'json',
+		success:function(response){
+			console.log("response",response);
+
+			callback(response);
+
+			res='';
+		 	res+='<table class="table table-hover text-nowrap">';
+			res+='	<thead>                                                   ';
+			res+='		<tr>                                                  ';
+			res+='			<th >                                             ';
+			res+='				<input type="checkbox" value="" id="check1">  ';
+			res+='				<label for="check1"></label>                  ';
+			res+='			</th>                                             ';
+			res+='				<th >이름</th>                                ';
+			res+='				<th >직위</th>                                ';
+			res+='				<th >휴대폰</th>                              ';
+			res+='				<th >이메일</th>                              ';
+			res+='				<th >부서</th>                                ';
+			res+='				<th >내선번호</th>                            ';
+			res+='		</tr>                                                 ';
+			res+='	</thead>                                                  ';
+			res+='	<tbody id="tall"> ';
+
+			$.each(response.myconList, function(i, v){
+					console.log("name", v.name);
+				res+='<tr style="font-size: 0.85em;cursor:pointer;">';
+				res+='	<td>  ';
+				res+='		<div class="icheck-primary">  ';
+				res+='			<input type="checkbox" class="empCheckbox" id="'+v.eno+'" name="eno" onclick="inputEmpList(' + v.eno + ')"> ';
+				res+='			<label for="check1"></label> ';
+				res+='		</div> ';
+				res+='	</td> ';
+		 	 	res+='	<td>'+v.name+'';
+
+		 	 	if(v.condition == '업무중'){
+		 	 	res+='<span class="position-absolute bottom-0 end-0 badge border border-white rounded-circle bg-success p-1"><span class="visually-hidden"></span></span>';
+		 	 	} else if (v.condition == '업무종료'){
+		 	 	res+='<span class="position-absolute bottom-0 end-0 badge border border-white rounded-circle bg-success p-1" style="background-color: #e10a14!important;"><span class="visually-hidden"></span></span>';
+		 	 	} else
+		 	 	res+='<span class="position-absolute bottom-0 end-0 badge border border-white rounded-circle bg-success p-1" style="background-color: #ffc107!important;"><span class="visually-hidden"></span></span>';
+				res+='</td>';
+				res+='	<td>'+v.ppsname+'</td> ';
+				res+='	<td>'+v.phone+'</td>';
+				res+='	<td  onclick=OpenWindow("../mail/send.do","메일보내기",1000,800)><U>'+v.email+'</U></td>';
+				res+='	<td>'+v.dname+'</td>';
+				res+='	<td>'+v.call+'</td>';
+				res+='</tr>';
+			});
+				res+='		</tbody>';
+				res+='		</table>';
+
+			res+='	<div class="card-footer">';
+			res+='		<ul class="pagination justify-content-center m-0">';
+			res+='			<li class="page-item">';
+			res+='				<a class="page-link" href=""> <i class="fas fa-angle-double-left"></i></a>';
+			res+='			</li><li class="page-item">';
+			res+='				<a class="page-link" href=""> <i class="fas fa-angle-left"></i></a>';
+			res+='			</li>';
+			res+='				<li class="page-item active">';
+			res+='					<a class="page-link" href="">1</a>';
+			res+='				</li>';
+			res+='			<li class="page-item">';
+			res+='				<a class="page-link" href=""> <i class="fas fa-angle-right"></i></a>';
+			res+='			</li>';
+			res+='			<li class="page-item">';
+			res+='				<a class="page-link" href=""> <i class="fas fa-angle-double-right"></i></a>';
+			res+='			</li>';
+			res+='		</ul>';
+			res+='	</div>';
+
+		$('#botallTable').html(res);
+		}
+	});
+}

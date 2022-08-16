@@ -1,0 +1,48 @@
+package kr.or.warehouse.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.or.warehouse.dao.MentoringDAO;
+import kr.or.warehouse.dto.MentoringVO;
+import kr.or.warehouse.dto.SubMentoringVO;
+
+
+@Service
+public class MentoringServiceImpl implements MentoringService{
+	@Autowired
+	private MentoringDAO mentoringDAO;
+
+	@Override
+	public List<SubMentoringVO> getMyMentoList(int eno) throws Exception {
+		List<SubMentoringVO> mentoList = mentoringDAO.selectMyMento(eno);
+
+//		for(SubMentoringVO mento : mentoList) {
+//			int mentoCount = mentoringDAO.selectMyMentoCount(eno);
+//			mento.setMentoCount(mentoCount);
+//		}
+
+		return mentoList;
+	}
+
+	@Override
+	public List<MentoringVO> getMyMenteeList(int eno) throws Exception {
+		List<MentoringVO> menteeList = mentoringDAO.selectMyMentee(eno);
+		return menteeList;
+	}
+
+	@Override
+	public List<SubMentoringVO> getSubMentoringList(int eno) throws Exception {
+		List<SubMentoringVO> subList = mentoringDAO.subMentoringList(eno);
+		return subList;
+	}
+
+	@Override
+	public List<MentoringVO> getMentoRank() throws Exception {
+		List<MentoringVO> rankList = mentoringDAO.selectMentoRank();
+		return rankList;
+	}
+
+}

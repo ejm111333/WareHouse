@@ -1,0 +1,523 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib prefix="c"  uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<head>
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/css/ehr.css">
+</head>
+
+<body>
+<c:set var="today" value="<%=new java.util.Date() %>"/>
+<div class="wrapper">
+	<h3 class="title">내 근태관리</h3>
+
+ 	<!-- Main content -->
+	<section class="top">
+<!-- 		<div class="card"> -->
+			<div class="row">
+   				<div class="card-body" style="text-align:left; padding: 7px;">
+					<div class="col-sm-12">
+						<div class="row">
+							<div class="col-sm-6">
+								<p style="margin-bottom: 4px;"><b>${hrType.hrType }</b>&nbsp;&nbsp;${hrType.onTime } - ${hrType.offTime }</p>
+							</div>
+							<div class="col-sm-6 text-right">
+								<p style="margin-bottom: 4px; font-size: 0.8em;"><i class="fas fa-cloud-download-alt"></i>&nbsp;목록 다운로드&nbsp;</p>
+							</div>
+						</div>
+						<div class="info-box card-info card-outline">
+							<span class="info-box-icon" style="width: 60; height: 60;">
+								<img data-cfsrc="../../dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image" src="https://adminlte.io/themes/v3/dist/img/user2-160x160.jpg">
+							</span>
+							<div class="info-box-content">
+								<div class="row text-center">
+									<div class="col-md-2">
+										<span class="info-box-text text-left"><b>최민규 팀장</b></span>
+										<span class="info-box-text text-left" style="font-size: 0.8em;">인사관리팀</span>
+									</div>
+									<div class="col-md-2">
+										<span class="info-box-text">이번 주 누적</span>
+										<span class="info-box-number">${calcHr.hrTime }</span>
+									</div>
+									<div class="col-md-2">
+										<span class="info-box-text">이번 주 초과</span>
+										<span class="info-box-number">${calcHr.overTime }</span>
+									</div>
+									<div class="col-md-2">
+										<span class="info-box-text">이번 주 잔여</span>
+										<span class="info-box-number">${calcHr.remainTime }</span>
+									</div>
+									<div class="col-md-2">
+										<span class="info-box-text">이번 주 지각</span>
+										<span class="info-box-number">${calcHr.tardy }건</span>
+									</div>
+									<div class="col-md-2">
+										<span class="info-box-text">이번 주 수정</span>
+										<span class="info-box-number">${calcHr.reqChange }건</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+    		</div>
+<!-- 	     </div> -->
+   	</section>
+
+	<section class="month" style="margin-bottom: 25px;">
+		<div class="row text-center" style="display: flex;">
+			<div class="col-md-12" style="font-size: 1.5em;">
+				<a class="btn btn-default btn-sm" href="javascript:changeMonth(-1);"> <i class="fas fa-angle-left"></i></a>
+				<span id="month">&nbsp;&nbsp;<fmt:formatDate value="${standardDate }" pattern="yyyy.MM"/>&nbsp;&nbsp;</span>
+				<a class="btn btn-default btn-sm" href="javascript:changeMonth(1);"> <i class="fas fa-angle-right"></i></a>
+				<a class="" style="font-size: 0.6em;" href="javascript:location.reload()">Today</a>
+			</div>
+		</div>
+	</section>
+
+	<section class="content">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-md-3">
+
+					<div class="card card-info card-outline">
+						<div class="card-body box-profile">
+							<p class="text-muted text-left" style="margin-bottom: 1px;"><fmt:formatDate value="${today }" pattern="yyyy-MM-dd(E)"/></p>
+							<div class="progress">
+								<div class="progress-bar" style="width: 60%"></div>
+							</div>
+							<ul class="list-group list-group-unbordered mb-3 list">
+								<li class="list-group-item"><b>출근시간</b>
+									<a class="float-right">08:47:13</a>
+								</li>
+								<li class="list-group-item"><b>퇴근시간</b>
+									<a class="float-right">미등록</a>
+								</li>
+<!-- 								<li class="list-group-item"><b>주간 누적근무시간</b> -->
+<%-- 									<a class="float-right">${calcHr.hrTime }</a> --%>
+<!-- 								</li> -->
+							</ul>
+							<div class="row">
+								<div class="col-6">
+									<button type="button" class="btn btn-info btn-block">출근</button>
+								</div>
+								<div class="col-6">
+									<button type="button" class="btn btn-info btn-block">퇴근</button>
+								</div>
+							</div>
+							<div class="row" style="margin-top: 6px;">
+								<div class="col-12">
+									<select class="form-control" name="perPageNum" id="perPageNum" style="text-align: center; background: #17a2b8; color: #fff">
+								  		<option value="" >업무중</option>
+								  		<option value="" style="background: none;">업무종료</option>
+								  		<option value="" >외근</option>
+								  		<option value="" >출장</option>
+								  		<option value="" >휴가</option>
+								  		<option value="" >회의중</option>
+								  		<option value="" >자리비움</option>
+								  		<option value="" >외근 후 퇴근</option>
+								  	</select>
+								</div>
+							</div>
+						</div>
+
+					</div>
+
+					<div class="card card-info card-outline">
+						<div class="card-body box-profile">
+							<p class="text-left mb-2" style="font-size: 1em;"><b style="padding: 0px;">내 근무유형 :${hrType.hrType }</b></p>
+							<ul class="list-group list-group-unbordered mb-3 list">
+								<li class="list-group-item"><b>출근시간</b>
+									<a class="float-right">${hrType.onTime }</a>
+								</li>
+								<li class="list-group-item"><b>퇴근시간</b>
+									<a class="float-right">${hrType.offTime }</a>
+								</li>
+								<li class="list-group-item"><b>주간 근무시간</b>
+									<a class="float-right">${hrType.weekTime }</a>
+								</li>
+							</ul>
+							<a href="#" class="btn btn-info btn-block"  onclick="OpenWindow('workTypeForm.do','근무계획표',800,600);"><b>근무유형 변경</b></a>
+						</div>
+
+					</div>
+
+				</div>
+
+				<div class="col-md-9">
+					<div class="calCard card ${calcHr.weekOfMonth eq 1 ? '' : 'collapsed-card'}">
+						<div class="card-header">
+							<div class="row">
+								<div class="col-1">
+									<button onclick="changeWeek(1)" type="button" class="btn" data-card-widget="collapse" title="Collapse">
+										<i class="colBtn fas fa-${calcHr.weekOfMonth eq 1 ? 'minus' : 'plus'}"></i>
+									</button>
+								</div>
+								<div class="col-5">
+									<span class=""><b>1주차</b></span>
+								</div>
+								<div class="col-4 text-right">
+									<span class="">누적근무시간</span>&nbsp;&nbsp;
+								</div>
+								<div class="col-2 week-target">
+								
+								</div>
+							</div>
+						</div>
+						<div class="card-body p-0 tableCard" style="display:  ${calcHr.weekOfMonth eq 1 ? 'block' : 'none'};">
+							<table class="table table-hover projects text-center" style="font-size: 0.9em;">
+								<thead>
+									<tr>
+										<th style="width: 10%">일자</th>
+										<th style="width: 12%">업무시작</th>
+										<th style="width: 12%">업무종료</th>
+										<th style="width: 15%">총 근무시간</th>
+										<th style="width: 32%">근무시간 상세</th>
+										<th style="width: 19%">승인요청내역</th>
+									</tr>
+								</thead>
+								<tbody class="table-target">
+
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+					<div class="calCard card ${calcHr.weekOfMonth eq 2 ? '' : 'collapsed-card'}">
+						<div class="card-header">
+							<div class="row">
+								<div class="col-1">
+
+									<button onclick="changeWeek(2)" type="button" class="btn" data-card-widget="collapse" title="Collapse">
+										<i class="colBtn fas fa-${calcHr.weekOfMonth eq 2 ? 'minus' : 'plus'}"></i>
+									</button>
+								</div>
+									<div class="col-5">
+									<span class=""><b>2주차</b></span>
+								</div>
+								<div class="col-4 text-right">
+									<span class="">누적근무시간</span>&nbsp;&nbsp;
+								</div>
+								<div class="col-2 week-target">
+								
+								</div>
+							</div>
+						</div>
+						<div class="card-body p-0 tableCard" style="display :  ${calcHr.weekOfMonth eq 2 ? 'block' : 'none'};">
+							<table class="table table-hover projects text-center" style="font-size: 0.9em;">
+								<thead>
+									<tr>
+										<th style="width: 10%">일자</th>
+										<th style="width: 12%">업무시작</th>
+										<th style="width: 12%">업무종료</th>
+										<th style="width: 15%">총 근무시간</th>
+										<th style="width: 32%">근무시간 상세</th>
+										<th style="width: 19%">승인요청내역</th>
+									</tr>
+								</thead>
+								<tbody class="table-target">
+
+								</tbody>
+							</table>
+						</div>
+
+					</div>
+
+					<div class="calCard card ${calcHr.weekOfMonth eq 3 ? '' : 'collapsed-card'}">
+						<div class="card-header">
+							<div class="row">
+								<div class="col-1">
+									<button onclick="changeWeek(3)" type="button" class="btn" data-card-widget="collapse" title="Collapse">
+										<i class="colBtn fas fa-${calcHr.weekOfMonth eq 3 ? 'minus' : 'plus'}"></i>
+									</button>
+								</div>
+								<div class="col-5">
+									<span class=""><b>3주차</b></span>
+								</div>
+								<div class="col-4 text-right">
+									<span class="">누적근무시간</span>&nbsp;&nbsp;
+								</div>
+								<div class="col-2 week-target">
+								
+								</div>
+							</div>
+						</div>
+						<div class="card-body p-0 tableCard" style="display:  ${calcHr.weekOfMonth eq 3 ? 'block' : 'none'};">
+							<table class="table table-hover projects text-center" style="font-size: 0.9em;">
+								<thead>
+									<tr>
+										<th style="width: 10%">일자</th>
+										<th style="width: 12%">업무시작</th>
+										<th style="width: 12%">업무종료</th>
+										<th style="width: 15%">총 근무시간</th>
+										<th style="width: 32%">근무시간 상세</th>
+										<th style="width: 19%">승인요청내역</th>
+									</tr>
+								</thead>
+								<tbody class="table-target">
+
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+					<div class="calCard card ${calcHr.weekOfMonth eq 4 ? '' : 'collapsed-card'}">
+						<div class="card-header">
+							<div class="row">
+								<div class="col-1">
+									<button onclick="changeWeek(4)" type="button" class="btn" data-card-widget="collapse" title="Collapse">
+										<i class="colBtn fas fa-${calcHr.weekOfMonth eq 4 ? 'minus' : 'plus'}"></i>
+									</button>
+								</div>
+								<div class="col-5">
+									<span class=""><b>4주차</b></span>
+								</div>
+								<div class="col-4 text-right">
+									<span class="">누적근무시간</span>&nbsp;&nbsp;
+								</div>
+								<div class="col-2 week-target">
+								
+								</div>
+							</div>
+						</div>
+						<div class="card-body p-0 tableCard" style="display:  ${calcHr.weekOfMonth eq 4 ? 'block' : 'none'};">
+							<table class="table table-hover projects text-center" style="font-size: 0.9em;">
+								<thead>
+									<tr>
+										<th style="width: 10%">일자</th>
+										<th style="width: 12%">업무시작</th>
+										<th style="width: 12%">업무종료</th>
+										<th style="width: 15%">총 근무시간</th>
+										<th style="width: 32%">근무시간 상세</th>
+										<th style="width: 19%">승인요청내역</th>
+									</tr>
+								</thead>
+								<tbody class="table-target">
+
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+					<div class="calCard card ${calcHr.weekOfMonth eq 5 ? '' : 'collapsed-card'}">
+						<div class="card-header">
+							<div class="row">
+								<div class="col-1">
+									<button onclick="changeWeek(5)" type="button" class="btn" data-card-widget="collapse" title="Collapse">
+										<i class="colBtn fas fa-${calcHr.weekOfMonth eq 5 ? 'minus' : 'plus'}"></i>
+									</button>
+								</div>
+								<div class="col-5">
+									<span class=""><b>5주차</b></span>
+								</div>
+								<div class="col-4 text-right">
+									<span class="">누적근무시간</span>&nbsp;&nbsp;
+								</div>
+								<div class="col-2 week-target">
+								
+								</div>
+							</div>
+						</div>
+						<div class="card-body p-0 tableCard" style="display:  ${calcHr.weekOfMonth eq 5 ? 'block' : 'none'};">
+							<table class="table table-hover projects text-center" style="font-size: 0.9em;">
+								<thead>
+									<tr>
+										<th style="width: 10%">일자</th>
+										<th style="width: 12%">업무시작</th>
+										<th style="width: 12%">업무종료</th>
+										<th style="width: 15%">총 근무시간</th>
+										<th style="width: 32%">근무시간 상세</th>
+										<th style="width: 19%">승인요청내역</th>
+									</tr>
+								</thead>
+								<tbody class="table-target">
+
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+		            <button type="button" class="btn btn-sm">
+						<span class="badge rounded-circle bg-black mt-1 mr-2" style="width:10px; height: 10px;"><span class="visually-hidden"></span></span>정상
+					</button>
+					<button type="button" class="btn btn-sm">
+						<span class="badge rounded-circle bg-danger mt-1 mr-2" style="width:10px; height: 10px;"><span class="visually-hidden"></span></span>지각
+					</button>
+					<button type="button" class="btn btn-sm">
+						<span class="badge rounded-circle bg-primary mt-1 mr-2" style="width:10px; height: 10px;"><span class="visually-hidden"></span></span>수정
+					</button>
+				</div>
+
+			</div>
+
+		</div>
+	</section>
+</div>
+
+<script type="text/javascript">
+function getTime() {
+	var date = new Date();
+	var hours = date.getHours();
+	var minutes = date.getMinutes();
+	var seconds = date.getSeconds();
+	hours = hours < 10 ? '0'+hours : hours;
+	minutes = minutes < 10 ? '0'+minutes : minutes;
+	seconds = seconds < 10 ? '0'+seconds : seconds;
+
+	$('.js-time').text(hours  + ':' + minutes + ':' + seconds);
+}
+
+function init() {
+	getTime();
+	setInterval(getTime, 1000);
+}
+
+init();
+
+</script>
+
+<script type="text/javascript">
+function changeMonth(num) {
+	console.log(num);
+	var calendar = $('#month').text().trim();
+	var calendarSplit = calendar.split('.');
+	console.log(calendarSplit);
+	
+	var year = parseInt(calendarSplit[0]);
+	var month = calendarSplit[1]-1 + parseInt(num);
+	
+	if(month>11){
+		month = 0;
+		year += 1;
+	}
+	if(month<0){
+		month = 11;
+		year -= 1;
+	}
+	
+	var creDate = new Date(year, month);
+	console.log(creDate);
+	
+	if((month+1)<10){
+		month = '0'+(month+1);
+	} else {
+		month = month+1
+	}
+	
+	$('#month').text('');
+	$('#month').html('&nbsp;&nbsp;'+year+'.'+month+'&nbsp;&nbsp;');
+	onloadHrTable(creDate);
+}
+</script>
+
+<script>
+function onloadHrTable(date){
+	if(date == null){
+		date = new Date();
+	}
+	
+	var data = {
+			'eno' : '14310056',
+			'date' : date
+	}
+	
+	$.ajax({
+		url : '<%=request.getContextPath()%>/ehr/onloadHrTable.do',
+		data : data,
+		type : 'post',
+		success: function(res){
+			$('.tableOn').remove();
+			$('.removeWeekHr').remove();
+			for(var i=0; i<5; i++) {
+				printHrTable(res.monthList[i], $('.table-target').eq(i), $('#table-template'));
+				printWeekHr(res.hrTimeList[i], $('.week-target').eq(i), $('#weekHr-template'));
+			}
+		},
+		error:function(error){
+			alert("error : " + error.status)
+		}
+	});
+	
+}
+onloadHrTable();
+</script>
+
+<script type="text/x-handlebars-template"  id="weekHr-template" >
+<span class="removeWeekHr" style="text-align:left;">{{""}}</span>
+</script>
+
+<script type="text/x-handlebars-template"  id="table-template" >
+{{#each .}}
+		<tr class="tableOn">
+			<td style="color: {{formatDateColor hrDate}};">{{formatDate hrDate}}</td>
+			<td style="color: {{formatTimeColor state}};">{{onTime}}</td>
+			<td>{{offTime}}</td>
+			<td>{{hrTime}}</td>
+			<td><small>기본 </small>{{hrTime}}&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;<small>연장 </small>{{overTime}}</td>
+			<td style="color : #007bff;">{{reqChange reqChange}}</td>
+		</tr>
+{{/each}}
+</script>
+
+<script>
+//handelbars printElement (args : data Array, appent target, handlebar template, remove class)
+function printHrTable(dataArr,target,templateObject){
+	var template=Handlebars.compile(templateObject.html());
+
+	var html = template(dataArr);
+
+	target.append(html);
+}
+
+function printWeekHr(dataArr,target,templateObject){
+	var template=Handlebars.compile(templateObject.html());
+
+	var html = template(dataArr);
+	target.append(html);
+}
+</script>
+
+<script type="text/javascript">
+Handlebars.registerHelper({
+	"formatDate" : function(strDate){
+		var dateObj = new Date(strDate);
+		var year = dateObj.getFullYear();
+		var month = dateObj.getMonth() + 1;
+		var date = dateObj.getDate();
+		var day = dateObj.getDay();
+		var week = new Array('일', '월', '화', '수', '목', '금', '토');
+		return date+"("+ week[dateObj.getDay()] +")";
+	},
+	"formatDateColor" : function(strDate){
+		var color = "";
+		var dateObj = new Date(strDate);
+		var day = dateObj.getDay();
+		if(day==0){
+			color = "red";
+		} else if(day==6){
+			color = "#007bff";
+		}
+		return color;
+	},
+	"formatTimeColor" : function(state){
+		var color = "";
+		if(state==2){
+			color = "red";
+		}else{
+			color = "black";
+		}
+		return color;
+	},
+	"reqChange" : function(reqChange){
+		var result = "";
+		if(reqChange==1){
+			result = "변경 신청";
+		} else if(reqChange==2){
+			result = "변경 승인";
+		}
+		return result;
+	}
+})
+</script>
+
+</body>

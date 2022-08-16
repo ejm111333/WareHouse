@@ -1,0 +1,37 @@
+package kr.or.warehouse.dto;
+
+public class CommuBoardVO {
+	
+	private String cboardNo;
+	private String cmno;
+	private String cname;
+	private String cintro;
+	
+	
+	public String getCboardNo() {
+		return cboardNo;
+	}
+	public void setCboardNo(String cboardNo) {
+		this.cboardNo = cboardNo;
+	}
+	public String getCmno() {
+		return cmno;
+	}
+	public void setCmno(String cmno) {
+		this.cmno = cmno;
+	}
+	public String getCname() {
+		return cname;
+	}
+	public void setCname(String cname) {
+		this.cname = cname;
+	}
+	public String getCintro() {
+		return cintro;
+	}
+	public void setCintro(String cintro) {
+		this.cintro = cintro;
+	}
+	
+	
+}

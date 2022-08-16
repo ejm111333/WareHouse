@@ -1,0 +1,22 @@
+package kr.or.warehouse.service;
+
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+
+import kr.or.warehouse.command.Criteria;
+import kr.or.warehouse.dto.ContactgrVO;
+
+public interface ContactgrService {
+
+	//그룹 등록
+	void regist(ContactgrVO contactgr, List<String> groupMember)throws SQLException;
+
+
+	Map<String,Object> getContactGroupList(Criteria cri)throws SQLException;
+
+
+
+
+
+}

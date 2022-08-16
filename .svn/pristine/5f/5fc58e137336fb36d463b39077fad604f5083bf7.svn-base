@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="CooperReq-Mapper">
+	<update id="insertCooperReq" parameterType="cooper">
+		INSERT INTO cooperreq (
+			creqno
+		   ,wcode
+		   ,eno
+		   ,content
+		   ,regdate
+		   ,result
+		   ,resdate
+		) VALUES (
+			cooperreq_seq.nextval
+		   ,#{wcode}
+		   ,#{eno}
+		   ,#{content}
+		   ,sysdate
+		   ,#{result}
+		   ,#{resDate}
+		)
+	</update>
+
+	<update id="updateWorkManagerAnswer" parameterType="cooper">
+		UPDATE
+			workmanager
+		SET
+			answer = '협업요청'
+		WHERE wcode = #{wcode}
+		  AND eno = #{eno}
+	</update>
+
+	<update id="updateWorkWstatus" parameterType="str">
+		UPDATE
+			work
+		SET wstatus = #{wstatus},
+			classcode = #{classcode}
+		WHERE
+			wcode = #{wcode}
+	</update>
+
+	<select id="selectCooperReq" resultType="cooper">
+		SELECT
+			creqno
+		   ,wcode
+		   ,eno
+		   ,content
+		   ,regdate
+		   ,result
+		   ,resdate
+		FROM
+		    cooperreq
+		WHERE creqno = (select max(creqno)
+                            from cooperreq
+                        where wcode = #{wcode})
+	</select>
+
+	<select id="selectCooperRequesterByEno" resultType="employee">
+		SELECT
+		    a.eno
+		   ,b.dname
+		   ,a.birth
+		   ,a.email
+		   ,a.name
+		   ,a.photo
+		   ,c.ppsname
+		   ,a.job
+		   ,a.phone
+		   ,a.call
+		   ,a.hiredate
+		   ,a.enabled
+		   ,a.mbti
+		   ,a.address
+		   ,a.retiredate
+		   ,a.retirereason
+		   ,a.pwd
+		   ,a.ipaddress
+		   ,a.signtype
+		   ,a.signpath
+		   ,a.condition
+		   ,a.year
+		FROM
+		    employee a, department b, postposition c
+		WHERE a.dno = b.dno
+		  AND a.ppscode = c.ppscode
+		  AND a.eno = #{eno}
+	</select>
+
+	<update id="updateCooperReqResult" parameterType="str">
+		UPDATE
+			cooperreq
+		SET
+			result = 1,
+			resdate = sysdate
+		WHERE wcode = #{wcode}
+	</update>
+</mapper>
+

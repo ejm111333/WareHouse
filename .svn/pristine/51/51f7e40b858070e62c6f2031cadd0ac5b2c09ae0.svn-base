@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Department-Mapper">
+<!--
+	<select id="selectDepartMentList" resultType="department">
+		SELECT
+		    dno
+		   ,dname
+		   ,manager
+		   ,updno
+		   ,createdate
+		   ,enabled
+		FROM
+		    department
+	</select>
+-->
+
+
+
+	<select id="selectDepartMentList" resultType="department">
+		WITH   CTE (dno, dname, updno) AS
+		(
+			SELECT t1.dno, t1.dname, t1.updno
+			FROM department t1
+			WHERE t1.updno = 300
+			UNION ALL
+
+			SELECT t2.dno, t2.dname, t2.updno
+			FROM department t2
+			INNER JOIN CTE ON t2.updno = CTE.dno
+		)
+
+		SELECT CTE.dno, CTE.dname, CTE.updno FROM CTE
+		ORDER BY CTE.dno
+	</select>
+
+
+</mapper>

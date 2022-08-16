@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Work-Mapper">
+
+	<sql id="myWorkSearch">
+		<if test="searchType == 't'.toString()">
+			and a.wtitle like '%'||#{keyword}||'%'
+		</if>
+
+		<if test="searchType == 'm'.toString()">
+			AND a.wcode in (SELECT b.wcode
+                         FROM workmanager b, employee c
+                         WHERE b.eno = c.eno
+                           AND c.name = #{keyword}
+                                )
+		</if>
+
+		<if test="searchType == 'r'.toString()">
+			AND a.wcode in (SELECT b.wcode
+                         FROM work b, employee c
+                         WHERE b.eno = c.eno
+                           AND c.name = #{keyword}
+                                )
+		</if>
+
+		<if test="searchType == 'h'.toString()">
+			AND a.wcode in (SELECT hashno
+                         FROM hashtag
+                         WHERE tagcontent like '%'||#{keyword}||'%'
+                                )
+		</if>
+	</sql>
+
+	<sql id="toReqSearch">
+		<if test="searchType == 't'.toString()">
+			and wtitle like '%'||#{keyword}||'%'
+		</if>
+
+		<if test="searchType == 'm'.toString()">
+			AND wcode in (SELECT b.wcode
+                         FROM workmanager b, employee c
+                         WHERE b.eno = c.eno
+                           AND c.name = #{keyword}
+                                )
+		</if>
+
+		<if test="searchType == 'h'.toString()">
+			AND wcode in (SELECT hashno
+                         FROM hashtag
+                         WHERE tagcontent like '%'||#{keyword}||'%'
+                                )
+		</if>
+	</sql>
+	<select id="selectMyWorkAllStatusList" resultType="work">
+		SELECT
+		    a.wcode
+		   ,a.wtitle
+		   ,a.wcontent
+		   ,a.wdate
+		   ,a.wend
+		   ,a.wopen
+		   ,a.walarm
+		   ,a.eno
+		   ,a.wprogress
+		   ,a.wstatus
+		   ,a.classcode
+		FROM
+		    work a, workmanager b
+		WHERE a.wcode = b.wcode
+		  AND b.eno = #{eno}
+		  <include refid="myWorkSearch"/>
+		  ORDER BY a.wcode desc
+
+	</select>
+
+	<select id="selectToReqAllStatusList" resultType="work">
+		SELECT
+		    wcode
+		   ,wtitle
+		   ,wcontent
+		   ,wdate
+		   ,wend
+		   ,wopen
+		   ,walarm
+		   ,eno
+		   ,wprogress
+		   ,wstatus
+		   ,classcode
+		FROM
+		    work
+		WHERE eno = #{eno}
+		<include refid="toReqSearch"/>
+		ORDER BY wcode desc
+	</select>
+
+	<select id="selectDepWorkAllStatusList" resultType="work">
+		SELECT
+		    a.wcode
+		   ,a.wtitle
+		   ,a.wcontent
+		   ,a.wdate
+		   ,a.wend
+		   ,a.wopen
+		   ,a.walarm
+		   ,a.eno
+		   ,a.wprogress
+		   ,a.wstatus
+		   ,a.classcode
+		FROM
+		    work a, employee b
+		WHERE a.eno = b.eno
+		  AND b.dno = #{dno}
+		  <include refid="myWorkSearch"/>
+		  ORDER BY a.wcode desc
+	</select>
+
+	<select id="selectMyWorkList" resultType="work">
+		SELECT
+		    a.wcode
+		   ,a.wtitle
+		   ,a.wcontent
+		   ,a.wdate
+		   ,a.wend
+		   ,a.wopen
+		   ,a.walarm
+		   ,a.eno
+		   ,a.wprogress
+		   ,a.wstatus
+		   ,a.classcode
+		FROM
+		    work a, workmanager b
+		WHERE a.wcode = b.wcode
+		  AND b.eno = #{eno}
+		  AND a.wstatus = #{wstatus}
+		  <include refid="myWorkSearch"/>
+		ORDER BY a.wcode desc
+	</select>
+
+	<select id="selectToReqList" resultType="work">
+		SELECT
+		    wcode
+		   ,wtitle
+		   ,wcontent
+		   ,wdate
+		   ,wend
+		   ,wopen
+		   ,walarm
+		   ,eno
+		   ,wprogress
+		   ,wstatus
+		   ,classcode
+		FROM
+		    work
+		WHERE eno = #{eno}
+		  AND wstatus = #{wstatus}
+		  <include refid="toReqSearch"/>
+		ORDER BY wcode desc
+	</select>
+
+	<select id="selectDepWorkList" resultType="work">
+		SELECT
+		    a.wcode
+		   ,a.wtitle
+		   ,a.wcontent
+		   ,a.wdate
+		   ,a.wend
+		   ,a.wopen
+		   ,a.walarm
+		   ,a.eno
+		   ,a.wprogress
+		   ,a.wstatus
+		   ,a.classcode
+		FROM
+		    work a, employee b
+		WHERE a.eno = b.eno
+		  AND b.dno = #{dno}
+		  AND a.wstatus = #{wstatus}
+		  <include refid="myWorkSearch"/>
+		ORDER BY a.wcode desc
+	</select>
+
+	<select id="selectMyWorkTotalCount" resultType="int">
+		SELECT
+			count(*)
+		FROM
+			work a, workmanager b
+		WHERE a.wcode = b.wcode
+		  AND b.eno = #{eno}
+		  <if test="wstatus != '전체'">
+			  AND a.wstatus = #{wstatus}
+		  </if>
+		  <include refid="myWorkSearch"/>
+	</select>
+
+	<select id="selectToReqTotalCount" resultType="int">
+		SELECT
+			count(*)
+		FROM
+			work
+		WHERE eno = #{eno}
+		  <if test="wstatus != '전체'">
+			  AND wstatus = #{wstatus}
+		  </if>
+		  <include refid="toReqSearch"/>
+	</select>
+
+	<select id="selectDepWorkTotalCount" resultType="int">
+		SELECT
+			count(*)
+		FROM
+			work a, employee b
+		WHERE a.eno = b.eno
+		  AND b.dno = #{dno}
+		  <if test="wstatus != '전체'">
+			  AND a.wstatus = #{wstatus}
+		  </if>
+		  <include refid="myWorkSearch"/>
+	</select>
+
+	<select id="selectWorkManagerList" resultType="workmanager">
+		SELECT
+		    a.wmstep
+		   ,a.wcode
+		   ,a.eno
+		   ,a.isafter
+		   ,a.answer
+		   ,a.wcheck
+		   ,c.dname
+		   ,b.birth
+		   ,b.email
+		   ,b.name
+		   ,b.photo
+		   ,d.ppsname
+		   ,b.job
+		   ,b.phone
+		   ,b.call
+		   ,b.hiredate
+		   ,b.enabled
+		   ,b.mbti
+		   ,b.address
+		   ,b.retiredate
+		   ,b.retirereason
+		   ,b.pwd
+		   ,b.ipaddress
+		   ,b.signtype
+		   ,b.signpath
+		   ,b.condition
+		   ,b.year
+		FROM
+		    workmanager a, employee b, department c, postposition d
+		WHERE a.eno = b.eno
+		  AND b.ppscode = d.ppscode
+		  AND b.dno = c.dno
+		  AND a.wcode = #{wcode}
+	</select>
+
+	<select id="selectWorkRequestBy" resultType="employee">
+		SELECT
+		    b.eno
+		   ,c.dname
+		   ,b.birth
+		   ,b.email
+		   ,b.name
+		   ,b.photo
+		   ,d.ppsname
+		   ,b.job
+		   ,b.phone
+		   ,b.call
+		   ,b.hiredate
+		   ,b.enabled
+		   ,b.mbti
+		   ,b.address
+		   ,b.retiredate
+		   ,b.retirereason
+		   ,b.pwd
+		   ,b.ipaddress
+		   ,b.signtype
+		   ,b.signpath
+		   ,b.condition
+		   ,b.year
+		FROM
+		    work a, employee b, department c, postposition d
+		WHERE a.eno = b.eno
+		  AND b.dno = c.dno
+		  AND b.ppscode = d.ppscode
+		  AND a.wcode = #{wcode}
+	</select>
+
+	<select id="selectEnoByKeyword" resultType="int">
+		SELECT
+			eno
+		FROM
+			employee
+		WHERE name = #{keyword}
+	</select>
+
+	<select id="workReadCheck" resultType="int">
+		SELECT
+			count(*)
+		FROM
+			workreader
+		WHERE wcode = #{wcode}
+		  AND eno = #{eno}
+	</select>
+
+	<select id="selectHashTagByWcode" resultType="str">
+		SELECT
+			a.tagcontent
+		FROM
+			hashtag a, work b
+		WHERE a.classcode = b.classcode
+		  AND b.wcode = #{wcode}
+		  AND a.hashno = #{wcode}
+	</select>
+
+	<select id="selectWorkByWcode" resultType="work">
+		SELECT
+		    wcode
+		   ,wtitle
+		   ,wcontent
+		   ,wdate
+		   ,wend
+		   ,wopen
+		   ,walarm
+		   ,eno
+		   ,wprogress
+		   ,wstatus
+		   ,classcode
+		FROM
+		    work
+		WHERE wcode = #{wcode}
+	</select>
+</mapper>
+

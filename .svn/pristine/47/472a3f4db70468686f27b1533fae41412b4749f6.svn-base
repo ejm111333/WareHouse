@@ -1,0 +1,12 @@
+package kr.or.warehouse.service;
+
+import java.sql.SQLException;
+import java.util.Map;
+
+import kr.or.warehouse.command.Criteria;
+
+public interface CommunityService {
+	
+	Map<String,Object> getCommunityList(Criteria cri)throws SQLException;
+	
+}

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Mentoring-Mapper">
+
+	<select id="selectMyMentee" parameterType="int" resultType="submentoring">
+		select
+			a.name, c.ppsname, a.condition
+		from
+			employee a, submentoring b, postposition c
+		where b.mentee=a.eno
+		and a.ppscode=c.ppscode
+		and b.mento=#{mento}
+        and b.approve=1
+	</select>
+
+	<select id="selectMyMenteeCount" resultType="int">
+		select
+			count(c.eno) as menteeCount
+		from
+			mentoring a, submentoring c, employee b
+		where a.smno=c.smno
+		and c.eno=b.eno
+		and a.mento=#{mento}
+		and c.approve=1
+	</select>
+
+	<select id="selectMyMento" parameterType="int" resultType="submentoring">
+		select
+			a.name, c.ppsname, a.condition
+		from
+			employee a, submentoring b, postposition c
+		where b.mento=a.eno
+		and a.ppscode=c.ppscode
+		and b.mentee=#{mentee}
+        and b.approve=1
+	</select>
+
+	<select id="selectMyMentoCount" resultType="int">
+		select
+			count(b.eno) as mentoCount
+		from
+			mentoring a, submentoring c, employee b
+		where a.smno=c.smno
+		and a.mento=b.eno
+		and c.eno=#{eno}
+		and c.approve=1
+	</select>
+
+	<select id="selectMentoRank" resultType="submentoring">
+		select
+            count(a.mento) as count, b.name, c.ppsname, b.condition
+        from
+            submentoring a, employee b, postposition c
+        where a.mento = b.eno
+        and b.ppscode=c.ppscode
+
+        group by a.mento, b.name, c.ppsname, b.condition
+        order by count(a.mento) desc
+	</select>
+
+	<select id="subMentoringList" parameterType="int" resultType="submentoring">
+		select
+			a.name, c.ppsname, a.condition
+		from
+			employee a, submentoring b, postposition c
+		where b.mentee=a.eno
+		and a.ppscode=c.ppscode
+		and b.mento=#{eno}
+        and b.approve=0
+	</select>
+
+	<select id="subMentoringListCount" resultType="int">
+		select
+			count(a.mentee)
+		from
+			submentoring a
+		where a.mento=#{eno}
+	</select>
+
+	<select id="endMentoringList" resultType="submentoring" parameterType="int">
+		select
+			a.name, c.ppsname, a.condition
+		from
+			employee a, submentoring b, postposition c
+		where b.mentee=a.eno
+		and a.ppscode=c.ppscode
+		and b.mento=#{mento}
+        and b.approve=1
+
+        union all
+
+        select
+			a.name, c.ppsname, a.condition
+		from
+			employee a, submentoring b, postposition c
+		where b.mento=a.eno
+		and a.ppscode=c.ppscode
+		and b.mentee=#{mentee}
+        and b.approve=1
+	</select>
+
+	<select id="endMentoringListCount" resultType="int">
+		select
+			count(*)
+		from
+			submentoring
+		where mento=#{mento}
+		or mentee=#{mentee}
+	</select>
+
+	<select id="myWorkList" parameterType="int" resultType="work">
+		select
+			a.wtitle
+		from
+			work a, knowhow b, employee c
+		where a.wcode=b.wcode
+		and a.eno=c.eno
+		and a.eno=#{eno}
+		order by b.viewcnt
+	</select>
+
+	<update id="applyMentoring" parameterType="submentoring">
+		insert into
+			submentoring(smno, intro, period, mentee, mento)
+		values(#{smno}, #{intro}, #{period}, #{mentee}, #{mento})
+	</update>
+
+	<select id="selectSmno" resultType="String">
+		SELECT 'SM' ||
+		trim(nvl(max(to_char(to_number(substr(smno,3))+1,'000000')),'000001'))
+		as smno
+		from submentoring
+
+		union
+
+		select nvl(null,'SM000001') as smno
+		from
+		dual
+		where not exists (select smno
+		from submentoring)
+	</select>
+
+</mapper>
+

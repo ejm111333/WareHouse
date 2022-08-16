@@ -1,0 +1,13 @@
+package kr.or.warehouse.dao;
+
+import java.util.List;
+
+import kr.or.warehouse.dto.PdsVO;
+
+public interface PdsDAO {
+	//개인자료실 자료 select
+	List<PdsVO> selectPdsListByEno(int eno) throws Exception;
+	
+	void insertFile(PdsVO pds) throws Exception;
+	
+}

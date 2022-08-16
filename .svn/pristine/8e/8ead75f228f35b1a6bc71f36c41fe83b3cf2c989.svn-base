@@ -1,0 +1,476 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+
+
+<script>
+	$(document).on('click', 'body > aside > div > ul > li:nth-child(2) > a', function(){
+		$(this).attr("href", "#");
+		OpenWindow('<%=request.getContextPath()%>/work/workRegistForm.do', '새 업무', '1000', '600');
+	});
+
+// 	$(function(){
+// 		setTimeout(() => {
+// 			closeLoading();
+// 		}, 300);
+// 	});
+
+
+// 	function closeLoading(){
+// 		$('.preloader').css({
+// 			"display" : "none"
+// 		});
+
+// 		$('.animation__shake').css({
+// 			"display" : "none"
+// 		})
+// 	}
+
+	function list_go(url, page, statusNo){
+
+		var jobForm=$('#jobForm');
+		jobForm.find("[name='page']").val(page);
+		jobForm.find("[name='perPageNum']").val();
+		jobForm.find("[name='searchType']").val($('select[name="searchType"]').val());
+		jobForm.find("[name='keyword']").val($('input[name="keyword"]').val());
+		jobForm.find("[name='statusNo']").val(statusNo);
+		jobForm.find("[name='mCode']").val();
+
+
+
+		jobForm.attr({
+			action:url,
+			method:'get'
+		}).submit();
+	}
+
+	var status = 0;
+	function myWorkListGo(page,statusNo){
+// 		openLoading();
+// 		setTimeout(() => {
+// 			closeLoading();
+// 		}, 500);
+		$('.nav-link').removeClass('active');
+		status = statusNo;
+		var data = {
+				'page' : page,
+				'perPageNum' : 5,
+				'searchType' : $('select[name="searchType"]').val(),
+				'keyword' : $('input[name="keyword"]').val(),
+				'statusNo' : statusNo
+		}
+
+
+		$.ajax({
+			url : '<%=request.getContextPath()%>/work/myWorkListAjax.do',
+			data : data,
+			type : 'post',
+			success: function(res){
+				console.log(res);
+				if(res.myWorkList.length > 0){
+					printWorkData(res.myWorkList, $('.workList'), $('#myworkList-template'));
+				}else{
+					var str = `
+						<tr>
+							<td colspan="6" style="text-align:center">
+								등록된 업무가 없습니다.
+							</td>
+						</tr>
+					`;
+
+					$('.workList').html(str);
+				}
+
+				pageMakerData = {
+						pageMaker : res.pageMaker,
+						statusNo : statusNo,
+						refer : "myWork"
+				}
+				printPageMaker(pageMakerData ,$('.pagination'), $('#pageMaker-template'));
+				printSelectOption(res.pageMaker.cri, $('#searchType'), $('#selectOption-template'));
+
+				var tabList = $('a[role="tab"]');
+				for(i = 0; i < tabList.length; i ++){
+					if(tabList[i].getAttribute("data-status") == statusNo){
+						tabList[i].classList.add('active');
+					}
+				}
+
+			},
+			error:function(error){
+				alert("error : " + error.status)
+			}
+		});
+	}
+
+	function toReqListGo(page,statusNo){
+		$('.nav-link').removeClass('active');
+		status = statusNo;
+		var data = {
+				'page' : page,
+				'perPageNum' : 5,
+				'searchType' : $('select[name="searchType"]').val(),
+				'keyword' : $('input[name="keyword"]').val(),
+				'statusNo' : statusNo
+		}
+
+
+		$.ajax({
+			url : '<%=request.getContextPath()%>/work/toReqListAjax.do',
+			data : data,
+			type : 'post',
+			success: function(res){
+				if(res.toReqList.length > 0){
+					printWorkData(res.toReqList, $('.workList'), $('#toReqList-template'));
+
+				}else{
+					var str = `
+						<tr>
+							<td colspan="6" style="text-align:center">
+								등록된 업무가 없습니다.
+							</td>
+						</tr>
+					`;
+
+					$('.workList').html(str);
+				}
+
+				pageMakerData = {
+						pageMaker : res.pageMaker,
+						statusNo : statusNo,
+						refer : "toReq"
+				}
+				printPageMaker(pageMakerData ,$('.pagination'), $('#pageMaker-template'));
+
+				var tabList = $('a[role="tab"]');
+				for(i = 0; i < tabList.length; i ++){
+					if(tabList[i].getAttribute("data-status") == statusNo){
+						tabList[i].classList.add('active');
+					}
+				}
+
+			},
+			error:function(error){
+				alert("error : " + error.status)
+			}
+		});
+	}
+
+	function depWorkListGo(page,statusNo){
+		$('.nav-link').removeClass('active');
+		status = statusNo;
+		var tabList = $('a[role="tab"]');
+		for(i = 0; i < tabList.length; i ++){
+			if(tabList[i].getAttribute("data-status") == statusNo){
+				tabList[i].classList.add('active');
+			}
+		}
+
+		var data = {
+				'page' : page,
+				'perPageNum' : 5,
+				'searchType' : $('select[name="searchType"]').val(),
+				'keyword' : $('input[name="keyword"]').val(),
+				'statusNo' : statusNo
+		}
+
+
+		$.ajax({
+			url : '<%=request.getContextPath()%>/work/depWorkListAjax.do',
+			data : data,
+			type : 'post',
+			success: function(res){
+				if(res.depWorkList.length > 0){
+					printWorkData(res.depWorkList, $('.workList'), $('#depworkList-template'));
+
+				}else{
+					var str = `
+						<tr>
+							<td colspan="6" style="text-align:center">
+								등록된 업무가 없습니다.
+							</td>
+						</tr>
+					`;
+
+					$('.workList').html(str);
+				}
+
+				pageMakerData = {
+						pageMaker : res.pageMaker,
+						statusNo : statusNo,
+						refer : "dep"
+				}
+				printPageMaker(pageMakerData ,$('.pagination'), $('#pageMaker-template'));
+
+
+			},
+			error:function(error){
+				alert("error : " + error.status)
+			}
+		});
+	}
+
+	function printWorkData(dataList, target, templateObject){
+		var template = Handlebars.compile(templateObject.html());
+		var html = template(dataList);
+		target.html(html);
+	}
+
+	function printPageMaker(data, target, templateObject){
+		var template = Handlebars.compile(templateObject.html());
+		var html = template(data);
+		target.html(html);
+	}
+
+	function printSelectOption(data, target, templateObject){
+		var template = Handlebars.compile(templateObject.html());
+		var html = template(data);
+		target.html(html);
+	}
+
+</script>
+
+<script type="text/x-handlebars-template"  id="myworkList-template">
+{{#each .}}
+	<tr style="{{readCheck wcheck}}">
+		<td>{{wtitle}}
+			{{overDayCheck wstatus overDay}}
+			{{dDayCheck dDay}}
+		</td>
+		<td>
+			<div style="align-items: center; display: flex;">
+				<div >
+					<img class="table-avatar emp_profile" src="<%=request.getContextPath() %>/resources/bootstrap/dist/img/avatar2.png">
+				</div>
+				<div>
+					<p style="font-size: 16px; font-weight: bold">{{requestBy.name}} </p>
+					<div style="font-size: 12px;">
+						<p>{{requestBy.ppsname }}</p>
+						<p>{{requestBy.dname }}</p>
+					</div>
+				</div>
+			</div>
+		</td>
+		<td>
+			<div style="align-items: center; display: flex;">
+				{{#each workManagerList}}
+					{{wmStepCheck this}}
+				{{/each}}
+				<div style="font-size: 12px">
+					<span>외 {{managerCnt}}명</span>
+				</div>
+			</div>
+		</td>
+		<td class="project_progress">
+			<div class="progress progress-sm">
+				<div class="progress-bar bg-green" role="progressbar" aria-valuenow="{{wprogress}}" aria-valuemin="0"
+				aria-valuemax="100" style="width: {{wprogress}}%"></div>
+			</div>
+			<small>{{wprogress}}% 완료</small>
+		</td>
+		<td>
+			{{formatDate wend}}
+		</td>
+		<td>
+			<span class="badge {{statusCheck wstatus}}">{{wstatus }}</span>
+		</td>
+	</tr>
+{{/each}}
+</script>
+
+<script type="text/x-handlebars-template"  id="toReqList-template">
+{{#each .}}
+	<tr style="{{readCheck wcheck}}">
+		<td>{{wtitle}}
+			{{overDayCheck wstatus overDay}}
+			{{dDayCheck dDay}}
+		</td>
+		<td>
+			<div style="align-items: center; display: flex;">
+				{{#each workManagerList}}
+					{{wmStepCheck this}}
+				{{/each}}
+				<div style="font-size: 12px">
+					<span>외 {{managerCnt}}명</span>
+				</div>
+			</div>
+		</td>
+		<td class="project_progress">
+			<div class="progress progress-sm">
+				<div class="progress-bar bg-green" role="progressbar" aria-valuenow="{{wprogress}}" aria-valuemin="0"
+				aria-valuemax="100" style="width: {{wprogress}}%"></div>
+			</div>
+			<small>{{wprogress}}% 완료</small>
+		</td>
+		<td>
+			{{formatDate wend}}
+		</td>
+		<td>
+			<span class="badge {{statusCheck wstatus}}">{{wstatus }}</span>
+		</td>
+	</tr>
+{{/each}}
+</script>
+
+<script type="text/x-handlebars-template"  id="depworkList-template">
+{{#each .}}
+	<tr style="{{readCheck wcheck}}">
+		<td>{{wtitle}}
+			{{overDayCheck wstatus overDay}}
+			{{dDayCheck dDay}}
+		</td>
+		<td>
+			<div style="align-items: center; display: flex;">
+				<div >
+					<img class="table-avatar emp_profile" src="<%=request.getContextPath() %>/resources/bootstrap/dist/img/avatar2.png">
+				</div>
+				<div>
+					<p style="font-size: 16px; font-weight: bold">{{requestBy.name}} </p>
+					<div style="font-size: 12px;">
+						<p>{{requestBy.ppsname }}</p>
+						<p>{{requestBy.dname }}</p>
+					</div>
+				</div>
+			</div>
+		</td>
+		<td>
+			<div style="align-items: center; display: flex;">
+				{{#each workManagerList}}
+					{{wmStepCheck this}}
+				{{/each}}
+				<div style="font-size: 12px">
+					<span>외 {{managerCnt}}명</span>
+				</div>
+			</div>
+		</td>
+		<td class="project_progress">
+			<div class="progress progress-sm">
+				<div class="progress-bar bg-green" role="progressbar" aria-valuenow="{{wprogress}}" aria-valuemin="0"
+				aria-valuemax="100" style="width: {{wprogress}}%"></div>
+			</div>
+			<small>{{wprogress}}% 완료</small>
+		</td>
+		<td>
+			{{formatDate wend}}
+		</td>
+		<td>
+			<span class="badge {{statusCheck wstatus}}">{{wstatus }}</span>
+		</td>
+	</tr>
+{{/each}}
+</script>
+
+<script type="text/x-handlebars-template"  id="pageMaker-template">
+	<li class="page-item">
+		<a class="page-link" href="">
+			<i class="fas fa-angle-double-left"></i>
+		</a>
+	</li>
+	<li class="page-item">
+		<a class="page-link" href="">
+			<i class="fas fa-angle-left"></i>
+		</a>
+	</li>
+		{{printPage this}}
+	<li class="page-item">
+		<a class="page-link" href="">
+			<i class="fas fa-angle-right"></i>
+		</a>
+	</li>
+	<li class="page-item">
+		<a class="page-link" href="">
+			<i class="fas fa-angle-double-right"></i>
+		</a>
+	</li>
+</script>
+
+<script type="text/x-handlebars-template"  id="selectOption-template">
+	<option value="tmrh" ${pageMaker.cri.searchType eq 'tmrh' ? 'selected' : '' }>전체</option>
+	<option value="t" {{searchTypeCheck searchType 't'}}>제목</option>
+	<option value="m" {{searchTypeCheck searchType 'm'}}>담당자</option>
+	<option value="r" {{searchTypeCheck searchType 'r'}}>요청자</option>
+	<option value="h" {{searchTypeCheck searchType 'h'}}>해시태그</option>
+</script>
+
+<script>
+	Handlebars.registerHelper({
+		"readCheck" : function(wcheck){
+			if(wcheck == 1){
+				 return "color:lightgray";
+			}
+
+			return "";
+		},
+		"overDayCheck" : function(wstatus, overDay){
+			if(wstatus == "대기" && overDay >= 3){
+				var str = '<span class="badge bg-danger">D+' + overDay + '</span>'
+				return new Handlebars.SafeString(str);
+			}
+		},
+		"dDayCheck" : function(dDay){
+			if(dDay <= 3){
+				var str = '<span class="badge bg-danger">임박</span>'
+				return new Handlebars.SafeString(str);
+			}
+		},
+		"wmStepCheck" : function(manager){
+			if(manager.wmstep == 1){
+				var str = '<div >';
+					str +='<img class="table-avatar emp_profile" src="<%=request.getContextPath() %>/resources/bootstrap/dist/img/avatar2.png">';
+ 					str +='</div>';
+ 					str +='<div>';
+ 					str +='<p style="font-size: 16px; font-weight: bold">' + manager.name +  '</p>';
+					str +='<div style="font-size: 12px;">';
+					str +='<p>' + manager.ppsname + '</p>';
+					str +='<p>' + manager.dname + '</p>';
+					str +='</div>';
+					str +='</div>';
+
+				return new Handlebars.SafeString(str);
+			}
+		},
+		"formatDate" : function(wend){
+			var dateObj = new Date(wend);
+			var year = dateObj.getFullYear();
+			var month = dateObj.getMonth() + 1;
+			var date = dateObj.getDate();
+			return year + "-" + month + "-" + date;
+		},
+		"printPage" : function(pageMakerData){
+			var pageMaker = pageMakerData.pageMaker;
+			var statusNo = pageMakerData.statusNo;
+			var func;
+
+			if(pageMakerData.refer == "myWork"){
+				func = "myWorkListGo";
+			}
+			if(pageMakerData.refer == "toReq"){
+				func = "toReqListGo";
+			}
+			if(pageMakerData.refer == "dep"){
+				func = "depWorkListGo";
+			}
+
+			var str = '';
+			for(i = pageMaker.startPage; i <= pageMaker.endPage; i++){
+				var active = i == pageMaker.cri.page ? 'active' : '';
+				str += '<li class="page-item ' + active + '">';
+				str += '<a class="page-link" href="javascript:' + func + '(' + i + ',' + statusNo + ')">';
+				str += i
+				str += '</a>';
+				str += '</li>';
+			}
+			return new Handlebars.SafeString(str);
+		},
+		"statusCheck" : function(wstatus){
+			var str = wstatus == "대기" ? "bg-secondary" : wstatus == "진행" ? "bg-info" : wstatus == "완료" ? "bg-success"
+					: wstatus == "이의신청" ? "bg-danger" : wstatus == "협업요청" ? "bg-primary" : "bg-warning";
+
+			return new Handlebars.SafeString(str);
+		},
+		"searchTypeCheck" : function(searchType, value){
+			var str = searchType == value ? 'selected' : ''
+
+				return new Handlebars.SafeString(str);
+		}
+	});
+</script>

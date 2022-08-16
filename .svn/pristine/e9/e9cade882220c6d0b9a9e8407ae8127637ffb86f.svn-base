@@ -1,0 +1,106 @@
+package kr.or.warehouse.service;
+
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.session.RowBounds;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.or.warehouse.command.Criteria;
+import kr.or.warehouse.command.PageMaker;
+import kr.or.warehouse.dao.CommunityDAO;
+import kr.or.warehouse.dto.CommunityVO;
+
+@Service
+public class CommunityServiceImpl implements CommunityService{
+	
+	@Autowired
+	private CommunityDAO communityDAO;
+
+	@Override
+	public Map<String, Object> getCommunityList(Criteria cri) throws SQLException {
+		
+		Map<String, Object> dataMap = new HashMap<String, Object>();
+		
+		int offset=cri.getStartRowNum();
+		int limit=cri.getPerPageNum();
+		RowBounds rowBounds=new RowBounds(offset,limit);
+		
+		List<CommunityVO> communityList = communityDAO.selectSearchCommunityList(cri, rowBounds);
+		for(CommunityVO community : communityList) {
+			String name = communityDAO.selectName(community);
+			int joinCnt = communityDAO.selectJoinCommuCount(community.getCmno());
+			
+			community.setName(name);
+			community.setJoinCnt(joinCnt);
+			
+		}
+		
+		int totalCount = communityDAO.selectSearchCommunityListCount(cri);
+		// PageMaker 생성.
+		PageMaker pageMaker = new PageMaker();
+		pageMaker.setCri(cri);
+		pageMaker.setTotalCount(totalCount);
+
+		dataMap.put("communityList", communityList);
+		dataMap.put("pageMaker", pageMaker);
+
+		return dataMap;
+	}
+
+	@Override
+	public List<CommunityVO> getJoinCommuList(int eno) throws SQLException {
+		List<CommunityVO> joinCommuList = communityDAO.selectJoinCommuList(eno);
+		for(CommunityVO community : joinCommuList) {
+			String name = communityDAO.selectName(community);
+			int joinCnt = communityDAO.selectJoinCommuCount(community.getCmno());
+			
+			community.setName(name);
+			community.setJoinCnt(joinCnt);
+			
+			
+		}
+		return joinCommuList;
+	}
+
+	@Override
+	public List<CommunityVO> getSubCommuList(int eno) throws SQLException {
+		
+		List<CommunityVO> subCommuList = communityDAO.selectSubCommuList(eno);
+				
+		for(CommunityVO community : subCommuList) {
+			String name = communityDAO.selectName(community);
+			int joinCnt = communityDAO.selectJoinCommuCount(community.getCmno());
+			
+			community.setName(name);
+			community.setJoinCnt(joinCnt);
+			
+			
+		}
+		return subCommuList;
+	}
+
+	@Override
+	public List<CommunityVO> getBestCommuList() throws SQLException {
+		List<CommunityVO> bestCommuList = communityDAO.selectBestCommuList();
+		
+		for(CommunityVO community : bestCommuList) {
+			String name = communityDAO.selectName(community);
+			
+			community.setName(name);
+			
+		}
+		return bestCommuList;
+	}
+
+	@Override
+	public List<CommunityVO> getApproveCommuList(int eno) throws SQLException {
+		return communityDAO.selectApproveCommuList(eno);
+	}
+
+	
+	
+}

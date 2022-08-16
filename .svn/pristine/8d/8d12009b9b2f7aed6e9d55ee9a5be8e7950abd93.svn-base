@@ -1,0 +1,242 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>    
+<c:set var="pageMaker" value="${dataMap.pageMaker }" />
+<c:set var="cri" value="${dataMap.pageMaker.cri }" />  
+<c:set var="teamList" value="${dataMap.teamList }" />  
+<head>
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/css/ehr.css">
+	<style>
+		.list-group-item{
+			padding: 6px 0.75rem;
+		}
+		.table th,.table td{
+			padding: 4px 0.75rem;
+		}
+
+		.card-header{
+			padding: 4px 1.25rem;
+		}
+		.card-body{
+			padding: 0.75rem 1.25rem;
+		}
+		.small-box{
+			margin: 0;
+		}
+		.table{
+			margin: 0;
+		}
+		.page-link { 
+ 		    color: #343a40;
+ 		}
+ 		.page-item.active .page-link { 
+ 		    color: #fff; 
+ 		    background-color: #343a40; 
+ 		    border-color: #343a40; 
+ 		} 
+	</style>
+</head>
+
+<body>
+
+<div class="wrapper">
+	<section class="content-header">
+		<div class="container-fluid">
+			<div class="row md-2">
+				<div class="col-sm-6">
+					<h3 class="title">부서 근태관리&nbsp;&nbsp;&gt;&nbsp;&nbsp;${loginUser.dname }</h3>
+					${teamList }
+				</div>
+			</div>
+		</div>
+	</section>
+	
+	
+<!-- 	<button class="btn btn-primary socketTest" type="button" onclick="hrLogToDataBase()"> -->
+<!--        <span class="navbar-toggler-icon">test</span> -->
+<!--      </button> -->
+<!-- 	<span style="margin-left: 7px;">전체인원 22명</span> -->
+	<section class="week" style="margin-bottom: 25px;">
+		<div class="row text-center" style="display: flex;">
+			<div class="col-md-12" style="font-size: 1.5em;">
+				<a class="btn btn-default btn-sm">&lt;</a>
+				<span>&nbsp;&nbsp;2022.06.27 - 2022.07.03&nbsp;&nbsp;</span>
+				<a class="btn btn-default btn-sm">&gt;</a>
+				<a class="" style="font-size: 0.6em;">Today</a>
+			</div>
+		</div>
+	</section>
+
+	<section class="content">
+			<div class="row col-md-2">
+				<span style="padding-left: 20px;padding-bottom: 10px;">전체인원 명</span>
+			</div>
+			<div class="container-fluid">
+				<div class="row md-2">
+					<div class="col-md-12">
+
+						<div class="card card-navy card-outline">
+							<div class="card-header with-border">
+								<button type="button" class="btn btn-sm">
+									<span class="badge rounded-circle bg-black mt-1 mr-2" style="width:10px; height: 10px;">
+										<span class="visually-hidden"></span>
+									</span>정상
+								</button>
+								<button type="button" class="btn btn-sm">
+									<span class="badge rounded-circle bg-danger mt-1 mr-2" style="width:10px; height: 10px;">
+										<span class="visually-hidden"></span>
+									</span>지각
+								</button>
+								<button type="button" class="btn btn-sm">
+									<span class="badge rounded-circle bg-primary mt-1 mr-2" style="width:10px; height: 10px;">
+										<span class="visually-hidden"></span>
+									</span>수정 (변경신청 : 1건)
+								</button>
+<!-- 								<div class="row p-0"> -->
+<!-- 									<div id="marker" class="col-5"> -->
+<!-- 						                <ul style="display: flex; list-style: disc; padding-left: 30px; width: 230px; float: left; margin-bottom: 0px;"> -->
+<!-- 						                    <li style="width: 50px;"><span><small>정상</small></span></li> -->
+<!-- 						                    <li style="width: 50px; color: red;"><span style="color: black;"><small>지각</small></span></li> -->
+<!-- 						                    <li style="width: 100px; color: #007bff;"><span style="color: black;"><small>수정(수정신청 1건)</small></span></li> -->
+<!-- 						                </ul> -->
+<!-- 						            </div> -->
+<!-- 									<span style="float: left;">전체인원 22명</span> -->
+									<div id="" class="card-tools" style="width: 450px;">
+										<div class="input-group input-group-sm row" style="margin-top: 0;}">
+											<select class="form-control col-md-3" name="perPageNum" id="perPageNum" onchange="list_go(1);">
+												<option value="10">정렬개수</option>
+												<option value="20" ${cri.perPageNum == 20 ? 'selected':''}>20개</option>
+												<option value="30" ${cri.perPageNum == 30 ? 'selected':''}>30개</option>
+												<option value="50" ${cri.perPageNum == 50 ? 'selected':''}>50개</option>
+											</select>
+											<select class="form-control col-md-3" name="searchType" id="searchType">
+												<option value="np" ${cri.searchType eq 'np' ? 'selected':'' }>전체</option>
+												<option value="n" ${cri.searchType eq 'n' ? 'selected':'' }>이름</option>
+												<option value="p" ${cri.searchType eq 'p' ? 'selected':'' }>직위</option>
+											</select>
+											<input class="form-control" type="text" name="keyword"
+												placeholder="검색어를 입력하세요" value="${param.keyword }" />
+											<span class="input-group-append">
+												<button class="btn btn-dark" type="button"
+													onclick="list_go(1);" data-card-widget="search">
+													<i class="fa fa-fw fa-search"></i>
+												</button>
+											</span>
+										</div>
+									</div>
+<!-- 								</div> -->
+							</div>
+
+							<div class="card-body">
+								<table class="table table-hover text-center">
+									<tr style="font-size: 0.95em;">
+										<th style="width: 15%;">이름</th>
+										<th style="width: 15%;">근무시간</th>
+										<th style="width: 10%;">27일(월)</th>
+										<th style="width: 10%;">28일(화)</th>
+										<th style="width: 10%;">29일(수)</th>
+										<th style="width: 10%;">30일(목)</th>
+										<th style="width: 10%;">1일(금)</th>
+										<th style="width: 10%; color: #007bff;">2일(토)</th>
+										<th style="width: 10%; color: red;">3일(일)</th>
+									</tr>
+									
+									<c:forEach items="${teamOne }" var="teamList">	
+										<tr style='font-size: 0.85em; text-align: left;' onclick="OpenWindow('detail.do','상세보기',800,600);">
+											<td>
+												<div style="align-items: center; display: flex; justify-content: center;">
+													<div>
+														<img class="rounded-circle emp_profile mr-2" src="/warehouse/resources/images/최민규.jpeg">
+													</div>
+													<div>
+														<span style="font-weight:bold; text-align: left;">최민규 대리</span>
+														<div style="font-size:12px; text-align: left;"><p>인사관리팀</p></div>
+													</div>
+												</div>
+											</td>
+											<td>
+												<span><b>주간누적:39h</b></span><br>
+												기본:39h / 연장:0h
+											</td>
+											<td>
+												<span>출:08:54:16</span><br>
+												<span>퇴:08:54:16</span>
+											</td>
+											<td>
+												<span>출:08:54:16</span><br>
+												<span>퇴:08:54:16</span>
+											</td>
+											<td>
+												<span>출:08:54:16</span><br>
+												<span>퇴:08:54:16</span>
+											</td>
+											<td>
+												<span>출:08:54:16</span><br>
+												<span>퇴:08:54:16</span>
+											</td>
+											<td>
+												<span>출:결 근</span><br>
+												<span>퇴:결 근</span>
+											</td>
+											<td>
+												<span>출: - </span><br>
+												<span>퇴: - </span>
+											</td>
+											<td>
+												<span>출: - </span><br>
+												<span>퇴: - </span>
+											</td>
+										</tr>
+									</c:forEach>
+									
+								</table>
+							</div>
+
+							<div class="card-footer">
+								<%@ include file="/WEB-INF/views/common/pagination.jsp" %>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+</div>
+
+<c:if test="${from eq 'hrLogToDataBase'}" >
+	<script>
+		alert("근태정보가 DB에 저장되었습니다.");
+	</script>
+</c:if>
+
+<script type="text/javascript">
+//pagination
+function list_go(page,url){
+	alert(page);
+	if(!url) url="teamList.do";
+
+	var jobForm=$('#jobForm');
+	jobForm.find("[name='page']").val(page);
+	jobForm.find("[name='perPageNum']").val($('select[name="perPageNum"]').val());
+	jobForm.find("[name='searchType']").val($('select[name="searchType"]').val());
+	jobForm.find("[name='keyword']").val($('div.input-group>input[name="keyword"]').val());
+
+	jobForm.attr({
+		action:url,
+		method:'get'
+	}).submit();
+}
+
+function modify() {
+	alert("변경내용띄울거야~");
+}
+
+function hrLogToDataBase() {
+	location.href='hrLogToDataBase.do?mCode='+'${menu.mcode}';
+}
+</script>
+
+</body>
+
+

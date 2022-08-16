@@ -1,0 +1,161 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
+<script>
+
+mentoPage = 1;
+
+function myMentoListGo(startPage){
+	console.log("mento");
+	mentoPage = startPage;
+	var data = {
+			'page' : mentoPage,
+			'eno' : ${loginUser.eno}
+	}
+
+	$.ajax({
+		url : '<%=request.getContextPath()%>/mentoring/main/myMentoList.do',
+		data : data,
+		type : 'post',
+		success: function(res){
+			console.log("mento",res);
+			if(res.mentoList.length > 0){
+				printWorkData(res.mentoList, $('.myMentoList'), $('#myMentoList-template'));
+			}else{
+				var str = `
+					<tr>
+						<td colspan="6" style="text-align:center">
+							<strong>해당 내용이 없습니다.</strong>
+						</td>
+					</tr>
+				`;
+
+				$('.myMentoList').html(str);
+			}
+
+			console.log('startpage : ' + res.pageMaker.startPage);
+			console.log('endpage : ' + res.pageMaker.endPage);
+// 			pageMakerData = {
+// 					pageMaker : res.pageMaker,
+// 					target : 'myMentoListGo',
+// 					left : "javascript:myMentoListGo("+(page -1)+")",
+// 					right : "javascript:myMentoListGo("+(page+1)+")",
+// 					doubleLeft : "javascript:myMentoListGo("+(1)+")",
+// 					doubleRight :"javascript:myMentoListGo("+(res.pageMaker.endPage)+")"
+// 			}
+			printPageMaker(res.pageMaker ,$('.myMentoPage'), $('#pageMaker-template'));
+		},
+		error:function(error){
+			alert("error mento : " + error.status)
+		}
+	});
+}
+
+function printWorkData(dataList, target, templateObject){
+	var template = Handlebars.compile(templateObject.html());
+	var html = template(dataList);
+	target.html(html);
+}
+
+function printPageMaker(pageMaker, target, templateObject){
+	var pageNumArray = new Array(pageMaker.endPage - pageMaker.startPage+1);
+	for(var i=0;i<pageMaker.endPage-pageMaker.startPage+1;i++){
+		pageNumArray[i]=pageMaker.startPage+i;
+	}
+
+	pageMaker.pageNum=pageNumArray;
+	pageMaker.prevPageNum=pageMaker.startPage-1;
+	pageMaker.nextPageNum=pageMaker.endPage+1;
+
+
+	var template = Handlebars.compile(templateObject.html());
+	var html = template(pageMaker);
+	target.html(html);
+}
+
+</script>
+
+<script type="text/x-handlebars-template"  id="myMentoList-template">
+{{#each .}}
+	<tr>
+		<td><img class="table-avatar emp_profile" src="/warehouse/resources/bootstrap/dist/img/avatar.png" data-name="최민규 팀장">&nbsp;&nbsp;{{name }} {{ppsName }}</td>
+		<td>{{dname}}</td>
+		<td>{{job}}</td>
+		<td>{{formatSDate startDate}}~{{formatEDate endDate}}</td>
+		<td><button class="btn btn-xs btn-secondary" type="button" onclick="">멘토링 종료</button></td>
+	</tr>
+{{/each}}
+</script>
+
+<script type="text/x-handlebars-template"  id="pageMaker-template">
+	<li class="page-item">
+		<a class="page-link" href="javascript:myMentoListGo('1')">
+			<i class="fas fa-angle-double-left"></i>
+		</a>
+	</li>
+	<li class="page-item">
+		<a class="page-link" href="{{#if prev}} javascript:myMentoListGo('{{prevPageNum}}{{/if}}')">
+			<i class="fas fa-angle-left"></i>
+		</a>
+	</li>
+{{#each pageNum}}
+<li class="paginate_button page-item {{signActive this}} ">
+	<a href="javascript:myMentoListGo('{{this}}');" aria-controls="example2" data-dt-idx="1" tabindex="0" class="page-link">
+		{{this}}
+	</a>
+</li>
+{{/each}}
+	<li class="page-item">
+		<a class="page-link" href="{{#if next}} javascript:myMentoListGo('{{nextPageNum}}{{/if}}')">
+			<i class="fas fa-angle-right"></i>
+		</a>
+	</li>
+	<li class="page-item">
+		<a class="page-link" href="javascript:myMentoListGo('{{realEndPage}}')">
+			<i class="fas fa-angle-double-right"></i>
+		</a>
+	</li>
+</script>
+
+<script>
+	Handlebars.registerHelper({
+		"formatSDate" : function(startDate){
+			var dateObj = new Date(startDate);
+			var year = dateObj.getFullYear();
+			var month = dateObj.getMonth() + 1;
+			var date = dateObj.getDate();
+			return year + "-" + month + "-" + date;
+		},
+		"formatEDate" : function(endDate){
+			var dateObj = new Date(endDate);
+			var year = dateObj.getFullYear();
+			var month = dateObj.getMonth() + 1;
+			var date = dateObj.getDate();
+			return year + "-" + month + "-" + date;
+		},
+		"signActive":function(pageNum){
+			if(pageNum == mentoPage) return 'active';
+		}
+// 		"printPage" : function(pageMakerData){
+// 			var pageMaker = pageMakerData.pageMaker;
+// 			var target;
+
+// 			if(pageMakerData.target == "myMentoListGo"){
+// 				target = "myMentoListGo";
+// 			}
+
+// 			var str = '';
+// 			for(i = pageMaker.startPage; i <= pageMaker.endPage; i++){
+// 				var active = i == pageMaker.cri.page ? 'active' : '';
+// 				str += '<li class="page-item ' + active + '">';
+// 				str += '<a class="page-link" href="javascript:'+target+'(' + i + ')">';
+// 				str += i
+// 				str += '</a>';
+// 				str += '</li>';
+// 			}
+// 			return new Handlebars.SafeString(str);
+// 		}
+	});
+</script>

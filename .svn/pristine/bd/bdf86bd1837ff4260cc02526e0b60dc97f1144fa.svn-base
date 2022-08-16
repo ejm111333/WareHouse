@@ -1,0 +1,50 @@
+package kr.or.warehouse.service;
+
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.session.RowBounds;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.or.warehouse.command.Criteria;
+import kr.or.warehouse.command.PageMaker;
+import kr.or.warehouse.dao.NewApprovalDAO;
+import kr.or.warehouse.dto.EmployeeVO;
+import kr.or.warehouse.dto.SignDocVO;
+
+@Service
+public class NewApprovalServiceImpl implements NewApprovalService {
+
+	@Autowired
+	private NewApprovalDAO newApprovalDAO;
+
+	//관련문서
+	@Override
+	public Map<String, Object> getRelatedDocList(Criteria cri) throws SQLException {
+
+		int offset=cri.getStartRowNum();//추가
+		int limit=cri.getPerPageNum();//추가
+		RowBounds rowBounds=new RowBounds(offset,limit); //추가
+
+		Map<String, String> paramMap = new HashMap<String, String>();
+		paramMap.put("searchType", cri.getSearchType());
+		paramMap.put("keyword", cri.getKeyword());
+
+		Map<String, Object>dataMap = new HashMap<String, Object>();
+		List<SignDocVO> myRelateDocList = newApprovalDAO.selectRelatedDocList(paramMap, rowBounds);
+
+		PageMaker pageMaker = new PageMaker();
+		pageMaker.setCri(cri);
+		pageMaker.setTotalCount(myRelateDocList.size());
+
+		dataMap.put("myRelateDocList", myRelateDocList);
+		dataMap.put("pageMaker", pageMaker);
+
+		return dataMap;
+
+	}
+
+}

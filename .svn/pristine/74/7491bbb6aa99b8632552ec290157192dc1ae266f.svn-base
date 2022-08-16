@@ -1,0 +1,11 @@
+package kr.or.warehouse.service;
+
+import java.sql.SQLException;
+import java.util.Map;
+
+import kr.or.warehouse.command.Criteria;
+
+public interface ApprovalService {
+	
+	Map<String,Object> getRequiredDocumentList(Criteria cri, int eno)throws SQLException;
+}

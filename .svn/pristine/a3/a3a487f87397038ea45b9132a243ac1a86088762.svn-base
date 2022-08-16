@@ -1,0 +1,43 @@
+package kr.or.warehouse.service;
+
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+
+import kr.or.warehouse.command.Criteria;
+import kr.or.warehouse.command.WorkModifyCommand;
+import kr.or.warehouse.controller.view.OrganizationNode;
+import kr.or.warehouse.dto.CooperReqVO;
+import kr.or.warehouse.dto.DepartmentVO;
+import kr.or.warehouse.dto.EmployeeVO;
+import kr.or.warehouse.dto.WorkVO;
+
+public interface WorkService {
+
+	//내업무 목록
+	public Map<String, Object> getMyWorkList(Criteria cri, int statusNo, int eno) throws SQLException;
+	//요청한업무 목록
+	public Map<String, Object> getToReqList(Criteria cri, int statusNo, int eno) throws SQLException;
+	//부서업무 목록
+	public Map<String, Object> getDepWorkList(Criteria cri, int statusNo, int eno, int dno) throws SQLException;
+	//상태별 미확인 업무 체크
+	public Map<String, Integer> getNoneCheckCnt(String referMcode, Criteria cri, int eno, int dno) throws SQLException;
+	//업무 상세
+	public WorkVO getWorkByWcode(String wcode) throws SQLException;
+	//협업요청
+	public void myWorkCooperReq(CooperReqVO cooper, int eno) throws SQLException;
+	public CooperReqVO getCooperReq(String wcode) throws SQLException;
+	//내업무 수정
+	public void modifyMyWork(WorkVO work) throws SQLException;
+	//업무승인
+	public void myWorkApprove(String wcode, int eno) throws SQLException;
+
+	//협업요청 업무 수정
+	public void modifyCooperReqWork(WorkModifyCommand modifyCommand) throws Exception;
+
+	//조직도
+	public List<OrganizationNode> organization(List<DepartmentVO> depList) throws Exception;
+	//담당자 수정
+	/* 선택한 담당자 정보 가져오기 */
+	public EmployeeVO getEmpByNodeId(int eno) throws SQLException;
+}

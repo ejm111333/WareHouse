@@ -1,0 +1,78 @@
+package kr.or.warehouse.dto;
+
+import java.util.Date;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
+public class SignalVO {
+	private int signalNo;
+	private int signalTarget;
+	private int signalFrom;
+	private Date signalDate;
+	private Date signalTime;
+	private int signalCheck;
+	private String signalContent;
+	private String moveUrl;
+	private String classCode;
+	
+	public int getSignalNo() {
+		return signalNo;
+	}
+	public void setSignalNo(int signalNo) {
+		this.signalNo = signalNo;
+	}
+	public int getSignalTarget() {
+		return signalTarget;
+	}
+	public void setSignalTarget(int signalTarget) {
+		this.signalTarget = signalTarget;
+	}
+	public int getSignalFrom() {
+		return signalFrom;
+	}
+	public void setSignalFrom(int signalFrom) {
+		this.signalFrom = signalFrom;
+	}
+	public Date getSignalDate() {
+		return signalDate;
+	}
+	public void setSignalDate(Date signalDate) {
+		this.signalDate = signalDate;
+	}
+	public Date getSignalTime() {
+		return signalTime;
+	}
+	public void setSignalTime(Date signalTime) {
+		this.signalTime = signalTime;
+	}
+	public int getSignalCheck() {
+		return signalCheck;
+	}
+	public void setSignalCheck(int signalCheck) {
+		this.signalCheck = signalCheck;
+	}
+	public String getSignalContent() {
+		return signalContent;
+	}
+	public void setSignalContent(String signalContent) {
+		this.signalContent = signalContent;
+	}
+	public String getMoveUrl() {
+		return moveUrl;
+	}
+	public void setMoveUrl(String moveUrl) {
+		this.moveUrl = moveUrl;
+	}
+	public String getClassCode() {
+		return classCode;
+	}
+	public void setClassCode(String classCode) {
+		this.classCode = classCode;
+	}
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this, ToStringStyle.JSON_STYLE);
+	}
+	
+}

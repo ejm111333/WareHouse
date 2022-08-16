@@ -1,0 +1,105 @@
+package kr.or.warehouse.service;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.or.warehouse.dao.HomeDAO;
+import kr.or.warehouse.dao.WorkDAO;
+import kr.or.warehouse.dto.WorkVO;
+
+@Service
+public class HomeServiceImpl implements HomeService{
+
+	@Autowired
+	private HomeDAO homeDAO;
+
+	@Override
+	public List<WorkVO> waitMyWork(int eno) throws SQLException {
+		List<WorkVO> waitMyWork = homeDAO.selectWaitMyWork(eno);
+		List<WorkVO> workList = new ArrayList<WorkVO>();
+
+		for(WorkVO waitWork : waitMyWork) {
+			if(workList.size() == 5) {
+				break;
+			}
+			workList.add(waitWork);
+		}
+		return workList;
+	}
+
+	@Override
+	public List<WorkVO> cooperReqWork(int eno) throws SQLException {
+		List<WorkVO> cooperReqWorkList = homeDAO.selectCooperReqToMeList(eno);
+		List<WorkVO> workList = new ArrayList<WorkVO>();
+
+		for(WorkVO waitWork : cooperReqWorkList) {
+			if(workList.size() == 5) {
+				break;
+			}
+			workList.add(waitWork);
+		}
+		return workList;
+	}
+
+	@Override
+	public List<WorkVO> proxyReqWork(int eno) throws SQLException {
+		List<WorkVO> proxyReqWorkList = homeDAO.selectProxyReqToMeList(eno);
+		List<WorkVO> workList = new ArrayList<WorkVO>();
+
+		for(WorkVO waitWork : proxyReqWorkList) {
+			if(workList.size() == 5) {
+				break;
+			}
+			workList.add(waitWork);
+		}
+		return workList;
+	}
+
+	@Override
+	public List<WorkVO> toReqCooperReqList(int eno) throws SQLException {
+		List<WorkVO> toReqCooperReqList = homeDAO.selectToReqCooperReqList(eno);
+		List<WorkVO> workList = new ArrayList<WorkVO>();
+
+		for(WorkVO toReq : toReqCooperReqList) {
+			if(workList.size() == 5) {
+				break;
+			}
+			workList.add(toReq);
+		}
+		return workList;
+	}
+
+	@Override
+	public List<WorkVO> toReqProxyReqList(int eno) throws SQLException {
+		List<WorkVO> toReqProxyReqList = homeDAO.selectToReqProxyReqList(eno);
+		List<WorkVO> workList = new ArrayList<WorkVO>();
+
+		for(WorkVO toReq : toReqProxyReqList) {
+			if(workList.size() == 5) {
+				break;
+			}
+			workList.add(toReq);
+		}
+		return workList;
+	}
+
+	@Override
+	public List<WorkVO> toReqObjectionList(int eno) throws SQLException {
+		List<WorkVO> toReqObjectionList = homeDAO.selectToReqObjectionList(eno);
+		List<WorkVO> workList = new ArrayList<WorkVO>();
+
+		for(WorkVO toReq : toReqObjectionList) {
+			if(workList.size() == 5) {
+				break;
+			}
+			workList.add(toReq);
+		}
+		return workList;
+	}
+
+
+}

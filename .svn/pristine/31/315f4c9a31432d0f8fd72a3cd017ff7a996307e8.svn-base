@@ -1,0 +1,18 @@
+package kr.or.warehouse.service;
+
+import java.util.List;
+
+import kr.or.warehouse.dto.PdsVO;
+
+public interface PdsService {
+
+	List<PdsVO> getPdsList(PdsVO pds) throws Exception;
+	
+	void uploadFile(PdsVO pds) throws Exception;
+	
+	PdsVO getPdsByPno(String pno) throws Exception;
+	
+	void removePdsByPno(String pno) throws Exception;
+	
+	void moveTrash(PdsVO pds) throws Exception;
+}

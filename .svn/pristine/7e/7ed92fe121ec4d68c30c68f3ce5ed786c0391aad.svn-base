@@ -1,0 +1,428 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib prefix="c"  uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
+
+<head>
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/css/mentoring.css">
+<style>
+.rank tr:nth-child(1) > td:nth-child(1) {
+	color: #ffc107;
+}
+.rank tr:nth-child(2) > td:nth-child(1) {
+	color: #A3A3A3;
+}
+.rank tr:nth-child(3) > td:nth-child(1) {
+	color: #CD7F32;
+}
+.card-header{
+	height: 50px;
+}
+.btn{
+	padding: 0rem 0.75rem;
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrapper">
+	<h3 class="title">멘토링</h3>
+
+	<!-- Main content -->
+	<section class="top">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-md-4">
+					<div class="card bg-light d-flex flex-fill">
+						<div class="card-body pt-0 pb-4" style="margin-top: 20px;">
+							<div class="row">
+								<div class="col-7">
+									<h2 class="lead">
+										<b>${employee.name }</b>&nbsp;&nbsp;${employee.ppsname }
+									</h2>
+									<p class="text-muted text-sm">
+										<b>${employee.dname }</b>
+									</p><br>
+								</div>
+								<div class="col-5 text-center">
+									<img width="75px;" data-cfsrc="../../dist/img/user1-128x128.jpg"
+										alt="user-avatar" class="img-circle img-fluid"
+										src="${loginUser.photo }">
+									<p class="text-muted text-sm">
+										<b>MBTI</b>&nbsp;&nbsp;${employee.mbti }
+									</p>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-7">
+									<p class="text-muted text-sm">
+										<b>대표 업무이력</b>
+									</p>
+								</div>
+								<div class="col-5 text-center">
+								</div>
+							</div>
+							<ul class="text-muted ml-3" style="list-style: disc;">
+								<c:forEach items="${myWorkList }" var="myWork">
+									<li class="small">
+										<span class="">${myWork.wtitle }</span>
+									</li>
+								</c:forEach>
+							</ul>
+
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-8">
+					<div class="card card-info card-outline">
+						<div class="card-header pb-0 border-bottom-0">
+							<div class="row">
+								<div class="col-11">
+									<ul class="nav nav-tabs border-bottom-0" id="custom-tabs-three-tab" role="tablist">
+										<li class="nav-item">
+											<a class="nav-link" id="custom-tabs-three-home-tab" data-toggle="pill" role="tab" aria-controls="custom-tabs-three-home" aria-selected="true">전체(3건)</a>
+										</li>
+										<li class="nav-item">
+											<a class="nav-link active" id="custom-tabs-three-home-tab" data-toggle="pill" role="tab" aria-controls="custom-tabs-three-home" aria-selected="true">멘토(2건)</a>
+										</li>
+										<li class="nav-item">
+											<a class="nav-link" id="custom-tabs-three-home-tab" data-toggle="pill" role="tab" aria-controls="custom-tabs-three-home" aria-selected="true">멘티(1건)</a>
+										</li>
+									</ul>
+								</div>
+								<div class="col-1">
+									<button type="button" class="btn">
+										<i class="fas fa-plus fa-xs"></i>
+									</button>
+								</div>
+							</div>
+						</div>
+						<div class="card-body pt-0  pb-0" style="display : block;">
+								<table class="table table-hover text-nowrap projects">
+									<tbody>
+										<tr style='font-size: 0.9em;' onclick="OpenWindow('detail.do','상세보기',800,600);">
+											<td>
+												<div class="row">
+													<div class="col-1">
+														<span class="info-box-icon">
+															<img class="direct-chat-img" data-cfsrc="../../dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image"
+															src="https://adminlte.io/themes/v3/dist/img/user1-128x128.jpg">
+														</span>
+													</div>
+													<div class="col-11">
+														<span><b>강정인 주임이(가) 새로운 업무 '테스트'을(를) 시작했습니다.</b></span>&nbsp;<span class="right badge badge-danger">New</span><br>
+														<span class="text-muted">06-27 15:00</span>&nbsp;&nbsp;<span>강정인 주임</span>
+													</div>
+												</div>
+											</td>
+										</tr>
+										<tr style='font-size: 0.9em;' onclick="OpenWindow('detail.do','상세보기',800,600);">
+											<td>
+												<div class="row">
+													<div class="col-1">
+														<span class="info-box-icon">
+															<img class="direct-chat-img" data-cfsrc="../../dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image"
+															src="https://adminlte.io/themes/v3/dist/img/user1-128x128.jpg">
+														</span>
+													</div>
+													<div class="col-11">
+														<span><b>강정인 주임이(가) 새로운 업무 '테스트'을(를) 시작했습니다.</b></span>&nbsp;<span class="right badge badge-danger">New</span><br>
+														<span class="text-muted">06-27 15:00</span>&nbsp;&nbsp;<span>강정인 주임</span>
+													</div>
+												</div>
+											</td>
+										</tr>
+										<tr style='font-size: 0.9em;' onclick="OpenWindow('detail.do','상세보기',800,600);">
+											<td>
+												<div class="row">
+													<div class="col-1">
+														<span class="info-box-icon">
+															<img class="direct-chat-img" data-cfsrc="../../dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image"
+															src="https://adminlte.io/themes/v3/dist/img/user1-128x128.jpg">
+														</span>
+													</div>
+													<div class="col-11 text-muted">
+														<span>강정인 주임이(가) 새로운 업무 '테스트'을(를) 시작했습니다.</span><br>
+														<span class="text-muted">06-27 15:00</span>&nbsp;&nbsp;<span>강정인 주임</span>
+													</div>
+												</div>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+
+
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-4">
+					<div class="card card-navy">
+						<div class="card-header">
+							<div class="row">
+								<div class="col-10">
+									<span class="">나의 멘토(명)</span>
+								</div>
+								<div class="col-2">
+									<button type="button" class="btn" style="color:white;" onclick="goIframPage('<%=request.getContextPath() %>/mentoring/mento.do','${menu.mcode}')">
+										<i class="fas fa-plus fa-xs"></i>
+									</button>
+								</div>
+							</div>
+						</div>
+						<div class="card-body table-responsive p-0">
+							<table class="table table-hover text-nowrap projects" style="border: none;">
+								<tbody>
+									<c:if test="${empty mentoList }" >
+										<tr style="text-align: center;">
+											<td colspan="6">
+												<strong>해당 내용이 없습니다.</strong>
+											</td>
+										</tr>
+									</c:if>
+									<c:forEach items="${mentoList }" var="mentoList">
+										<tr style='font-size: 0.9em;' onclick="">
+											<td>
+												<div class="position-relative">
+													<img src="https://adminlte.io/themes/v3/dist/img/user2-160x160.jpg" alt="User" width="25" height="25" class="rounded-circle" loading="lazy">
+
+													<c:if test="${mentoList.condition eq '업무중'}">
+														<span class="position-absolute bottom-0 end-0 badge border border-white rounded-circle bg-success p-1" style="right: 90!important;"><span class="visually-hidden"></span></span>
+													</c:if>
+													<c:if test="${mentoList.condition eq '업무종료'}">
+														<span class="position-absolute bottom-0 end-0 badge border border-white rounded-circle bg-success p-1" style="background-color: #e10a14!important;right: 90!important;"><span class="visually-hidden"></span></span>
+													</c:if>
+													<c:if test="${mentoList.condition eq '자리비움'}">
+														<span class="position-absolute bottom-0 end-0 badge border border-white rounded-circle bg-success p-1" style="background-color: #ffc107!important;right: 90!important;"><span class="visually-hidden"></span></span>
+													</c:if>
+
+													<span class="ml-2"><b>${mentoList.name } ${mentoList.ppsName }</b></span>
+												</div>
+											</td>
+											<td>
+												금주 활동 7건
+											</td>
+										</tr>
+									</c:forEach>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-4">
+					<div class="card card-lightblue">
+						<div class="card-header">
+							<div class="row">
+								<div class="col-10">
+									<span class="">나의 멘티(4명)</span>
+								</div>
+								<div class="col-2">
+<!-- 									<button type="button" class="btn btn-info btn-sm">수정</button> -->
+									<button type="button" class="btn" style="color:white;" onclick="goIframPage('<%=request.getContextPath() %>/mentoring/mentee.do','${menu.mcode}')">
+										<i class="fas fa-plus fa-xs"></i>
+									</button>
+								</div>
+							</div>
+						</div>
+						<div class="card-body table-responsive p-0">
+							<table class="table table-hover text-nowrap projects" style="border: none;">
+								<tbody>
+									<c:if test="${empty menteeList }" >
+										<tr style="text-align: center;">
+											<td colspan="6">
+												<strong>해당 내용이 없습니다.</strong>
+											</td>
+										</tr>
+									</c:if>
+									<c:forEach items="${menteeList }" var="menteeList">
+										<tr style='font-size: 0.9em;' onclick="">
+											<td>
+												<div class="position-relative">
+													<img src="https://adminlte.io/themes/v3/dist/img/user2-160x160.jpg" alt="User" width="25" height="25" class="rounded-circle" loading="lazy">
+
+													<c:if test="${menteeList.condition eq '업무중'}">
+														<span class="position-absolute bottom-0 end-0 badge border border-white rounded-circle bg-success p-1" style="right: 90!important;"><span class="visually-hidden"></span></span>
+													</c:if>
+													<c:if test="${menteeList.condition eq '업무종료'}">
+														<span class="position-absolute bottom-0 end-0 badge border border-white rounded-circle bg-success p-1" style="background-color: #e10a14!important;right: 90!important;"><span class="visually-hidden"></span></span>
+													</c:if>
+													<c:if test="${menteeList.condition eq '자리비움'}">
+														<span class="position-absolute bottom-0 end-0 badge border border-white rounded-circle bg-success p-1" style="background-color: #ffc107!important;right: 90!important;"><span class="visually-hidden"></span></span>
+													</c:if>
+
+													<span class="ml-2"><b>${menteeList.name } ${menteeList.ppsName }</b></span>
+												</div>
+											</td>
+											<td>
+												금주 활동 7건
+											</td>
+										</tr>
+									</c:forEach>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-4">
+					<div class="card card-gray">
+						<div class="card-header">
+							<div class="row">
+								<div class="col-10">
+									<span class="">사내 인기 멘토</span>
+								</div>
+							</div>
+						</div>
+						<div class="card-body table-responsive p-0">
+							<table class="table table-hover text-nowrap projects rank" style="border: none;">
+								<tbody>
+									<c:forEach items="${rankList }" var="rankList">
+										<tr style='font-size: 0.9em;' onclick="">
+											<td>
+												<i class="fas fa-crown"></i>
+											</td>
+											<td>
+												<div class="position-relative">
+													<img src="https://adminlte.io/themes/v3/dist/img/user2-160x160.jpg" alt="User" width="25" height="25" class="rounded-circle" loading="lazy">
+
+													<c:if test="${rankList.condition eq '업무중'}">
+														<span class="position-absolute bottom-0 end-0 badge border border-white rounded-circle bg-success p-1" style="right: 90!important;"><span class="visually-hidden"></span></span>
+													</c:if>
+													<c:if test="${rankList.condition eq '업무종료'}">
+														<span class="position-absolute bottom-0 end-0 badge border border-white rounded-circle bg-success p-1" style="background-color: #e10a14!important;right: 90!important;"><span class="visually-hidden"></span></span>
+													</c:if>
+													<c:if test="${rankList.condition eq '자리비움'}">
+														<span class="position-absolute bottom-0 end-0 badge border border-white rounded-circle bg-success p-1" style="background-color: #ffc107!important;right: 90!important;"><span class="visually-hidden"></span></span>
+													</c:if>
+
+													<span class="ml-2"><b>${rankList.name } ${rankList.ppsName }</b></span>
+							                    </div>
+											</td>
+											<td>
+												&nbsp;&nbsp;멘티 ${rankList.count }명
+											</td>
+										</tr>
+									</c:forEach>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-6">
+					<div class="card card-info card-outline">
+						<div class="card-header border-bottom-0">
+							<div class="row">
+								<div class="col-11">
+									<span class="">멘토링 신청내역</span>
+								</div>
+								<div class="col-1">
+<!-- 									<button type="button" class="btn btn-info btn-sm">수정</button> -->
+									<button type="button" class="btn" style="visibility: hidden;">
+										<i class="fas fa-plus fa-xs"></i>
+									</button>
+								</div>
+							</div>
+						</div>
+						<div class="card-body p-0">
+							<table class="table table-hover text-nowrap projects">
+								<tbody class="subMentoringList"></tbody>
+							</table>
+						</div>
+						<div class="card-footer">
+							<ul class="subMentoringPage pagination pagination-sm justify-content-center m-0">
+							</ul>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-6">
+					<div class="card card-info card-outline">
+						<div class="card-header">
+							<div class="row">
+								<div class="col-10">
+									<span class="">만료직전 멘토링</span>
+								</div>
+								<div class="col-2">
+<!-- 									<button type="button" class="btn btn-info btn-sm">수정</button> -->
+									<button type="button" class="btn" style="visibility: hidden;" >
+										<i class="fas fa-plus fa-xs"></i>
+									</button>
+								</div>
+							</div>
+						</div>
+						<div class="card-body p-0">
+							<table class="table table-hover text-nowrap projects">
+								<tbody class="endMentoringList">
+								</tbody>
+							</table>
+						</div>
+						<div class="card-footer">
+							<ul class="endMentoringPage pagination pagination-sm justify-content-center m-0">
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+   	</section>
+
+   	<div class="modal fade" id="modal" role="dialog">
+	    <div class="modal-dialog modal-sm">
+	      <div class="modal-content">
+	        <div class="modal-header">
+
+	          <h4 class="modal-title" style="font-size: large;" value="">연장기간 선택</h4>
+	           <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        </div>
+	        <div class="modal-body">
+	        	<div class="row">
+	            <label style="padding-left: 10px;">
+					<input type="radio" id="radioName" name="radioName" value="0" >&nbsp;&nbsp;6개월<br>
+					<input type="radio" id="radioName" name="radioName" value="1" >&nbsp;&nbsp;12개월
+	            </label>
+	           </div>
+	        </div>
+	        <div class="modal-footer">
+	          <button type="button" class="btn btn-default" data-dismiss="modal">취소</button>
+	     	  <button id="groupsave"type="button" class="btn btn-info" data-dismiss="modal" onclick='exdateApply_Go()'>신청</button>
+	        </div>
+	      </div>
+	    </div>
+	  </div>
+
+</div>
+<script type="text/javascript">
+$(document).on('click', 'body > aside > div > ul > li:nth-child(2) > a', function(){
+	$(this).attr("href", "#");
+	OpenWindow('registForm.do','멘토링 신청',800,600);
+})
+
+$(function(){
+	subMentoringListGo(1);
+	endMentoringListGo(1);
+});
+
+<c:if test="${from eq 'regist'}" >
+	alert("멘토링이 신청되었습니다.");
+	window.close();
+</c:if>
+
+<c:if test="${from eq 'accept' }">
+	alert("멘토링을 수락하였습니다.");
+	window.close();
+	window.opener.location.reload();
+</c:if>
+</script>
+
+<%@ include file="./mentoring_js.jsp" %>
+
+</body>

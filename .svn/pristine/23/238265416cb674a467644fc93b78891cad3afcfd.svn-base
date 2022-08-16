@@ -1,0 +1,5 @@
+package kr.or.warehouse.dao;
+
+public interface CommunityDAO {
+
+}

@@ -1,0 +1,35 @@
+package kr.or.warehouse.dao;
+
+import java.sql.SQLException;
+import java.util.List;
+
+import kr.or.warehouse.dto.CalAlarmVO;
+import kr.or.warehouse.dto.CalRefVO;
+import kr.or.warehouse.dto.CalendarVO;
+
+public interface CalendarDAO {
+
+	List<CalendarVO> selectSearchCalendarList() throws SQLException;
+
+	CalendarVO selectCalendarByCcode(String ccode) throws SQLException;
+
+	List<CalRefVO> selectCalRefByCcode(String ccode) throws SQLException;
+
+	CalAlarmVO selectCalAlarmByCcode(String ccode) throws SQLException;
+
+	void insertCalendar(CalendarVO calendar) throws SQLException;
+
+	void insertCalRef(CalRefVO calref) throws SQLException;
+
+	void insertCalAlarm(CalAlarmVO calalarm) throws SQLException;
+	
+	void updateCalAlarm(CalAlarmVO calalarm) throws SQLException;
+
+	void updateCalendar(CalendarVO calendar) throws SQLException;
+
+	void deleteCalendar(String ccode) throws SQLException;
+	
+	String selectCcode() throws SQLException;
+
+	int selectCalendarSeqNext() throws SQLException;
+}

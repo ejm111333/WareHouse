@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ApprovalDocBox-Mapper">
+
+
+	<sql id="search">
+		<if test="searchType == 't'.toString()">
+			and a.title like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'w'.toString()">
+			and a.eno = (select distinct a.eno
+                         from SignDoc a, employee b
+                        where  a.eno = b.eno
+                         and b.name like '%'||#{keyword}||'%')
+		</if>
+		<if test="searchType == 'tw'.toString()">
+			and (
+			a.title like '%'||#{keyword}||'%'
+			or
+			a.eno = (select distinct a.eno
+                         from SignDoc a, employee b
+                        where  a.eno = b.eno
+                         and b.name like '%'||#{keyword}||'%')
+			)
+		</if>
+	</sql>
+	
+	<!-- 전사문서함 양식 -->
+	<select id="selectSignForm" resultType="signForm">
+		SELECT
+		    sformno
+		   ,formclass
+		   ,formtext
+		FROM
+		    signform
+	</select>
+	
+	
+	<!-- 전사문서함 리스트 -->
+	<select id="selectSearchApprovalList" resultType="signDoc">
+		SELECT
+		    a.signno
+		   ,a.eno
+		   ,a.dno
+		   ,a.sformno
+		   ,a.classcode
+		   ,a.Ddate
+		   ,a.emergency
+		   ,a.title
+		   ,a.edate
+		   ,a.sopen
+		   ,a.signcontent
+		   ,a.tempsave
+		   ,a.state
+		   ,a.takeover
+		   ,a.viewcnt
+		   ,c.name
+		   ,b.FORMTEXT
+		FROM
+		    signdoc a, SIGNFORM b, EMPLOYEE c
+		where a.signno is not null
+		<include refid="search" />
+		and a.SFORMNO = b.SFORMNO
+		and a.eno = c.eno
+		and a.SFORMNO =#{sFormNo}
+	</select>
+	
+	<!-- 즐겨찾기 -->
+	<update id="insertFavDoc" parameterType="signDoc">
+		INSERT INTO favdoc (
+						    regdate
+						   ,signno
+						   ,eno
+						) VALUES (
+						    sysdate
+						   ,#{signNo}
+						   ,#{eno}
+						)
+	</update>
+	
+	<update id="deleteFavDoc" parameterType="signDoc">
+		DELETE FROM favdoc
+		WHERE
+		signNo =#{signNo}
+		AND eno = #{eno}
+	</update>
+	
+	
+	
+	<select id="selectSearchFAVDocList" resultType="SignDoc" parameterType="hashMap">
+		SELECT
+			    a.signno,
+			    a.eno,
+			    a.dno,
+			    a.sformno,
+			    a.classcode,
+			    a.ddate,
+			    a.emergency,
+			    a.title,
+			    a.edate,
+			    a.sopen,
+			    a.signcontent,
+			    a.tempsave,
+			    a.state,
+			    a.takeover,
+			    a.viewcnt
+			FROM
+			    signdoc a, FAVDOC b
+			 where a.signno = b.signno
+			 and b.eno = #{eno}
+			<include refid="search" />
+			order by b.regdate desc
+	</select>
+	
+	<select id="selectName" resultType="str">
+		SELECT
+			  b.name
+			FROM
+			    signdoc a, employee b
+			 where a.eno = b.eno
+			 and a.signno = #{signNo}
+    
+	</select>
+	
+	
+</mapper>

@@ -1,0 +1,150 @@
+package kr.or.warehouse.service;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import kr.or.warehouse.dao.HrDAO;
+import kr.or.warehouse.dto.EmployeeVO;
+import kr.or.warehouse.dto.HrTypeVO;
+import kr.or.warehouse.dto.HrVO;
+
+public class TaskHrServiceImpl extends HrServiceImpl implements HrService{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(TaskHrServiceImpl.class);
+
+	private HrDAO hrDAO;
+	public void setHrDAO(HrDAO hrDAO) {
+		this.hrDAO = hrDAO;
+	}
+
+	private String savePath = "c:\\log";
+	public void setSavePath(String savePath) {
+		this.savePath = savePath;
+	}
+
+	private String saveFileName = "hr_log.csv";
+	SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+	@Override
+	public void write(Map<String, HrVO> logMap) throws Exception {
+		System.out.println("logMap" +logMap);
+		HrVO hr = null;
+		String hrcode = "";
+		String hrTime = "0h0m0s";
+		String overTime = "0h0m0s";
+
+
+		Map<String, Object> paramMap = null;
+		if(logMap != null) for(String key : logMap.keySet()) {
+			//key를 이용해서 hrVO꺼내기
+			hr = logMap.get(key);
+			System.out.println("before : " + hr);
+			
+			
+			//이미 있는 eno는 continue
+			paramMap = new HashMap<String, Object>();
+			paramMap.put("eno", hr.getEno());
+			paramMap.put("hrdate", hr.getHrDate());
+			HrVO selectHrByEno = hrDAO.selectHrByEno(paramMap);
+			if(selectHrByEno != null) continue;
+
+			//다오로 그날의 마지막 코드 가져와서 뒤 3자리 자르고, 파스 인트 / null이면 0으로 초기화
+			int code = 0;
+			List<String> selectHrcodeByHrDate = hrDAO.selectHrcodeByHrDate(hr.getHrDate());
+			if(selectHrcodeByHrDate != null) {
+				code = Integer.parseInt(selectHrcodeByHrDate.get(0).substring(8));
+			}
+			//hrcode
+			code += 1;
+			hrcode = "hr"
+					+ hr.getHrDate().substring(2).replace("-", "")
+					+ String.format( "%1$03d" , code );
+			System.out.println(hrcode);
+			hr.setHrcode(hrcode);
+
+			//state
+			// 1. emp꺼내서 근무유형 및 설정 시간 확인
+			HrTypeVO hrType = hrDAO.selectHrType(hr.getEno());
+			// 2. 지각이면 2, 아니면 1
+			if(sdf.parse(hr.getOnTime()).after(sdf.parse(hrType.getOnTime()))) {
+				hr.setState(2);
+			} else {
+				hr.setState(1);
+			}
+			// 3. 결근자 처리는? 따로!
+
+			//hrTime
+			hr.getOnTime();
+			hr.getOffTime();
+			Date parse1 = sdf.parse(hr.getOnTime());
+			Date parse2 = sdf.parse(hr.getOffTime());
+			long time = (parse2.getTime() - parse1.getTime()) / 1000;
+			int hour = (int) (time/(60*60));
+	        int minute = (int) (time/60-(hour*60));
+	        int second = (int) (time%60);
+
+	        hrTime = hour+"h"+minute+"m"+second+"s";
+	        System.out.println(hrTime);
+	        hr.setHrTime(hrTime);
+
+			//overTime
+	        long over = time - 28800;
+	        if(over>0) {
+	        	int hour2 = (int) (over/(60*60));
+	        	int minute2 = (int) (over/60-(hour2*60));
+	        	int second2 = (int) (over%60);
+
+	        	overTime = hour2+"h"+minute2+"m"+second2+"s";
+	        }
+	        System.out.println(overTime);
+	        hr.setOverTime(overTime);
+
+			//reqChange -> default 0
+	        hr.setReqChange(0);
+
+			//DAO를 통해 insert
+			System.out.println("after : " + hr);
+			hrDAO.insertHr(hr);
+		}
+	}
+	
+	@Override
+	public List<HrVO> getHrList(int eno) throws Exception {
+		List<HrVO> hrList = null;
+		hrList = hrDAO.selectHrList(eno);
+		return hrList;
+	}
+	
+	@Override
+	public List<EmployeeVO> getEmpForHrData(String day) throws Exception {
+		return hrDAO.selectEmpForHrData(day);
+	}
+	
+	@Override
+	public void writeAbsent(HrVO hr) throws Exception {
+		//다오로 그날의 마지막 코드 가져와서 뒤 3자리 자르고, 파스 인트 / null이면 0으로 초기화
+		int code = 0;
+		String hrcode = "";
+		List<String> selectHrcodeByHrDate = hrDAO.selectHrcodeByHrDate(hr.getHrDate());
+		System.out.println(selectHrcodeByHrDate.get(0));
+		if(selectHrcodeByHrDate != null) {
+			code = Integer.parseInt(selectHrcodeByHrDate.get(0).substring(8));
+		}
+		
+		//hrcode
+		code += 1;
+		hrcode = "hr"
+				+ hr.getHrDate().substring(2).replace("-", "")
+				+ String.format( "%1$03d" , code );
+		hr.setHrcode(hrcode);
+		hr.setHrTime("0h0m0s");
+		hr.setOverTime("0h0m0s");
+		hr.setReqChange(0);
+		hrDAO.insertHr(hr);
+	}
+}

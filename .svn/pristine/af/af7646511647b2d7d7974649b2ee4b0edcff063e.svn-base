@@ -1,0 +1,418 @@
+package kr.or.warehouse.service;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.session.RowBounds;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.or.warehouse.command.Criteria;
+import kr.or.warehouse.command.PageMaker;
+import kr.or.warehouse.controller.view.OrganizationNode;
+import kr.or.warehouse.dao.ContactDAO;
+import kr.or.warehouse.dto.ContactgrVO;
+import kr.or.warehouse.dto.DepartmentVO;
+import kr.or.warehouse.dto.EmployeeVO;
+import kr.or.warehouse.dto.MycontactVO;
+
+@Service
+public class ContactServiceImpl implements ContactService{
+
+	@Autowired
+	private ContactDAO contactDAO;
+
+	//전체주소록 리스트
+	@Override
+	public Map<String, Object> getContactList(Criteria cri) throws SQLException {
+
+		int offset=cri.getStartRowNum();//추가
+		int limit=cri.getPerPageNum();//추가
+		RowBounds rowBounds=new RowBounds(offset,limit); //추가
+
+		Map<String, String> paramMap = new HashMap<String, String>();
+		paramMap.put("searchType", cri.getSearchType());
+		paramMap.put("keyword", cri.getKeyword());
+
+		Map<String, Object> dataMap = new HashMap<String, Object>();
+		List<EmployeeVO> myconList = contactDAO.selectSearchContactList(paramMap,rowBounds);
+
+		PageMaker pageMaker = new PageMaker();
+		pageMaker.setCri(cri);
+		pageMaker.setTotalCount(myconList.size());
+
+		dataMap.put("myconList", myconList);
+		dataMap.put("pageMaker", pageMaker);
+
+
+		return dataMap;
+
+	}
+
+	//전체주소록 팀 클릭시 리스트
+	@Override
+	public Map<String, Object> getTeamContactList(Criteria cri, String dname) throws SQLException {
+
+
+		Map<String, Object> dataMap = new HashMap<String, Object>();
+		List<EmployeeVO> myconList = contactDAO.selectTeamContactList(cri, dname);
+
+		PageMaker pageMaker = new PageMaker();
+		pageMaker.setCri(cri);
+		pageMaker.setTotalCount(myconList.size());
+
+		dataMap.put("myconList", myconList);
+		dataMap.put("pageMaker", pageMaker);
+
+		return dataMap;
+	}
+	
+	
+	@Override
+	public Map<String, Object> getDepartmentList(Criteria cri, int dno) throws SQLException {
+		int offset=cri.getStartRowNum();//추가
+		int limit=cri.getPerPageNum();//추가
+		RowBounds rowBounds=new RowBounds(offset,limit); //추가
+
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("searchType", cri.getSearchType());
+		paramMap.put("keyword", cri.getKeyword());
+		paramMap.put("dno", dno);
+		
+		Map<String, Object> dataMap = new HashMap<String, Object>();
+		List<EmployeeVO> myDepartmenList = contactDAO.selectDepartment(paramMap,rowBounds);
+
+		PageMaker pageMaker = new PageMaker();
+		pageMaker.setCri(cri);
+		pageMaker.setTotalCount(myDepartmenList.size());
+
+		dataMap.put("myDepartmenList", myDepartmenList);
+		dataMap.put("pageMaker", pageMaker);
+
+		return dataMap;
+	}
+	
+	
+
+	//개인주소록 그룹된 사원 리스트
+	@Override
+	public Map<String, Object> getGroupInfoList(Criteria cri, String cogroupcode) throws SQLException {
+		Map<String, Object> groupInfoMap = new HashMap<String, Object>();
+		List<EmployeeVO> mygroupList = contactDAO.selectGroupInfoList(cri,cogroupcode);
+
+		PageMaker pageMaker = new PageMaker();
+		pageMaker.setCri(cri);
+		pageMaker.setTotalCount(mygroupList.size());
+
+		groupInfoMap.put("mygroupList",mygroupList);
+		groupInfoMap.put("pageMaker", pageMaker);
+
+		return groupInfoMap;
+	}
+
+
+	//개인주소록 그룹 등록
+	@Override
+	public String regist(ContactgrVO contactgr) throws SQLException {
+		String cogroupcode = contactDAO.selectContactGrNo();
+		contactgr.setCogroupcode(cogroupcode);
+		contactDAO.insertGroup(contactgr);
+
+		return cogroupcode;
+	}
+
+	//그룹된 사원들 정보 등록
+	@Override
+	public void registInfo(String cogroupcode, List<String> groupMember) throws SQLException {
+		for(String strEno : groupMember) {
+			int eno = Integer.parseInt(strEno);
+			MycontactVO mycontact = new MycontactVO();
+			mycontact.setCogroupcode(cogroupcode);
+			mycontact.setEno(eno);
+			contactDAO.insertGrInfo(mycontact);
+		}
+	}
+
+
+	//그룹 지정
+	@Override
+	public String registGroupAssign(String cogroupcode, List<String> groupMember) throws SQLException {
+		for(String strEno : groupMember) {
+			int eno = Integer.parseInt(strEno);
+			MycontactVO mycontact = new MycontactVO();
+
+			mycontact.setCogroupcode(cogroupcode);
+			mycontact.setEno(eno);
+
+			contactDAO.insertGrInfo(mycontact);
+		}
+		return cogroupcode;
+	}
+
+
+
+
+
+
+	// 개인주소록 그룹 리스트
+	@Override
+	public Map<String, Object> getContactGroupList(Criteria cri) throws SQLException {
+
+		Map<String, Object> dataMap = new HashMap<String, Object>();
+		List<EmployeeVO> mygroupList = contactDAO.selectGroupList(cri);
+
+		PageMaker pageMaker = new PageMaker();
+		pageMaker.setCri(cri);
+		pageMaker.setTotalCount(mygroupList.size());
+
+		dataMap.put("mygroupList", mygroupList);
+		dataMap.put("pageMaker", pageMaker);
+
+		return dataMap;
+	}
+
+	//개인주소록 전체리스트
+	@Override
+	public Map<String, Object> getPersonalList(Criteria cri) throws SQLException {
+		int offset=cri.getStartRowNum();//추가
+		int limit=cri.getPerPageNum();//추가
+		RowBounds rowBounds=new RowBounds(offset,limit); //추가
+
+		Map<String, String> paramMap = new HashMap<String, String>();
+		paramMap.put("searchType", cri.getSearchType());
+		paramMap.put("keyword", cri.getKeyword());
+
+		Map<String, Object> dataPersonal = new HashMap<String, Object>();  //다름
+		List<EmployeeVO> myPersonalList = contactDAO.selectPersonalList(paramMap,rowBounds); //다름
+
+		PageMaker pageMaker = new PageMaker();
+		pageMaker.setCri(cri);
+		pageMaker.setTotalCount(myPersonalList.size());
+
+		dataPersonal.put("myPersonalList", myPersonalList);
+		dataPersonal.put("pageMaker", pageMaker);
+
+		return dataPersonal;
+	}
+
+
+	//개인주소록 그룹 안 사원 삭제
+	@Override
+	public void remove(List<String> empList, String cogroupcode) throws SQLException {
+		for(String enoStr : empList) {
+			MycontactVO mycontact = new MycontactVO();
+			int eno = Integer.parseInt(enoStr);
+			mycontact.setEno(eno);
+			mycontact.setCogroupcode(cogroupcode);
+			contactDAO.deleteGrEmployee(mycontact);
+		}
+	}
+
+	//그룹삭제
+	@Override
+	public void removeGr(String cogroupcode) throws SQLException {
+		contactDAO.deleteGr(cogroupcode);
+	}
+
+
+	
+
+	//-------------------------------- 초성 ---------------------------------------------------
+	@Override
+	public Map<String, Object> getGiList(Criteria cri) throws SQLException {
+		Map<String, Object> dataGiMap = new HashMap<String, Object>();
+		List<EmployeeVO> myGiList = contactDAO.selectGirstList(cri);
+		PageMaker pageMaker = new PageMaker();
+		pageMaker.setCri(cri);
+		pageMaker.setTotalCount(myGiList.size());
+
+		dataGiMap.put("myconList", myGiList);
+		dataGiMap.put("pageMaker", pageMaker);
+		return dataGiMap;
+	}
+	@Override
+	public Map<String, Object> getNiList(Criteria cri) throws SQLException {
+		Map<String, Object> dataGiMap = new HashMap<String, Object>();
+		List<EmployeeVO> myGiList = contactDAO.selectNirstList(cri);
+		PageMaker pageMaker = new PageMaker();
+		pageMaker.setCri(cri);
+		pageMaker.setTotalCount(myGiList.size());
+		dataGiMap.put("myconList", myGiList);
+		dataGiMap.put("pageMaker", pageMaker);
+		return dataGiMap;
+	}
+
+	@Override
+	public Map<String, Object> getDiList(Criteria cri) throws SQLException {
+		Map<String, Object> dataGiMap = new HashMap<String, Object>();
+		List<EmployeeVO> myGiList = contactDAO.selectDirstList(cri);
+		PageMaker pageMaker = new PageMaker();
+		pageMaker.setCri(cri);
+		pageMaker.setTotalCount(myGiList.size());
+		dataGiMap.put("myconList", myGiList);
+		dataGiMap.put("pageMaker", pageMaker);
+		return dataGiMap;
+	}
+
+	@Override
+	public Map<String, Object> getRiList(Criteria cri) throws SQLException {
+		Map<String, Object> dataGiMap = new HashMap<String, Object>();
+		List<EmployeeVO> myGiList = contactDAO.selectRirstList(cri);
+		PageMaker pageMaker = new PageMaker();
+		pageMaker.setCri(cri);
+		pageMaker.setTotalCount(myGiList.size());
+		dataGiMap.put("myconList", myGiList);
+		dataGiMap.put("pageMaker", pageMaker);
+		return dataGiMap;
+	}
+
+	@Override
+	public Map<String, Object> getMiList(Criteria cri) throws SQLException {
+		Map<String, Object> dataGiMap = new HashMap<String, Object>();
+		List<EmployeeVO> myGiList = contactDAO.selectMirstList(cri);
+		PageMaker pageMaker = new PageMaker();
+		pageMaker.setCri(cri);
+		pageMaker.setTotalCount(myGiList.size());
+		dataGiMap.put("myconList", myGiList);
+		dataGiMap.put("pageMaker", pageMaker);
+		return dataGiMap;
+	}
+
+	@Override
+	public Map<String, Object> getBiList(Criteria cri) throws SQLException {
+		Map<String, Object> dataGiMap = new HashMap<String, Object>();
+		List<EmployeeVO> myGiList = contactDAO.selectBirstList(cri);
+		PageMaker pageMaker = new PageMaker();
+		pageMaker.setCri(cri);
+		pageMaker.setTotalCount(myGiList.size());
+		dataGiMap.put("myconList", myGiList);
+		dataGiMap.put("pageMaker", pageMaker);
+		return dataGiMap;
+	}
+
+	@Override
+	public Map<String, Object> getXiList(Criteria cri) throws SQLException {
+		Map<String, Object> dataGiMap = new HashMap<String, Object>();
+		List<EmployeeVO> myGiList = contactDAO.selectXirstList(cri);
+		PageMaker pageMaker = new PageMaker();
+		pageMaker.setCri(cri);
+		pageMaker.setTotalCount(myGiList.size());
+		dataGiMap.put("myconList", myGiList);
+		dataGiMap.put("pageMaker", pageMaker);
+		return dataGiMap;
+	}
+
+	@Override
+	public Map<String, Object> getOiList(Criteria cri) throws SQLException {
+		Map<String, Object> dataGiMap = new HashMap<String, Object>();
+		List<EmployeeVO> myGiList = contactDAO.selectOirstList(cri);
+		PageMaker pageMaker = new PageMaker();
+		pageMaker.setCri(cri);
+		pageMaker.setTotalCount(myGiList.size());
+		dataGiMap.put("myconList", myGiList);
+		dataGiMap.put("pageMaker", pageMaker);
+		return dataGiMap;
+	}
+
+	@Override
+	public Map<String, Object> getJiList(Criteria cri) throws SQLException {
+		Map<String, Object> dataGiMap = new HashMap<String, Object>();
+		List<EmployeeVO> myGiList = contactDAO.selectJirstList(cri);
+		PageMaker pageMaker = new PageMaker();
+		pageMaker.setCri(cri);
+		pageMaker.setTotalCount(myGiList.size());
+		dataGiMap.put("myconList", myGiList);
+		dataGiMap.put("pageMaker", pageMaker);
+		return dataGiMap;
+	}
+
+	@Override
+	public Map<String, Object> getCiList(Criteria cri) throws SQLException {
+		Map<String, Object> dataGiMap = new HashMap<String, Object>();
+		List<EmployeeVO> myGiList = contactDAO.selectCirstList(cri);
+		PageMaker pageMaker = new PageMaker();
+		pageMaker.setCri(cri);
+		pageMaker.setTotalCount(myGiList.size());
+		dataGiMap.put("myconList", myGiList);
+		dataGiMap.put("pageMaker", pageMaker);
+		return dataGiMap;
+	}
+
+	@Override
+	public Map<String, Object> getCaiList(Criteria cri) throws SQLException {
+		Map<String, Object> dataGiMap = new HashMap<String, Object>();
+		List<EmployeeVO> myGiList = contactDAO.selectCairstList(cri);
+		PageMaker pageMaker = new PageMaker();
+		pageMaker.setCri(cri);
+		pageMaker.setTotalCount(myGiList.size());
+		dataGiMap.put("myconList", myGiList);
+		dataGiMap.put("pageMaker", pageMaker);
+		return dataGiMap;
+	}
+
+	@Override
+	public Map<String, Object> getTiList(Criteria cri) throws SQLException {
+		Map<String, Object> dataGiMap = new HashMap<String, Object>();
+		List<EmployeeVO> myGiList = contactDAO.selectTirstList(cri);
+		PageMaker pageMaker = new PageMaker();
+		pageMaker.setCri(cri);
+		pageMaker.setTotalCount(myGiList.size());
+		dataGiMap.put("myconList", myGiList);
+		dataGiMap.put("pageMaker", pageMaker);
+		return dataGiMap;
+	}
+
+	@Override
+	public Map<String, Object> getPiList(Criteria cri) throws SQLException {
+		Map<String, Object> dataGiMap = new HashMap<String, Object>();
+		List<EmployeeVO> myGiList = contactDAO.selectPirstList(cri);
+		PageMaker pageMaker = new PageMaker();
+		pageMaker.setCri(cri);
+		pageMaker.setTotalCount(myGiList.size());
+		dataGiMap.put("myconList", myGiList);
+		dataGiMap.put("pageMaker", pageMaker);
+		return dataGiMap;
+	}
+
+	@Override
+	public Map<String, Object> getHiList(Criteria cri) throws SQLException {
+		Map<String, Object> dataGiMap = new HashMap<String, Object>();
+		List<EmployeeVO> myGiList = contactDAO.selectHirstList(cri);
+		PageMaker pageMaker = new PageMaker();
+		pageMaker.setCri(cri);
+		pageMaker.setTotalCount(myGiList.size());
+		dataGiMap.put("myconList", myGiList);
+		dataGiMap.put("pageMaker", pageMaker);
+		return dataGiMap;
+	}
+
+	@Override
+	public List<OrganizationNode> organization(List<DepartmentVO> depList) throws Exception {
+		List<OrganizationNode> nodeList = new ArrayList<OrganizationNode>();
+
+		for(DepartmentVO dep : depList) {
+			OrganizationNode node = new OrganizationNode();
+			node.setId(Integer.toString(dep.getDno()));
+			node.setText(dep.getDname());
+			if(dep.getUpdno() == 0) {
+				node.setParent("#");
+			}else {
+				node.setParent(Integer.toString(dep.getUpdno()));
+			}
+
+
+			node.setIcon("fas fa-building");
+
+			nodeList.add(node);
+		}
+
+		return nodeList;
+	}
+
+
+
+
+}

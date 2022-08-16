@@ -1,0 +1,10 @@
+package kr.or.warehouse.dao;
+
+import java.sql.SQLException;
+
+import kr.or.warehouse.dto.ReportVO;
+
+public interface ReportDAO {
+
+	public void insertReport(ReportVO report) throws SQLException;
+}

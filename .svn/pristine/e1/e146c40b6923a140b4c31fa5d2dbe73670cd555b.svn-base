@@ -1,0 +1,24 @@
+package kr.or.warehouse.service;
+
+import java.sql.SQLException;
+import java.util.List;
+
+import kr.or.warehouse.dto.CalAlarmVO;
+import kr.or.warehouse.dto.CalRefVO;
+import kr.or.warehouse.dto.CalendarVO;
+
+public interface CalendarService {
+	
+	List<CalendarVO> getCalendarList() throws SQLException ;
+	
+//	void registCalendar(CalendarVO calendar) throws SQLException;
+//	void registCalendar(CalendarVO calendar, CalRefVO calref) throws SQLException;
+	CalendarVO getCalendarByCcode(String ccode) throws SQLException;
+	
+	void registCalendar(CalendarVO calendar, CalRefVO calref, CalAlarmVO calalarm) throws SQLException;
+	
+	void modify(CalendarVO calendar)throws SQLException;
+	
+	void remove(String ccode)throws SQLException;
+	
+}

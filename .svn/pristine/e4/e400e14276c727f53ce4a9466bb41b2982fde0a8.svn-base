@@ -1,0 +1,18 @@
+package kr.or.warehouse.dao;
+
+import java.sql.SQLException;
+import java.util.List;
+
+import kr.or.warehouse.dto.AttachVo;
+
+public interface BoardAttachDAO {
+	public List<AttachVo> selectAttachByBoardNo(String boardNo)throws SQLException;
+	public AttachVo selectAttachByAttachNo(String attachNo)throws SQLException;
+
+	public void insertAttach(AttachVo attach) throws SQLException;
+
+	public void deleteAttach(String attachNo) throws SQLException;
+
+	public void deleteAllAttach(String boardNo)throws SQLException;
+
+}

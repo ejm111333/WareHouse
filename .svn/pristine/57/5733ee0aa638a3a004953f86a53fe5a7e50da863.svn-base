@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Community-Mapper">
+
+	<sql id="search">
+		<if test="searchType == 't'.toString()">
+			and manualtitle like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'w'.toString()">
+			and eno = (select distinct a.eno
+                         from manual a, employee b
+                        where  a.eno = b.eno
+                         and b.name like '%'||#{keyword}||'%')
+		</if>
+		<if test="searchType == 'tw'.toString()">
+			and (
+			manualtitle like '%'||#{keyword}||'%'
+			or
+			eno = (select distinct a.eno
+                         from manual a, employee b
+                        where  a.eno = b.eno
+                         and b.name like '%'||#{keyword}||'%')
+			)
+		</if>
+	
+	</sql>
+
+	<select id="selectSearchCommunityList" resultType="community">
+		SELECT
+	    cmno
+	   ,cname
+	   ,intro
+	   ,open
+	   ,eno
+	   ,approve
+	   ,regdate
+	FROM
+	    community
+	where OPEN = 0
+	  and APPROVE = 1
+	  <include refid="search" />
+	</select>
+	
+	<select id="selectSearchCommunityListCount" resultType="int">
+		SELECT
+	   count(*)
+	FROM
+	    community
+	where OPEN = 0
+	  and APPROVE = 1
+	  <include refid="search" />
+	</select>
+	
+	<select id="selectNameByEno" resultType="str">
+		select name
+		  from community a, employee b
+		 where a.eno = b.eno
+		   and a.eno = #{eno}
+	</select>
+
+</mapper>
+

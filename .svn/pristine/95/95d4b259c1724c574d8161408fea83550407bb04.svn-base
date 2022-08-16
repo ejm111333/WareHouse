@@ -1,0 +1,171 @@
+package kr.or.warehouse.controller.view;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+
+import kr.or.warehouse.command.Criteria;
+import kr.or.warehouse.dto.EmployeeVO;
+import kr.or.warehouse.dto.MenuVO;
+import kr.or.warehouse.service.WorkService;
+
+@Controller
+@RequestMapping("/work")
+public class WorkController {
+	@Autowired
+	private WorkService workService;
+
+	@RequestMapping("/main")
+	public String main(Model model) throws Exception{
+		String url = "work/main";
+
+		return url;
+	}
+
+	/**
+	 * 내 업무리스트 출력(동기화)
+	 * @param model
+	 * @param cri -> pagination 설정정보(페이지:page, 한 페이지에 보여줄 데이터 수:perPageNum, 검색카테고리:searchType, 검색키워드:keyword)
+	 * @param statusNo -> 업무 상태(0:대기, 1:진행, 2:완료, 3:이의신청, 4:협업요청, 5:대리요청, 6:전체)
+	 * @return String model에 데이터를 심어서 보낼 화면 url
+	 * @throws Exception
+	 */
+	@RequestMapping("/myWorkList")
+	public String myWorkList(Model model, Criteria cri, @RequestParam(defaultValue = "0") int statusNo, HttpSession session) throws Exception{
+		String url = "work/myWorkList";
+
+		EmployeeVO loginUser = (EmployeeVO)session.getAttribute("loginUser");
+
+		Map<String, Integer> noneCheckCnt = null;
+		noneCheckCnt = workService.getNoneCheckCnt("M113000",cri,loginUser.getEno(), loginUser.getDno());
+		Map<String, Object> dataMap = workService.getMyWorkList(cri, statusNo,loginUser.getEno());
+
+		model.addAttribute("dataMap", dataMap);
+		model.addAttribute("noneCheckCnt", noneCheckCnt);
+
+		return url;
+	}
+
+	/**
+	 * 내가 요청한 업무리스트 출력(동기화)
+	 * @param model
+	 * @param cri -> pagination 설정정보(페이지:page, 한 페이지에 보여줄 데이터 수:perPageNum, 검색카테고리:searchType, 검색키워드:keyword)
+	 * @param statusNo -> 업무 상태(0:대기, 1:진행, 2:완료, 3:이의신청, 4:협업요청, 5:대리요청, 6:전체)
+	 * @return String model에 데이터를 심어서 보낼 화면 url
+	 * @throws Exception
+	 */
+	@RequestMapping("/toReqList")
+	public String toReqList(Model model, Criteria cri, @RequestParam(defaultValue = "0") int statusNo, HttpSession session) throws Exception{
+		String url = "work/toReqList";
+
+		EmployeeVO loginUser = (EmployeeVO)session.getAttribute("loginUser");
+
+		Map<String, Integer> noneCheckCnt = null;
+		noneCheckCnt = workService.getNoneCheckCnt("M114000",cri,loginUser.getEno(), loginUser.getDno());
+		Map<String, Object> dataMap = workService.getToReqList(cri, statusNo, loginUser.getEno());
+
+		model.addAttribute("dataMap", dataMap);
+		model.addAttribute("noneCheckCnt", noneCheckCnt);
+
+		return url;
+	}
+
+	/**
+	 * 부서 목록 출력(동기화)
+	 * @param model
+	 * @param cri -> pagination 설정정보(페이지:page, 한 페이지에 보여줄 데이터 수:perPageNum, 검색카테고리:searchType, 검색키워드:keyword)
+	 * @param statusNo -> 업무 상태(0:대기, 1:진행, 2:완료, 3:이의신청, 4:협업요청, 5:대리요청, 6:전체)
+	 * @return String model에 데이터를 심어서 보낼 화면 url
+	 * @throws Exception
+	 */
+	@RequestMapping("/depWorkList")
+	public String depWorkList(Model model, Criteria cri, @RequestParam(defaultValue = "0") int statusNo, HttpSession session) throws Exception{
+		String url = "work/depWorkList";
+
+		EmployeeVO loginUser = (EmployeeVO)session.getAttribute("loginUser");
+
+		Map<String, Integer> noneCheckCnt = null;
+		noneCheckCnt = workService.getNoneCheckCnt("M115000",cri,loginUser.getEno(), loginUser.getDno());
+		Map<String, Object> dataMap = workService.getDepWorkList(cri, statusNo, loginUser.getEno(), loginUser.getDno());
+
+		model.addAttribute("dataMap", dataMap);
+		model.addAttribute("noneCheckCnt", noneCheckCnt);
+
+		return url;
+	}
+
+	@RequestMapping("/declareList")
+	public String declareList() throws Exception{
+		String url = "work/declareList";
+
+		return url;
+	}
+
+	@RequestMapping("/waitDetail")
+	public String waitDetail() throws Exception{
+		String url = "work/waitDetail";
+
+
+		return url;
+	}
+
+	@RequestMapping("/workDetailGo")
+	public String workDetailGo() throws Exception{
+		String url = "work/workDetail";
+
+		return url;
+	}
+
+	@RequestMapping("/workDetail")
+	public String workDetail(@RequestHeader Map<String, Object> requestHeader, Model model) throws Exception{
+		String url = "work/workDetail";
+
+		String refer = requestHeader.get("referer").toString();
+		String referMcode = refer.substring(refer.indexOf("=") + 1);
+
+		if(referMcode.contains("M13")) {
+			model.addAttribute("refer", "knowhow");
+		}
+
+		return url;
+	}
+
+	@RequestMapping("/reportRegistForm")
+	public String reportRegistForm() throws Exception{
+		String url = "work/reportRegistForm";
+
+		return url;
+	}
+
+	@RequestMapping("/proceedRegistForm")
+	public String proceedRegistForm() throws Exception{
+		String url = "work/proceedRegistForm";
+
+		return url;
+	}
+
+	@RequestMapping("/toReqWorkDetailGo")
+	public String toReqWorkDetail() throws Exception{
+		String url = "work/toReqWorkDetail";
+
+		return url;
+	}
+
+	@RequestMapping("/workRegistForm")
+	public String workRegistForm() throws Exception{
+		String url = "work/workRegistForm";
+
+		return url;
+	}
+
+}

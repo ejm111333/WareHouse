@@ -1,0 +1,50 @@
+package kr.or.warehouse.service;
+
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.warehouse.command.Criteria;
+import kr.or.warehouse.controller.view.OrganizationNode;
+import kr.or.warehouse.dto.DepartmentVO;
+import kr.or.warehouse.dto.SignDocVO;
+import kr.or.warehouse.dto.SignFormVO;
+import kr.or.warehouse.dto.SignLineVO;
+import kr.or.warehouse.dto.SignerVO;
+
+public interface NewApprovalService {
+
+	//관련문서
+	Map<String,Object> getRelatedDocList(Criteria cri, String sformno)throws SQLException;
+
+	//참조자 리스트
+	Map<String,Object> getRefLineList(Criteria cri)throws SQLException;
+
+	//조직도
+	public List<OrganizationNode> organization(List<DepartmentVO> depList) throws Exception;
+
+	//조직도 부서
+	Map<String,Object> getDeptName(Criteria cri, int eno)throws SQLException;
+	
+	//결재선 리스트
+	Map<String,Object> getSignLineList(Criteria cri, int dno, String sformno)throws SQLException;
+		
+	//로그인한 사원 정보
+	Map<String,Object> getContactList(Criteria cri, int eno)throws SQLException;
+	
+	//문서정보
+	Map<String, Object> getSignDocNo()throws SQLException;
+
+	//결재문서 저장
+	void registSignDoc(SignDocVO signDoc,List<String> signerMemberList) throws SQLException;
+	
+	//결재자 저장
+	//void registSigner(SignerVO signer) throws SQLException;
+
+	
+	
+
+	
+}

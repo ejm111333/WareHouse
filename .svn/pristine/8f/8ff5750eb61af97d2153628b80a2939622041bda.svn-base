@@ -1,0 +1,31 @@
+package kr.or.warehouse.dao;
+
+import org.apache.ibatis.session.SqlSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import kr.or.warehouse.dto.HrTypeVO;
+import kr.or.warehouse.dto.HrVO;
+
+public class TaskHrDAOImpl extends HrDAOImpl implements HrDAO{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(TaskHrDAOImpl.class);
+	private SqlSession session;
+	public void setSession(SqlSession session) {
+		this.session = session;
+	}
+
+	@Override
+	public void insertHr(HrVO hr) throws Exception {
+		session.update("Hr-Mapper.insertHr", hr);
+	}
+
+	@Override
+	public String selectHrcodeByHrDate(String hrDate) throws Exception {
+		return session.selectOne("Hr-Mapper.selectHrcodeByHrDate", hrDate);
+	}
+	@Override
+	public HrTypeVO selectHrType(int eno) throws Exception {
+		return session.selectOne("Hr-Mapper.selectHrType", eno);
+	}
+}

@@ -1,0 +1,22 @@
+package kr.or.warehouse.service;
+
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+
+import kr.or.warehouse.command.Criteria;
+import kr.or.warehouse.dto.WorkVO;
+
+public interface WorkService {
+
+	//내업무 목록
+	public Map<String, Object> getMyWorkList(Criteria cri, int statusNo, int eno) throws SQLException;
+	//요청한업무 목록
+	public Map<String, Object> getToReqList(Criteria cri, int statusNo, int eno) throws SQLException;
+	//부서업무 목록
+	public Map<String, Object> getDepWorkList(Criteria cri, int statusNo, int eno, int dno) throws SQLException;
+	//상태별 미확인 업무 체크
+	public Map<String, Integer> getNoneCheckCnt(String referMcode, Criteria cri, int eno, int dno) throws SQLException;
+	//업무 상세
+	public WorkVO getWorkByWcode(String wcode) throws SQLException;
+}

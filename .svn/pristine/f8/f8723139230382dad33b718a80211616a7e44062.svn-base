@@ -1,0 +1,408 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ page trimDirectiveWhitespaces="true" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+   
+<head>
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/css/jquery.datetimepicker.css" />
+	<script src="<%=request.getContextPath()%>/resources/js/jquery.datetimepicker.full.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
+
+<style>
+label {
+	display: inline-block;
+	margin-bottom: 0.5rem;
+}
+
+input[type=text], .textarea {
+	border: 1px solid darkgray;
+	border-radius: 3px;
+}
+
+.datetimepicker {
+	width: 130px;
+	padding-left: 7px;
+}
+
+input[type=text] {
+	height: 38px;
+}
+
+.nemo {
+	margin-bottom: 4px;
+	margin-top: 10px;
+	margin-left: 128px;
+	display: flex;
+}
+
+.rBtn {
+	margin-left: 10px;
+}
+
+.div1, .div2 {
+	width: 130px;
+}
+
+.close3:after {
+	content: "\00d7";
+	font-size: 40pt;
+	line-height: 25px;
+}
+
+img {
+	width: 35px;
+}
+</style>
+</head>
+
+<body>
+<div class="wrapper" style="padding: 0px 5px;">
+	 <!-- Main content -->
+	<section class="content-header">
+	  	<div class="container-fluid">
+	  		<div class="row md-2">
+	  			<div class="col-sm-6">
+	  				<h3>일정등록</h3>  				
+	  			</div>
+	  		</div>
+	  	</div>
+	</section>
+	 
+  <!-- Main content -->
+    <section class="content container-fluid">
+		<div class="row justify-content-center">
+			<div class="col-md-12">
+				<div class="card card-outline card-info">
+					<div class="card-header">
+						<h3 class="card-title p-1">일정등록</h3>
+						<div class ="card-tools">
+							<button type="button" class="btn btn-info" id="registBtn" onclick="regist_go();">등 록</button>
+							<button type="button" class="btn btn-secondary" id="cancelBtn" onclick="CloseWindow();" >취 소</button>
+						</div>
+					</div><!--end card-header  -->
+					<div class="card-body pad">
+						<form role="form" method="post" action="regist.do" name="registForm">
+							<div class="form-group row">
+								<input type="hidden" value="${loginUser.eno }" name="eno">
+								<label for="title" class="col-2">제목</label>
+								<input type="text" id="title" name="title" class="form-control col-10" placeholder="일정 제목을 입력하세요.">
+							</div>							
+							<div class="form-group row">
+								<label for="" class="col-2">기간</label>
+								<div class="col-10" style="float: right; padding-left: 0px; margin-left: -9px;">
+									<div class="col-6" style="float: left; display: flex;">
+										<input class="datetimepicker" type="text" name="sdate" autocomplete="off" id="sdate" value="${sdate }">
+										<div id="edateHide">
+											&nbsp;&nbsp;~&nbsp;&nbsp;
+											<input class="datetimepicker" type="text" name="edate" autocomplete="off" id="edate" value="" onchange="dateSetting();">
+										</div>
+									</div>
+									<div class="form-group col-6" style="float:right; padding-left: 30px; margin-top: 5px;">
+										<label for="allday">종일</label>
+										<div class="form-check-label" style="margin-top: -30px;">
+											<input type="checkbox" class="form-check-input" name="allday" id="allday" onchange="allDayEvent();">
+										</div>
+									</div>
+								</div>
+							</div>							
+							<div class="form-group row">
+								<label for="catecode" class="col-2">일정 분류</label> 
+								<select class="col-2" name="catecode" id="catecode" style="height: 38px;" onclick="addSelect();">
+                       				<option value="0" >선택없음</option>
+                       				<option value="1" >개인일정</option>
+                       				<option value="2" >부서일정</option>
+                       				<option value="3" >회사일정</option>
+                    			</select>
+                    			<label for="catedetail"></label>
+                    			<select name="catedetail" id="catedetail" style="height: 38px; width: 125px; display: none; margin-left: 10px;">
+                    				<option value="0" >선택없음</option>
+                    				<option value="1" >재택근무</option>
+                    				<option value="2" >세미나</option>
+                    				<option value="3" >특강</option>
+                    			</select>
+							</div>
+							<div class="form-group row" data-toggle="modal" data-target="#modal-default">
+								<label for="" class="col-2">참조자</label> 
+								<button type="button" class="btn bg-gradient-info col-2" onclick="referSelect();" style="height: 38px;">참조자 선택</button><br>
+								<div class="manager-list col-12" id="emp_List" style="align-items: center; display: flex; position: relative; padding-left: 126px;">
+<!-- 									<div class="col-2" id="emp_List"> -->
+<!-- 									</div> -->
+								</div>
+								
+							</div>
+							<div class="form-group row">
+								<label for="space" class="col-2">장 소</label>
+								<input type="text" id="space" name="space" class="col-10">
+							</div>
+							<div class="form-group row">
+								<label for="content" class="col-2">내 용</label>
+								<textarea class="textarea col-10" name="content" id="content" cols="80" rows="5" placeholder="일정 상세 내용을 작성하세요."></textarea>
+							</div>
+							<div class="form-group row">
+								<label for="" class="col-2">알 림</label>
+								<div class="col-10 calmethod" >
+									<select class="" id="calarmtime" name="calarmtime" style="margin-left: -8px; height: 38px; width: 90px !important;" onchange="time();">
+	                       				<option value="5" >없음</option>
+	                       				<option value="1" >1시간전</option>
+	                       				<option value="2" >1일전</option>
+	                       				<option value="3" >2일전</option>
+	                       				<option value="4" >1주일전</option>
+	                    			</select>&nbsp;&nbsp;
+                    			</div>
+							</div>
+						</form>
+					</div><!--end card-body  -->
+					<div class="card-footer" style="display:none">
+					
+					</div><!--end card-footer  -->
+				</div><!-- end card -->				
+			</div><!-- end col-md-12 -->
+		</div><!-- end row -->
+    </section>
+    <!-- /.content -->
+    
+    
+    <div class="modal fade" id="modal-default" role="dialog" style="display:none; border-radius: 0.2rem;">
+		<div class="modal-dialog modal-mg" style="width: 350px">
+			<div class="modal-content">
+				<div class="modal-header" style="background: #17A2B8; color: white;">
+					<h4 class="modal-title">참조자 선택</h4>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true" style="color: white;">×</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div class="card card-info">
+						<form class="form-horizontal">
+							<div class="tab-pane fade active show" id="custom-tabs-four-home" role="tabpanel" aria-labelledby="custom-tabs-four-home-tab" style="margin: 20px">
+								<span class="material-symbols-outlined">
+									corporate_fare
+								</span>
+							  	<span >PoJo기업</span>
+								<div id="organization" ></div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+    
+<script>
+// window.onload=function(){
+<%-- 	summernote_go($('#content'),'<%=request.getContextPath()%>');  --%>
+// }
+
+
+
+// 일정 등록 
+function regist_go(){
+	var form = document.registForm;
+	if($("input[name='title']").val()==""){
+		alert("제목은 필수입니다.");
+		$("input[name='title']").focus();
+		return;
+	}
+	
+	if($("#catecode option:selected").text()=="선택없음"){
+		alert("분류코드를 선택하세요.");
+		return;
+	}
+	
+	if($("#calarmtime option:selected").text()=="선택"){
+		alert("알림방식을  선택하세요.");
+		return;
+	}
+	
+	if($("#calarmmethod option:selected").text()=="선택"){
+		alert("알림방식을  선택하세요.");
+		return;
+	}
+	
+	$("form[role='form']").submit();
+}
+
+// 팝업창 닫기
+function CloseWindow(){
+	window.opener.location.reload(true);		
+	window.close();
+}
+
+// datetimepicker 사용
+$('.datetimepicker').datetimepicker({
+	'minTime' : '00:00',
+	'maxTime' : '24:00'
+});
+
+// // 일정 알림 추가
+// function addAlarm(){
+	
+// 	var time = $('#calarmtime option:selected').text();
+// 	var timeVal = $('#calarmtime option:selected').val();
+// 	var method = $('#calarmmethod option:selected').text();
+// 	var methodVal = $('#calarmmethod option:selected').val();
+	
+// // 	$('.addAl').append('<div class="nemo"><div class="div1">' + time +'&nbsp;&nbsp;'+ method + '</div><div class="close close3 rBtn"></div></div>');
+// 	$('.addAl').append('<div class="nemo"><label for="time">'+time+'</label><input type="hidden" name="calarmtime" id="time" value="'+ timeVal +'"><label for="method">'+method+'</label><input type="hidden" name="calarmmethod" id="method" value="'+ methodVal +'"><div class="close close3 rBtn"></div></div>')
+// }
+
+
+// // 일정 알림 삭제
+// $(document).on('click', '.rBtn', function(){
+// 	var removeItem = $(this).closest('.nemo');
+// 	removeItem.remove();
+// })
+
+
+// 개인일정 옵션 
+function addSelect(){
+	var cate = $('#catecode option:selected').val();
+	
+	if(cate == "1"){
+		$("#catedetail").show();
+	}else{
+		$("#catedetail").hide();
+	}
+}
+
+// 시작시간보다 끝시간을 나중으로 설정
+function dateSetting() {
+	if($('#edate').val() < $('#sdate').val()){
+		alert('잘못 선택했습니다.');
+		$('#sdate').val('');
+		$('#edate').val('');
+		$('#edate').focus();
+		return;
+	}
+}
+
+// 하루종일 체크 여부
+function allDayEvent(){
+	if($('#allday').is(":checked") == true){
+// 		$('#sdate').val('');
+// 		$('#edate').val('');
+// 		console.log('체크된 상태');
+
+		var sdate = $('#sdate').val();
+		var scut = sdate.substring(0,10);
+		scut = scut + ' 00:00'
+// 		scut = scut.concat(' ', '00:00');
+// 		console.log(scut);
+		$('#sdate').val(scut);
+		$('#edate').val(scut);
+		$("#edateHide").hide();
+		
+		
+// 		$('#edate').val(scut + ' 59:00');
+// 		console.log(sdate);
+// 		console.log(edate);
+		
+	}else{
+		$("#edateHide").show();
+	}
+}
+
+// 알림 없음일 경우
+function time(){
+	$('#calarmmethod').remove();
+	val = $("#calarmtime").val();
+	str = "";
+	if(val != 5){
+		str += '<select class="" id="calarmmethod" name="calarmmethod" style="height: 38px; width: 90px !important;">';
+		str += '<option value="0" >선택</option>';
+		str += '<option value="4" >없음</option>';
+		str += '<option value="1" >푸시알림</option>';
+		str += '<option value="2" >메일알림</option>';
+		str += '<option value="3" >문자알림</option>';
+		str += '</select>';
+	}else if(val == 5){
+		$('#calarmmethod').remove();
+	}
+	
+	$('.calmethod').append(str);
+}
+</script>
+
+
+<script>
+//조직도
+$('#organization').jstree({
+	core : {
+		data :${organizationNode}
+	},
+	types : {
+		'default' : {'icon': 'jstree-folder'}
+	},
+	 plugins: ['wholerow', 'types']
+});
+
+$('#organization').on("changed.jstree", function (e, data) {
+	console.log("data",data);
+    if(data.node.id.length > 3){
+		console.log("data.node.id.length",data.node.id.length);
+    	$.ajax({
+    		url : "<%=request.getContextPath()%>/work/getEmpByNodeId.do?eno=" + data.node.id,
+    		type:'get',
+    		success:function(res){
+    			console.log(res);
+    			if($('div[data-eno="' + res.eno + '"]').length == 0){
+	    			addEmp(res, $('#emp_List'), $('#addEmp-template'))
+	    			if($('.emp_select_card').length == 1){
+	    				$('.wmstepBtn').css("display", "block");
+	    				$('input[name=wmstep]').prop('checked', true); 
+	    			}
+	    			addWorkManager(res.eno);
+    			}else{
+    				alert("이미 등록된 담당자는 추가할 수 없습니다.");
+    			}
+
+    		},
+    		error:function(error){
+    			alert(error);
+    		}
+    	});
+    }
+});
+
+function addEmp(data, target, templateObject){
+	var template=Handlebars.compile(templateObject.html());
+	var html = template(data);
+	target.append(html);
+}
+</script>
+
+<script type="text/x-handlebars-template"  id="addEmp-template">
+	<div class="emp_select_card col-4" data-eno="{{eno}}" style="align-items: center; display: flex; justify-content: center; flex: 0% !important;">
+		<div style="padding: 5px; position: relative;">
+			<input type="hidden" name="calRefEno" value="{{eno}}">		
+			<label for="{{eno}}"><img class="table-avatar emp_profile" src="{{photo}}"></label>
+		</div>
+		<div class="text-left" style="position: relative;">
+			<div style="display: flex; align-items: center">
+				<p style="font-size: 12px; font-weight: bold">{{name}} </p>&nbsp;&nbsp;
+				<i class="fas fa-times removeBtn text-danger" onclick="removeManager('{{eno}}')" style="cursor:pointer;"></i>
+			</div>
+			<div style="font-size: 8px;">
+				<p>{{ppsname}}</p>
+				<p>{{dname}}</p>
+			</div>
+		</div>
+	</div>
+</script>
+	
+<script>
+function removeManager(eno){
+	var removeItem = $('div[data-eno="' + eno + '"]');
+	removeItem.remove();
+	removeWorkManager.push(eno);
+	console.log(removeWorkManager);
+}
+</script>
+
+
+</div>
+</body>
+
+

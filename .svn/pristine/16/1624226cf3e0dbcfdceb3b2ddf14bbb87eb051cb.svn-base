@@ -1,0 +1,164 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+
+
+<script>
+
+	page = 1;
+	function manualListGo(startPage){
+		page = startPage
+		$('.nav-link').removeClass('active');
+		var data = {
+				'page' : page,
+				'searchType' : $('select[name="searchType"]').val(),
+				'keyword' : $('input[name="keyword"]').val(),
+		}
+
+
+		$.ajax({
+			url : '<%=request.getContextPath()%>/kw/manual/manualList.do',
+			data : data,
+			type : 'post',
+			success: function(res){
+				if(res.manualList.length > 0){
+					printWorkData(res.manualList, $('.manualList'), $('#manualList-template'));
+
+
+				}else{
+					var str = `
+						<tr>
+							<td colspan="6" style="text-align:center">
+								등록된 업무가 없습니다.
+							</td>
+						</tr>
+					`;
+
+					$('.manualList').html(str);
+				}
+
+				pageMakerData = {
+						pageMaker : res.pageMaker,
+						target : 'manual',
+				}
+
+				printPageMaker(pageMakerData ,$('.manualPage'), $('#pageMaker-template'));
+
+				var tabList = $('a[role="tab"]');
+				for(i = 0; i < tabList.length; i ++){
+					if(tabList[i].getAttribute("data-status") == statusNo){
+						tabList[i].classList.add('active');
+					}
+				}
+
+			},
+			error:function(error){
+				alert("error : " + error.status)
+			}
+		});
+	}
+
+	function printWorkData(dataList, target, templateObject){
+		var template = Handlebars.compile(templateObject.html());
+		var html = template(dataList);
+		target.html(html);
+	}
+
+	function printPageMaker(data, target, templateObject){
+		var template = Handlebars.compile(templateObject.html());
+		var html = template(data);
+		target.html(html);
+	}
+
+</script>
+
+<script type="text/x-handlebars-template"  id="manualList-template">
+{{#each .}}
+	<tr style='font-size: 0.85em;'>
+		<td id="manualTitle"
+			style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; "
+			onclick="javascript:OpenWindow('manualDetail.do?from=list&manualNo={{manualNo}}','상세보기',800,700);">
+				<span class="col-sm-12 ">{{manualTitle}}</span>
+		</td>
+		<td class="as">{{name}}</td>
+		<td >{{title}}</td>
+		<td>{{formatDate regDate}}</td>
+		<td><i class="fas fa-light fa-eye"></i> {{viewCnt }}</td>
+		<td class="favManual">
+		<input type="hidden" id="{{manualNo}}" name="manualNo">
+		<input type="hidden" id="{{eNo}}" name="eNo">
+<%--		<c:set var="doneLoop" value="false"/> 
+		<c:forEach items="${favManualList }" var="favManual" varStatus="status">
+			<c:if test="${not doneLoop}">
+	        	 <c:if test = "${favManual.manualNo eq manual.manualNo}">
+	           		<i id="fav"class="fas fa-solid fa-star star"style="font-size: 1.5em; color: #ffc107;" onclick=""></i>
+	           		<c:set var="doneLoop" value="true"/>
+	         	</c:if>
+	      	</c:if>
+		</c:forEach>
+		<c:if test="${not doneLoop }">
+			 <i id="nFav" class="far fa-star star"style="font-size: 1.5em; color: #ffc107;" onclick=""></i>
+		</c:if>
+
+		</td> --%>
+		<i id="nFav" class="far fa-star star"style="font-size: 1.5em; color: #ffc107;" onclick=""></i></td>
+	</tr>
+{{/each}}
+</script>
+
+<script type="text/x-handlebars-template"  id="pageMaker-template">
+	<li class="page-item">
+		<a class="page-link" href="">
+			<i class="fas fa-angle-double-left"></i>
+		</a>
+	</li>
+	<li class="page-item">
+		<a class="page-link" href="">
+			<i class="fas fa-angle-left"></i>
+		</a>
+	</li>
+		{{printPage this}}
+	<li class="page-item">
+		<a class="page-link" href="">
+			<i class="fas fa-angle-right"></i>
+		</a>
+	</li>
+	<li class="page-item">
+		<a class="page-link" href="">
+			<i class="fas fa-angle-double-right"></i>
+		</a>
+	</li>
+</script>
+<script>
+	Handlebars.registerHelper({
+		"formatDate" : function(regDate){
+			var dateObj = new Date(regDate);
+			var year = dateObj.getFullYear();
+			var month = dateObj.getMonth() + 1;
+			var date = dateObj.getDate();
+			return year + "-" + month + "-" + date;
+		},
+		"printPage" : function(pageMakerData){
+			var pageMaker = pageMakerData.pageMaker;
+			var target;
+
+			if(pageMakerData.target == "manual"){
+				target = "toReqListGo";
+			}
+			if(pageMakerData.target == "favManual"){
+				target = "depWorkListGo";
+			}
+
+			var str = '';
+			for(i = pageMaker.startPage; i <= pageMaker.endPage; i++){
+				var active = i == pageMaker.cri.page ? 'active' : '';
+				str += '<li class="page-item ' + active + '">';
+				str += '<a class="page-link" href="javascript:manualListGo(' + i + ')">';
+				str += i
+				str += '</a>';
+				str += '</li>';
+			}
+			return new Handlebars.SafeString(str);
+		}
+
+	});
+</script>

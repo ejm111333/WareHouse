@@ -1,0 +1,87 @@
+package kr.or.warehouse.service;
+
+import java.sql.SQLException;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.or.warehouse.dao.CalendarDAO;
+import kr.or.warehouse.dto.CalAlarmVO;
+import kr.or.warehouse.dto.CalRefVO;
+import kr.or.warehouse.dto.CalendarVO;
+
+@Service
+public class CalendarServiceImpl implements CalendarService{
+	
+	@Autowired
+	private CalendarDAO calendarDAO;
+
+	@Override
+	public List<CalendarVO> getCalendarList() throws SQLException {
+		return calendarDAO.selectSearchCalendarList();
+	}
+
+//	@Override
+//	public void registCalendar(CalendarVO calendar) throws SQLException {
+//		int ccode = calendarDAO.selectCalendarSeqNext();
+//		String ccodeStr = "" + ccode;
+//		calendar.setCcode(ccodeStr);
+	
+	//select시 사용
+//	calendar.setCalAlarmList(calAlarmList);
+//	calendar.setCalRefList(calRefList);
+	
+//		// insert
+//		calendarDAO.insertCalendar(calendar);
+//	}
+
+	@Override
+	public void registCalendar(CalendarVO calendar, CalRefVO calref, CalAlarmVO calalarm) throws SQLException {
+		String ccode = calendarDAO.selectCcode();
+		
+		calendar.setCcode(ccode);
+		
+		calref.setCcode(ccode);
+		calalarm.setCcode(ccode);
+		
+		//insert
+		calendarDAO.insertCalendar(calendar);
+		calendarDAO.insertCalRef(calref);
+		calendarDAO.insertCalAlarm(calalarm);
+	}
+	
+	@Override
+	public void modify(CalendarVO calendar) throws SQLException {
+		calendarDAO.updateCalAlarm(calendar.getCalAlarm());
+		calendarDAO.updateCalendar(calendar);
+	}
+
+	@Override
+	public CalendarVO getCalendarByCcode(String ccode) throws SQLException {
+		CalendarVO calendar = calendarDAO.selectCalendarByCcode(ccode);
+		
+		CalAlarmVO calAlarm = calendarDAO.selectCalAlarmByCcode(ccode);
+		List<CalRefVO> calRefList = calendarDAO.selectCalRefByCcode(ccode);
+		
+		calendar.setCalAlarm(calAlarm);
+		calendar.setCalRefList(calRefList);
+		String start = calendar.getStart();
+		String end = calendar.getEnd();
+		
+		start = start.replace('-', '/').replace('T', ' ').substring(0,start.lastIndexOf(":"));
+		end = end.replace('-', '/').replace('T', ' ').substring(0,end.lastIndexOf(":"));
+		
+		calendar.setStart(start);
+		calendar.setEnd(end);
+		
+		return calendar; 
+	}
+	
+	@Override
+	public void remove(String ccode) throws SQLException {
+		System.out.println(ccode);
+		calendarDAO.deleteCalendar(ccode);
+	}
+
+}

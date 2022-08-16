@@ -1,0 +1,49 @@
+package kr.or.warehouse.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.session.SqlSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import kr.or.warehouse.dto.MentoringVO;
+import kr.or.warehouse.dto.SubMentoringVO;
+
+
+@Repository
+public class MentoringDAOImpl implements MentoringDAO{
+	private static final Logger LOGGER = LoggerFactory.getLogger(MentoringDAOImpl.class);
+
+	@Autowired
+	private SqlSession session;
+
+	@Override
+	public List<SubMentoringVO> selectMyMento(int eno) throws Exception {
+		return session.selectList("Mentoring-Mapper.selectMyMento", eno);
+	}
+
+	@Override
+	public List<MentoringVO> selectMyMentee(int eno) throws Exception {
+		return session.selectList("Mentoring-Mapper.selectMyMentee", eno);
+	}
+
+	@Override
+	public List<SubMentoringVO> subMentoringList(int eno) throws Exception {
+		return session.selectList("Mentoring-Mapper.subMentoringList", eno);
+	}
+
+	@Override
+	public List<MentoringVO> selectMentoRank() throws Exception {
+		return session.selectList("Mentoring-Mapper.selectMentoRank");
+	}
+
+//	@Override
+//	public String selectMentoName(int eno) throws Exception {
+//		return session.selectOne("Mentoring-Mapper.selectMentoName",eno);
+//	}
+
+
+
+}

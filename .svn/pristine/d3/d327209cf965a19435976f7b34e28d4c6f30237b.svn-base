@@ -1,0 +1,639 @@
+package kr.or.warehouse.service;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.apache.ibatis.session.RowBounds;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.or.warehouse.command.Criteria;
+import kr.or.warehouse.command.PageMaker;
+import kr.or.warehouse.dao.DepartMentDAO;
+import kr.or.warehouse.dao.HrDAO;
+import kr.or.warehouse.dto.DepartmentVO;
+import kr.or.warehouse.dto.EmployeeVO;
+import kr.or.warehouse.dto.HrTypeVO;
+import kr.or.warehouse.dto.HrVO;
+import kr.or.warehouse.dto.PostPositionVO;
+import kr.or.warehouse.dto.VacLogVO;
+import kr.or.warehouse.dto.VacProduceVO;
+import kr.or.warehouse.dto.VacationVO;
+
+@Service("hrService")
+public class HrServiceImpl implements HrService {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(HrServiceImpl.class);
+
+	@Resource(name = "hrDAO")
+	private HrDAO hrDAO;
+
+	@Autowired
+	private DepartMentDAO departmentDAO;
+
+	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+	@Override
+	public List<HrVO> getHrList(int eno) throws Exception {
+		List<HrVO> hrList = null;
+		hrList = hrDAO.selectHrList(eno);
+		return hrList;
+	}
+
+	@Override
+	public HrTypeVO getHrType(int eno) throws Exception {
+		HrTypeVO hrType = null;
+		hrType = hrDAO.selectHrType(eno);
+		return hrType;
+	}
+
+	@Override
+	public EmployeeVO getEmp(int eno) throws Exception {
+		EmployeeVO employee = null;
+		employee = hrDAO.selectEmp(eno);
+//		DepartmentVO dep = departmentDAO.selectDepartmentByDno(employee.getDno());
+//		employee.setDname(dep.getDname());
+//		PostPositionVO pps = hrDAO.selectPpsByPpscode(employee.getPpscode());
+//		employee.setPpsname(pps.getPpsName());
+		return employee;
+	}
+
+	@Override
+	public void changeCondition(EmployeeVO employee) throws Exception {
+		hrDAO.updateCondition(employee);
+	}
+
+	@Override
+	public Map<String, Object> onloadHrTable(int eno, Date inputDate) throws Exception {
+		Map<String, Object> result = new HashMap<String, Object>();
+		List<List<HrVO>> monthList = new ArrayList<List<HrVO>>();
+		List<String> hrTimeList = new ArrayList<String>();
+		List<HrVO> hrList = null;
+		List<String> hrTimes = null;
+		Map<String, Object> paramMap = null;
+
+		//월 구하기
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(inputDate);
+		int intYear = cal.get(Calendar.YEAR);
+		int intMonth = cal.get(Calendar.MONTH) + 1;
+		int intDate = 1;
+		System.out.println(intYear + ", " + intMonth + ", " + intDate);
+
+		for(int i = 0; i < 5; i++) {
+			hrTimes = new ArrayList<String>();
+			cal = Calendar.getInstance();
+			cal.set(intYear, intMonth-1, intDate +(7 * i));
+			Date calDate = cal.getTime();
+//			System.out.println("calDate : " + calDate);
+
+			String[] daysOfWeek = getDaysOfWeek(calDate); //입력한 날짜의 주간 범위
+			hrList = new ArrayList<HrVO>();
+			HrVO hr = null;
+			for(String date : daysOfWeek) { //주간 날짜로 hr구하기
+				paramMap = new HashMap<String, Object>();
+				paramMap.put("eno", eno);
+				paramMap.put("hrDate", date);
+
+				hr = hrDAO.selectHrByDate(paramMap);
+				if(hr != null) hrTimes.add(hr.getHrTime());
+				if(hr != null) hrList.add(hr);
+				else if(hr == null) {
+					hr = new HrVO();
+					hr.setHrcode("-");
+					hr.setEno(eno);
+					hr.setHrTime("-");
+					hr.setOverTime("-");
+					hr.setOnTime("-");
+					hr.setOffTime("-");
+					hr.setHrDate(date);
+
+					hrList.add(hr);
+				}
+			}
+			monthList.add(hrList);
+			hrTimeList.add(calcHrTime(hrTimes));
+
+		}
+		result.put("monthList", monthList);
+		result.put("hrTimeList", hrTimeList);
+//		System.out.println(monthList);
+//		System.out.println(result);
+		return result;
+	}
+
+	@Override
+	public Map<String, Object> calcHr(int eno) throws Exception {
+		Map<String, Object> result = null;
+
+		Map<String, Object> paramMap = null;
+		List<String> hrTimes = new ArrayList<String>();
+		List<String> overTimes = new ArrayList<String>();
+		int tardy = 0; //지각 정보
+		int reqChange = 0; //수정 정보
+
+		//해당 주차의 날짜 구하기
+		Date today = new Date();
+		String[] daysOfWeek = getDaysOfWeek(today);
+
+		for(String date : daysOfWeek) {
+			paramMap = new HashMap<String, Object>();
+			paramMap.put("eno", eno);
+			paramMap.put("hrDate", date);
+
+			HrVO hr = hrDAO.selectHrByDate(paramMap);
+			if(hr != null) {
+				hrTimes.add(hr.getHrTime());
+				overTimes.add(hr.getOverTime());
+				if(hr.getState() == 2) tardy += 1;
+				if(hr.getReqChange() != 0) {
+					reqChange +=1;
+				}
+			}
+		}
+
+		//잔여, 초과 시간
+		HrTypeVO hrType = null;
+		hrType = hrDAO.selectHrType(eno);
+		if(hrType == null) return null;
+
+		result = calcRemainTime(calcHrTime(hrTimes), hrType.getWeekTime());
+		result.put("hrTime", calcHrTime(hrTimes));
+		result.put("overTime", calcHrTime(overTimes));
+
+		//주차 구하기
+		int weekOfMonth = getWeekOfMonth(sdf.format(today));
+		result.put("weekOfMonth", weekOfMonth);
+
+		result.put("tardy", tardy);
+		result.put("reqChange", reqChange);
+
+//		System.out.println(result);
+		return result;
+	}
+
+	@Resource(name = "hrLogSavePath")
+	private String savePath = "c:\\log";
+
+	private String saveFileName = "hr_log.csv";
+
+	@Override
+	public String getOffTime(int eno) throws Exception{
+		String result = "";
+
+		File logFile = new File(savePath+File.separator+saveFileName);
+		if(!logFile.exists()) {
+			new File(savePath).mkdirs();
+			String logFilePath=savePath+File.separator+saveFileName;
+			BufferedWriter out=new BufferedWriter(new FileWriter(logFilePath,true));
+
+			//로그 기록
+			out.write("");
+			out.close();
+		}
+
+		FileReader reader = new FileReader(logFile);
+		BufferedReader in=new BufferedReader(reader);
+
+		String textLine=null;
+		try {
+			while((textLine=in.readLine())!=null) {
+				System.out.println(textLine);
+				String[] logData =textLine.split(",");
+				if(Integer.parseInt(logData[1])==eno){
+					String[] split = logData[5].split(" ");
+					Date date = new Date();
+			        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+			        String strDate = format.format(date);
+			        System.out.println(strDate);
+					if(split[0].equals(strDate)) {
+						if(logData[0].equals("[offtime]")) {
+							result = logData[3];
+							System.out.println(result);
+						}
+					}
+				}
+			}
+		}finally {
+			if(reader!=null) reader.close();
+			if(in!=null) in.close();
+		}
+
+		return result;
+	}
+
+	@Override
+	public String leaveWorklogFile(HrVO hr, String ip) throws Exception{
+		String result = "";
+		int eno = hr.getEno();
+		EmployeeVO employee = hrDAO.selectEmp(eno);
+
+		String ipAddress = employee.getIpaddress();
+
+		if(!(ipAddress.equals(ip))) {
+			result = "false";
+			return result;
+		}
+
+		leaveLogFile(hr, ipAddress);
+		result = hr.getOffTime();
+		return result;
+	}
+
+	@Override
+	public String getOnTime(int eno) throws Exception{
+		String result = "";
+
+		File logFile = new File(savePath+File.separator+saveFileName);
+		if(!logFile.exists()) {
+			new File(savePath).mkdirs();
+			String logFilePath=savePath+File.separator+saveFileName;
+			BufferedWriter out=new BufferedWriter(new FileWriter(logFilePath,true));
+
+			//로그 기록
+			out.write("");
+			out.close();
+		}
+
+		FileReader reader = new FileReader(logFile);
+		BufferedReader in=new BufferedReader(reader);
+
+		String textLine=null;
+		try {
+			while((textLine=in.readLine())!=null) {
+				String[] logData =textLine.split(",");
+				if(Integer.parseInt(logData[1])==eno){
+					String[] split = logData[5].split(" ");
+					Date date = new Date();
+					SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+					String strDate = format.format(date);
+					if(split[0].equals(strDate)) {
+						if(logData[0].equals("[ontime]")) {
+							result = logData[3];
+							break;
+						}
+					}
+				}
+			}
+		}finally {
+			if(reader!=null) reader.close();
+			if(in!=null) in.close();
+		}
+
+		return result;
+	}
+
+	@Override
+	public String goToWorklogFile(HrVO hr, String ip) throws Exception{
+		String result = "";
+		int eno = hr.getEno();
+		EmployeeVO employee = hrDAO.selectEmp(eno);
+
+		String ipAddress = employee.getIpaddress();
+
+		if(!(ipAddress.equals(ip))) {
+			result = "false";
+			return result;
+		}
+
+		goToWorkLogFile(hr, ipAddress);
+		result = hr.getOnTime();
+		return result;
+	}
+
+	@Override
+	public void write(Map<String, HrVO> logMap) throws Exception {
+
+	}
+
+
+
+	//-------------------------------------------------
+
+	private void leaveLogFile(HrVO hr, String ip) throws IOException{
+		String tag = "[offtime]";
+		String log = tag + ","
+				+ hr.getEno() + ","
+				+ hr.getHrDate() + ","
+				+ hr.getOffTime() + ","
+				+ ip + ","
+				+ new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+
+		File file=new File(savePath);
+		file.mkdirs();
+
+		String logFilePath=savePath+File.separator+saveFileName;
+		BufferedWriter out=new BufferedWriter(new FileWriter(logFilePath,true));
+
+		//로그 기록
+		out.write(log);
+		out.newLine();
+		out.close();
+	}
+
+	private void goToWorkLogFile(HrVO hr, String ip) throws IOException{
+		String tag = "[ontime]";
+		String log = tag + ","
+				+ hr.getEno() + ","
+				+ hr.getHrDate() + ","
+				+ hr.getOnTime() + ","
+				+ ip + ","
+				+ new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+
+		File file=new File(savePath);
+		file.mkdirs();
+
+		String logFilePath=savePath+File.separator+saveFileName;
+		BufferedWriter out=new BufferedWriter(new FileWriter(logFilePath,true));
+
+		//로그 기록
+		out.write(log);
+		out.newLine();
+		out.close();
+	}
+
+
+	//해당월의 주차 구하기
+	public int getWeekOfMonth(String date) {
+		Calendar calendar = Calendar.getInstance();
+		String[] dates = date.split("-");
+		int year = Integer.parseInt(dates[0]);
+		int month = Integer.parseInt(dates[1]);
+		int day = Integer.parseInt(dates[2]);
+		calendar.set(year, month - 1, day);
+		calendar.setFirstDayOfWeek(Calendar.MONDAY);
+		return calendar.get(Calendar.WEEK_OF_MONTH);
+	}
+
+	//입력받은 날짜의 해당 주차 날짜 구하기
+	public static String[] getDaysOfWeek(Date date) {
+		String[] arrYMD = new String[7];
+
+		try {
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(date);
+
+			int inYear = cal.get(cal.YEAR);
+		    int inMonth = cal.get(cal.MONTH);
+		    int inDay = cal.get(cal.DAY_OF_MONTH);
+
+		    int dayOfTheWeek = cal.get(cal.DAY_OF_WEEK); //요일나오게하기(숫자로)
+		    if(dayOfTheWeek != 1){   //해당요일이 일요일이 아닌경우
+		        dayOfTheWeek = dayOfTheWeek-2;
+		     }else{           //해당요일이 일요일인경우
+		        dayOfTheWeek = 7;
+		     }
+		    inDay = inDay-dayOfTheWeek;
+
+		    for(int i = 0; i < 7; i++){
+				cal.set(inYear, inMonth, inDay+i);
+				String y = Integer.toString(cal.get(cal.YEAR));
+				String m = Integer.toString(cal.get(cal.MONTH)+1);
+				String d = Integer.toString(cal.get(cal.DAY_OF_MONTH));
+				if(m.length() == 1) m = "0" + m;
+				if(d.length() == 1) d = "0" + d;
+
+			    arrYMD[i] = y +"-"+m +"-"+d;
+		    }
+		} catch (Exception e) {
+
+		}
+
+		return arrYMD;
+	}
+
+	//남은시간, 초과시간 계산
+	public Map<String, Object> calcRemainTime(String hrTime, String weekTime) {
+		Map<String, Object> result = new HashMap<String, Object>();
+
+		int hh = 0; int hm = 0; int hs = 0;
+
+		String[] splitHH = hrTime.split("h");
+		String[] splitHM = splitHH[1].split("m");
+		String[] splitHS = splitHM[1].split("s");
+
+		hh += Integer.parseInt(splitHH[0]);
+		hm += Integer.parseInt(splitHM[0]);
+		hs += Integer.parseInt(splitHS[0]);
+
+		int calcHt = (hh * 10000) + (hm *100) + hs;
+
+		int wh = 0; int wm = 0; int ws = 0;
+
+		String[] splitWH = weekTime.split("h");
+		String[] splitWM = splitWH[1].split("m");
+		String[] splitWS = splitWM[1].split("s");
+
+		wh += Integer.parseInt(splitWH[0]);
+		wm += Integer.parseInt(splitWM[0]);
+		ws += Integer.parseInt(splitWS[0]);
+
+		int calcWt = (wh * 10000) + (wm *100) + ws;
+
+		String remainTime = "0h0m0s";
+		String overTime = "0h0m0s";
+
+		int rh = 0; int rm = 0; int rs = 0;
+
+		if(calcWt > calcHt) {
+			if(hs>ws) {
+				wm -= 1;
+				ws += 60;
+			}
+			rs = ws-hs;
+
+			if(hm>wm) {
+				wh -= 1;
+				wm += 60;
+			}
+			rm = wm-hm;
+
+			rh = wh-hh;
+
+			remainTime = rh + "h" + rm + "m" + rs + "s";
+
+		} else if(calcWt < calcHt) {
+			remainTime = "0h0m0s";
+//			if(ws>hs) {
+//				hm -= 1;
+//				hs += 60;
+//			}
+//			rs = hs-ws;
+//			if(wm>hm) {
+//				hh -= 1;
+//				hm += 60;
+//			}
+//			rm = hm-wm;
+//
+//			rh = hh-wh;
+//
+//			overTime = rh + "h" + rm + "m" + rs + "s";
+		}
+
+		result.put("remainTime", remainTime);
+//		result.put("overTime", overTime);
+
+		return result;
+	}
+
+	//근무시간 계산
+	public String calcHrTime(List<String> times) {
+		String result = "";
+		int h = 0; int m = 0; int s = 0;
+
+		for(String time : times) {
+			String[] splitH = time.split("h");
+			String[] splitM = splitH[1].split("m");
+			String[] splitS = splitM[1].split("s");
+
+			h += Integer.parseInt(splitH[0]);
+			m += Integer.parseInt(splitM[0]);
+			s += Integer.parseInt(splitS[0]);
+		}
+
+		if(s > 59) {
+			s -= 60;
+			m += 1;
+		}
+		if(m > 59) {
+			m -= 60;
+			h += 1;
+		}
+
+		result = h + "h" + m + "m" + s + "s";
+
+		return result;
+	}
+
+	@Override
+	public List<PostPositionVO> getPostPositionList() throws Exception {
+		return hrDAO.selectPostPosition();
+	}
+
+	@Override
+	public List<EmployeeVO> getEmpForHrData(String day) throws Exception {
+		return hrDAO.selectEmpForHrData(day);
+	}
+
+	@Override
+	public void writeAbsent(HrVO hr) throws Exception {
+		//다오로 그날의 마지막 코드 가져와서 뒤 3자리 자르고, 파스 인트 / null이면 0으로 초기화
+		int code = 0;
+		String hrcode = "";
+		Date today = new Date();
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+        String hrDate = format.format(today);
+		List<String> selectHrcodeByHrDate = hrDAO.selectHrcodeByHrDate(hrDate);
+		if(selectHrcodeByHrDate != null) {
+			code = Integer.parseInt(selectHrcodeByHrDate.get(0).substring(8));
+		}
+
+		//hrcode
+		code += 1;
+		hrcode = "hr"
+				+ hr.getHrDate().substring(2).replace("-", "")
+				+ String.format( "%1$03d" , code );
+		hr.setHrcode(hrcode);
+		hr.setHrTime("0h0m0s");
+		hr.setOverTime("0h0m0s");
+		hr.setReqChange(0);
+		hrDAO.insertHr(hr);
+	}
+
+	@Override
+	public VacationVO getVacation(int eno) throws SQLException {
+		VacationVO vacation = hrDAO.selectVacation(eno);
+		return vacation;
+	}
+
+	@Override
+	public List<Map<String, Date>> selectVacationPeriod(int eno) throws SQLException {
+		return hrDAO.selectVacationPeriod(eno);
+	}
+
+	@Override
+	public List<VacLogVO> VacationUsageHistory(int eno, String vyear) throws SQLException {
+		Map<String, Object> vacMap = new HashMap<String, Object>();
+		vacMap.put("eno", eno);
+		vacMap.put("vyear", vyear);
+
+		return hrDAO.selectVacationUsageHistory(vacMap);
+	}
+
+	@Override
+	public List<VacProduceVO> VacationProduceHistory(int eno, String vyear) throws SQLException {
+		Map<String, Object> vacMap = new HashMap<String, Object>();
+		vacMap.put("eno", eno);
+		vacMap.put("vyear", vyear);
+
+		return hrDAO.selectVacationProduceHistory(vacMap);
+	}
+
+	@Override
+	public Map<String, Object> getSelectTeamHrList(Criteria cri, int dno, String condition) throws Exception {
+		int offset=cri.getStartRowNum();
+		int limit=cri.getPerPageNum();
+		RowBounds rowBounds=new RowBounds(offset,limit);
+
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("searchType", cri.getSearchType());
+		paramMap.put("keyword", cri.getKeyword());
+		paramMap.put("condition", condition);
+		paramMap.put("dno", dno);
+
+		List<EmployeeVO> teamList = hrDAO.selectTeamHrList(paramMap,rowBounds);
+
+		int teamListCount = hrDAO.selectTeamHrListCount(paramMap);
+
+		PageMaker pageMaker = new PageMaker();
+		pageMaker.setCri(cri);
+		pageMaker.setTotalCount(teamListCount);
+
+		Map<String, Object> dataMap = new HashMap<String, Object>();
+		dataMap.put("teamList", teamList);
+		dataMap.put("pageMaker", pageMaker);
+
+		return dataMap;
+	}
+
+	@Override
+	public int selectTeamHrListCount(int dno, String condition) throws Exception {
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("condition", condition);
+		paramMap.put("dno", dno);
+
+		int teamListCount = hrDAO.selectTeamHrListCount(paramMap);
+		return teamListCount;
+	}
+
+	@Override
+	public int selectTeamHrListAllCount(int dno) throws Exception {
+		int allCount = hrDAO.selectTeamHrListAllCount(dno);
+		return allCount;
+	}
+
+	@Override
+	public void modifyHr(EmployeeVO employee) throws Exception {
+		hrDAO.updateHr(employee);
+	}
+
+
+
+}

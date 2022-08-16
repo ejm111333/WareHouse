@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Contact-Mapper">
+	<sql id="search">
+		<if test="searchType == 'n'.toString()">
+			and name like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'p'.toString()">
+			and phone like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'e'.toString()">
+			and email like '%'||#{keyword}||'%'
+		</if>
+	</sql>
+
+
+	<!-- 전체 주소록 리스트-->
+	<select id="selectSearchContactList" resultType="employee">
+
+		SELECT
+		b.eno,
+		b.name ,
+		b.email,
+		b.phone,
+		b.call,
+		b.condition,
+		c.ppsname,
+		a.dname
+
+		FROM department a, employee b,  postposition c
+		where a.dno = b.dno
+		and b.PPSCODE = c.PPSCODE
+		and b.name is not null
+		<include refid="search" />
+		order by b.name
+	</select>
+
+
+
+<!-- 팀 클릭 시 정보 가져옴  -->
+	<select id="selectTeamContactList" resultType="employee">
+		SELECT
+			   b.eno,
+			   b.name ,
+			   b.email,
+			   b.phone,
+			   b.call,
+			   b.condition,
+			   c.ppsname,
+			   a.dname
+		FROM department a, employee b,  postposition c
+		where a.dno = b.dno
+		and b.PPSCODE = c.PPSCODE
+		and a.dname = #{dname}
+	</select>
+
+
+
+
+	<!-- cogroupcode -->
+	<select id="selectContactGrNo" resultType="String">
+		SELECT 'GR' ||
+		trim(nvl(max(to_char(to_number(substr(cogroupcode,3))+1,'000000')),'000001'))
+		as COGROUPCODE
+		from contactgr
+
+		union
+
+		select nvl(null,'GR000001') as COGROUPCODE
+		from
+		dual
+		where not exists (select COGROUPCODE
+		from contactgr)
+	</select>
+
+
+
+
+	<!-- 그룹 저장 -->
+	<update id="insertGroup" parameterType="contactgr">
+			insert
+			into
+			contactgr(cogroupcode,cogroupname,eno)
+			values
+			(#{cogroupcode},#{cogroupname},'22310053')
+	</update>
+
+
+	<!-- 개인주소록 그룹 리스트 사원 정보 저장 -->
+	<update id="insertGrInfo" parameterType="contactgr">
+			insert
+			into
+			mycontact (eno,cogroupcode) values (#{eno} ,#{cogroupcode})
+	</update>
+
+
+	<!-- 그룹 리스트  -->
+	<select id="selectGroupList" resultType="contactgr">
+	 SELECT cogroupname,cogroupcode,eno
+	   FROM contactgr
+	  where eno = 22310053
+	 </select>
+
+
+
+
+	<!-- 개인주소록 그룹 리스트의 사원 정보 -->
+	<select id="selectGroupInfoList" resultType="employee">
+		select
+		a.eno,
+	    b.name,
+	    d.ppsname,
+	    b.phone,
+	    b.email,
+	    b.condition,
+	    c.dname,
+	    b.call
+
+		from
+		    mycontact a, employee b, department c, postposition d
+		where a.eno = b.eno
+		and b.dno = c.dno
+		and b.ppscode = d.ppscode
+		and a.cogroupcode = #{cogroupcode}
+
+	</select>
+
+
+
+	<!-- 개인주소록 전체 리스트 -->
+	<select id="selectPersonalList" resultType="employee">
+	 select
+	 	DISTINCT
+	 	a.eno,
+        b.name,
+        b.phone,
+        b.call,
+        c.dname,
+        d.PPSNAME,
+        b.CONDITION,
+        b.email
+
+		from MYCONTACT a, EMPLOYEE b,DEPARTMENT c, postposition d
+		where a.eno = b.eno
+		and b.DNO = c.DNO
+		and b.PPSCODE = d.PPSCODE
+	</select>
+
+
+	<select id="selectSearchContactListCount" resultType="int">
+		select
+		count(*)
+		from
+		employee
+		where name is not null
+		<include refid="search" />
+		order by name
+	</select>
+
+
+</mapper>

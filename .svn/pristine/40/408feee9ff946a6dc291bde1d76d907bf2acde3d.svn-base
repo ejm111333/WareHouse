@@ -1,0 +1,70 @@
+package kr.or.warehouse.dto;
+
+import java.util.Date;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
+public class SignerVO {
+
+	private String signLineno;
+	private int eno;
+	private int signRank;
+	private int signState;
+	private Date signDate;
+	private int signCheck;
+
+	public int getSignCheck() {
+		return signCheck;
+	}
+
+	public void setSignCheck(int signCheck) {
+		this.signCheck = signCheck;
+	}
+
+	public String getSignLineno() {
+		return signLineno;
+	}
+
+	public void setSignLineno(String signLineno) {
+		this.signLineno = signLineno;
+	}
+
+	public int getEno() {
+		return eno;
+	}
+
+	public void setEno(int eno) {
+		this.eno = eno;
+	}
+
+	public int getSignRank() {
+		return signRank;
+	}
+
+	public void setSignRank(int signRank) {
+		this.signRank = signRank;
+	}
+
+	public int getSignState() {
+		return signState;
+	}
+
+	public void setSignState(int signState) {
+		this.signState = signState;
+	}
+
+	public Date getSignDate() {
+		return signDate;
+	}
+
+	public void setSignDate(Date signDate) {
+		this.signDate = signDate;
+	}
+
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this, ToStringStyle.JSON_STYLE);
+	}
+
+}

@@ -1,0 +1,21 @@
+package kr.or.warehouse.service;
+
+import java.sql.SQLException;
+import java.util.Map;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.warehouse.command.Criteria;
+
+public interface NewApprovalService {
+
+	//관련문서
+	Map<String,Object> getRelatedDocList(Criteria cri)throws SQLException;
+
+	//결재선 리스트
+	Map<String,Object> getSignLineList(Criteria cri)throws SQLException;
+
+	//참조자 리스트
+	Map<String,Object> getRefLineList(Criteria cri)throws SQLException;
+
+}

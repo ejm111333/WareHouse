@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="NewApproval-Mapper">
+
+	<!-- 관련문서 리스트-->
+	<select id="selectRelatedDocList" resultType="signDoc">
+
+		select
+		    b.name
+		   ,a.title
+		   ,c.ppsname
+		   ,b.photo
+		from
+		    signdoc a, employee b, postposition c, signform d
+		where a.eno = b.eno
+		and b.ppscode = c.ppscode
+		and a.sformno = d.sformno
+		and a.sformno=#{sFormNo}
+		<!-- and a.sformno = 'SF000002'  문서 양식 종류-->
+	</select>
+
+
+
+	<!-- 참조자 -->
+	<select id="selectRefLineList" resultType="employee">
+		select  c.name,
+		        d.dname,
+		        e.ppsname,
+		        c.photo
+
+		from  signref a, signdoc b, employee c, department d, postposition e
+		where a.signno = b.signno
+		and a.eno = c.eno
+		and c.dno =d.dno
+		and c.ppscode = e.ppscode
+	</select>
+
+
+
+  <!-- 모달 조직도 부서 이름 찾기 -->
+	<select id="selectDeptName" resultType="signDoc">
+		select
+                b.eno,
+			   b.name ,
+			   c.ppsname,
+			   a.dname
+
+		FROM department a, employee b,  postposition c
+		where a.dno = b.dno
+		and b.PPSCODE = c.PPSCODE
+		and b.eno = #{eno}
+	</select>
+
+
+	<!-- 결재양식코드 -->
+	<select id="selectSignForm" resultType="signForm">
+		select
+		    sformno
+		   ,formClass
+		   ,formtext
+		FROM
+		    signform
+		where sformno=#{sformno}
+	</select>
+
+
+	
+  <!-- 결재선 번호  -->
+	<select id="selectSignLineNo" resultType="String">
+		SELECT 'SL' ||
+		trim(nvl(max(to_char(to_number(substr(SIGNLINENO,3))+1,'000000')),'000001'))
+		as SIGNLINENO
+		from SIGNLINE
+
+		union
+
+		select nvl(null,'SL000001') as SIGNLINENO
+		from
+		dual
+		where not exists (select SIGNLINENO
+		from SIGNLINE)
+	</select>
+	
+	
+	<!-- 문서번호 -->
+	<select id="selectSignDocNo" resultType="String">
+		SELECT 'SN' ||
+		trim(nvl(max(to_char(to_number(substr(SIGNNO,3))+1,'000000')),'000001'))
+		as SIGNNO
+		from SIGNDOC
+
+		union
+
+		select nvl(null,'SN000001') as SIGNNO
+		from
+		dual
+		where not exists (select SIGNNO
+		from SIGNDOC)
+	</select>
+	
+
+	
+	<!-- 결재선 리스트 -->
+	<select id="selectSignLineList" resultType="signline">
+
+		 SELECT
+			 d.name
+			,d.photo
+			,e.ppsname
+			,f.dname
+			,a.signstate
+			,a.signrank
+			,d.eno
+			,c.sformno
+		
+		FROM 	signer a, 
+				signline b, 
+				signdoc c, 
+				employee d,
+				postposition e,
+				department f
+				 
+		where	 a.signlineno = b.signlineno
+		and		 b.signno = c.SIGNNO
+		and		 a.eno = d.eno
+		and 	d.PPSCODE = e.PPSCODE
+		and 	d.dno = f.dno
+		and	 c.sformno = #{sFormNo}
+		and	 f.dno = #{dno}
+		order by a.signrank 
+	</select>
+
+<!-- 로그인한 사원의 정보 -->
+	<select id="selectSearchContactList" resultType="employee">
+
+		SELECT
+		b.eno,
+		b.name ,
+		b.email,
+		b.phone,
+		b.call,
+		b.condition,
+		c.ppsname,
+		a.dname
+
+		FROM department a, employee b,  postposition c
+		where a.dno = b.dno
+		and b.PPSCODE = c.PPSCODE
+		and b.eno = #{eno}
+	</select>
+
+
+<!-- 결재선 -->
+<update id="insertSignLine" parameterType="signline">
+	INSERT INTO signline (
+	    signlineno
+	   ,signno
+	) VALUES (
+	    #{signLineNo}
+	   ,#{signNo}
+	)
+</update>
+
+<!-- 결재자 저장 -->
+<update id="insertSigner" parameterType="signer">
+		INSERT INTO signer (
+	    signlineno,
+	    eno,
+	    signrank,
+	    signstate,
+	    signdate
+	) VALUES (
+	    {signLineNo},
+	    {eno},
+	    {signrank},
+	    0,
+	    ''
+	)
+</update>
+
+<!-- 결재선의 순위 -->
+<select id="selectPpsCode" resultType="signer">
+	select 
+       case when  a.ppscode ='PPS001' then '1'
+             when  a.ppscode ='PPS002' then '2'
+             when  a.ppscode ='PPS003' then '3'
+             when  a.ppscode ='PPS004' then '4'
+             when  a.ppscode ='PPS005' then '5'
+             when  a.ppscode ='PPS006' then '6'
+             when  a.ppscode ='PPS007' then '7'
+             when  a.ppscode ='PPS008' then '8'
+             when  a.ppscode ='PPS009' then '9'
+             when  a.ppscode ='PPS0010' then '10'               
+            else '0'
+          end as  signRank
+
+from employee a, POSTPOSITION b
+where a.PPSCODE =b.PPSCODE
+and a.eno=#{eno}
+
+</select>
+
+<!-- 결재문서 저장 -->
+<update id="insertSignDoc" parameterType="signDoc">
+	INSERT INTO signdoc (
+	    signno
+	   ,eno
+	   ,dno
+	   ,sformno
+	   ,classcode
+	   ,ddate
+	   ,emergency
+	   ,title
+	   ,edate
+	   ,sopen
+	   ,signcontent
+	   ,tempsave
+	   ,state
+	   ,takeover
+	) VALUES (
+	    #{signNo}
+	   ,#{eno}
+	   ,#{dno}
+	   ,#{sFormNo}
+	   ,C101
+	   ,sysdate
+	   ,#{emergency}
+	   ,#{title}
+	   ,#{eDate}
+	   ,#{sOpen}
+	   ,#{signContent}
+	   ,#{tempSave}
+	   ,0
+	   ,1
+	)
+</update>
+
+
+
+
+  
+
+	
+</mapper>

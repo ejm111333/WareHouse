@@ -1,0 +1,94 @@
+package kr.or.warehouse.dto;
+
+import java.util.Date;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
+public class SubMentoringVO {
+	private String smno;
+	private Date regDate;
+	private String intro;
+	private int period;
+	private int mentee;
+	private int mento;
+	private int approve;
+
+	public int getMentee() {
+		return mentee;
+	}
+	public void setMentee(int mentee) {
+		this.mentee = mentee;
+	}
+	public int getMento() {
+		return mento;
+	}
+	public void setMento(int mento) {
+		this.mento = mento;
+	}
+
+	private String name;
+	private String ppsName;
+	private String condition;
+	private int count; //신청멘티수
+
+	public int getCount() {
+		return count;
+	}
+	public void setCount(int count) {
+		this.count = count;
+	}
+	public String getCondition() {
+		return condition;
+	}
+	public void setCondition(String condition) {
+		this.condition = condition;
+	}
+	public String getPpsName() {
+		return ppsName;
+	}
+	public void setPpsName(String ppsName) {
+		this.ppsName = ppsName;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getSmno() {
+		return smno;
+	}
+	public void setSmno(String smno) {
+		this.smno = smno;
+	}
+	public Date getRegDate() {
+		return regDate;
+	}
+	public void setRegDate(Date regDate) {
+		this.regDate = regDate;
+	}
+	public String getIntro() {
+		return intro;
+	}
+	public void setIntro(String intro) {
+		this.intro = intro;
+	}
+	public int getPeriod() {
+		return period;
+	}
+	public void setPeriod(int period) {
+		this.period = period;
+	}
+	public int getApprove() {
+		return approve;
+	}
+	public void setApprove(int approve) {
+		this.approve = approve;
+	}
+
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this, ToStringStyle.JSON_STYLE);
+	}
+}

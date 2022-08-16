@@ -1,0 +1,52 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+
+
+<script>
+	$(document).on('click', 'body > aside > div > ul > li:nth-child(2) > a', function(){
+		$(this).attr("href", "#");
+		OpenWindow('<%=request.getContextPath()%>/work/workRegistForm.do', '새 업무', '1000', '600');
+	});
+
+// 	$(function(){
+// 		setTimeout(() => {
+// 			closeLoading();
+// 		}, 300);
+// 	});
+
+
+// 	function closeLoading(){
+// 		$('.preloader').css({
+// 			"display" : "none"
+// 		});
+
+// 		$('.animation__shake').css({
+// 			"display" : "none"
+// 		})
+// 	}
+
+	function list_go(url, page, statusNo){
+		var jobForm=$('#jobForm');
+		jobForm.find("[name='page']").val(page);
+		jobForm.find("[name='perPageNum']").val();
+		jobForm.find("[name='searchType']").val($('select[name="searchType"]').val());
+		jobForm.find("[name='keyword']").val($('input[name="keyword"]').val());
+		jobForm.find("[name='statusNo']").val(statusNo);
+		jobForm.find("[name='mCode']").val();
+
+
+
+		jobForm.attr({
+			action:url,
+			method:'get'
+		}).submit();
+	}
+
+	function detail_go(wstatus,wcode){
+		if(wstatus == "대기" || wstatus == "이의신청"){
+			OpenWindow('waitDetail.do?wcode=' + wcode, '업무상세', '1000', '800');
+		}else{
+			goDetail('<%= request.getContextPath()%>/work/workDetailGo.do?wcode=' + wcode, '${menu.upcode}');
+		}
+	}
+</script>

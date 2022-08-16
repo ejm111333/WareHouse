@@ -1,0 +1,40 @@
+package kr.or.warehouse.controller.rest;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import kr.or.warehouse.dto.PdsVO;
+import kr.or.warehouse.service.PdsService;
+
+@RestController
+@RequestMapping("/pds")
+public class PdsRestController {
+	
+	@Autowired
+	private PdsService pdsService;
+	
+	@RequestMapping("/getPds")
+	public ResponseEntity<List<PdsVO>> getPds(int eno) throws Exception{
+		ResponseEntity<List<PdsVO>> entity = null;
+
+		List<PdsVO> pdsList = null;
+
+		try {
+			pdsList = pdsService.getPdsList(eno);
+			entity = new ResponseEntity<List<PdsVO>>(pdsList, HttpStatus.OK);
+		} catch (Exception e) {
+			entity = new ResponseEntity<List<PdsVO>>(HttpStatus.INTERNAL_SERVER_ERROR);
+			e.printStackTrace();
+		}
+
+		return entity;
+	}
+
+}

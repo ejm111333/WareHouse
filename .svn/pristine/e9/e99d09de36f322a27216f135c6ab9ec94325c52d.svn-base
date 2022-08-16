@@ -1,0 +1,213 @@
+package kr.or.warehouse.controller;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+public class MingyuTest {
+	
+	public void zip() {
+		String where = "/Users/wise_ant/Desktop/01.수행계획서_1조 (1)";
+		
+		File file_ = new File(where);
+		File[] listFiles = file_.listFiles();
+			
+		FileOutputStream fos = null;
+		ZipOutputStream zipOut = null;
+		FileInputStream fis = null;
+		try {
+	            
+		    fos = new FileOutputStream("/Applications/Eclipse.app/Contents/MacOS/c:/warehouse/pds/user/14310056/wow.zip");
+		    zipOut = new ZipOutputStream(fos);
+	        
+		    for(File fileToZip :  listFiles) {
+					
+			    fis = new FileInputStream(fileToZip);
+			    ZipEntry zipEntry = new ZipEntry(fileToZip.getName());
+			    zipOut.putNextEntry(zipEntry);
+					                
+			    byte[] bytes = new byte[1024];
+			    int length;
+			    while((length = fis.read(bytes)) >= 0) {
+			       zipOut.write(bytes, 0, length);
+			    }
+		        
+	            fis.close();
+		        zipOut.closeEntry();
+	            
+		    }
+				
+		    zipOut.close();
+		    fos.close();
+
+		} catch (IOException e) {
+		    System.out.println(e.getMessage());
+		} finally {
+		    try { if(fis != null)fis.close(); } catch (IOException e1) {System.out.println(e1.getMessage());/*ignore*/}
+		    try { if(zipOut != null)zipOut.closeEntry();} catch (IOException e2) {System.out.println(e2.getMessage());/*ignore*/}
+		    try { if(zipOut != null)zipOut.close();} catch (IOException e3) {System.out.println(e3.getMessage());/*ignore*/}
+		    try { if(fos != null)fos.close(); } catch (IOException e4) {System.out.println(e4.getMessage());/*ignore*/}
+		}
+	   }
+	
+		public static void deleteFolder(String path) {
+
+			File folder = new File(path);
+			try {
+				if (folder.exists()) {
+					File[] folder_list = folder.listFiles(); // 파일리스트 얻어오기
+
+					for (int i = 0; i < folder_list.length; i++) {
+						if (folder_list[i].isFile()) {
+							folder_list[i].delete();
+							System.out.println("파일이 삭제되었습니다.");
+						} else {
+							deleteFolder(folder_list[i].getPath()); // 재귀함수호출
+							System.out.println("폴더가 삭제되었습니다.");
+						}
+						folder_list[i].delete();
+					}
+					folder.delete(); // 폴더 삭제
+				}
+			} catch (Exception e) {
+				e.getStackTrace();
+			}
+		}
+
+	public static void main(String[] args) {
+		
+//		new MingyuTest().zip();
+		
+		String where = "/Users/wise_ant/Desktop/이종민";
+		
+		File target=new File(where);
+		if(target.exists()) {
+			if(target.isFile()) {
+				target.delete();
+			}else {
+				deleteFolder(target.getPath());
+			}
+			target.delete();
+		}
+		
+		
+//		String dist = "개인자료실";
+//		String[] split = dist.split("/");
+//		
+//		System.out.println(split.length);
+//		for(String res : split) {
+//			System.out.println(res);
+//		}
+//		
+		
+//		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+//		Date date1 = null;
+//		Date date2 = null;
+//		try {
+//			date1 = sdf.parse("09:00:00");
+//			date2 = sdf.parse("09:12:00");
+//		} catch (ParseException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//
+//		if(date1.before(date2)) {
+//			System.out.println("dd");
+//		} else {
+//			System.out.println("aa");
+//		}
+
+//		Calc calc = new Calc();
+//
+//		int thisWeek = calc.thisWeek;
+//
+//		System.out.println("주차 계산 : " + thisWeek);
+//
+//		//해당월의 주차 구하기
+//		Calendar cal = Calendar.getInstance();
+//		cal.setFirstDayOfWeek(Calendar.MONDAY);
+//		int weekOfMonth = cal.get(Calendar.WEEK_OF_MONTH);
+//		System.out.println(weekOfMonth);
+//
+//		//해당 주차의 날짜 구하기
+//		Date today = new Date();
+//		String[] daysOfWeek = Calc.getDaysOfWeek(today, "2022-07-20");
+//
+//		for(String day : daysOfWeek) {
+//			System.out.println(day);
+//			System.out.println();
+//		}
+//
+//		Date today2 = new Date();
+//		Calendar cal2 = Calendar.getInstance();
+//		cal2.setTime(today2);
+//		int month = cal.get(Calendar.MONTH);
+//
+//		System.out.println(month+1);
+	}
+
+}
+
+class Calc {
+	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.KOREA);
+	int thisWeek = getWeekOfYear("2022-07-01");
+//	int thisWeek = getWeekOfYear(sdf.format(new Date()));
+
+	//해당월의 주차 구하기
+	private int getWeekOfYear(String date) {
+		Calendar calendar = Calendar.getInstance();
+		String[] dates = date.split("-");
+		int year = Integer.parseInt(dates[0]);
+		int month = Integer.parseInt(dates[1]);
+		int day = Integer.parseInt(dates[2]);
+		calendar.set(year, month - 1, day);
+		return calendar.get(Calendar.WEEK_OF_MONTH);
+	}
+
+	//입력받은 날짜의 해당 주차 날짜 구하기
+	public static String[] getDaysOfWeek(Date date, String dateStr) {
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		String[] arrYMD = new String[7];
+
+		try {
+//			Date date = df.parse(dateStr);
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(date);
+
+			int inYear = cal.get(cal.YEAR);
+		    int inMonth = cal.get(cal.MONTH);
+		    int inDay = cal.get(cal.DAY_OF_MONTH);
+
+		    int dayOfTheWeek = cal.get(cal.DAY_OF_WEEK); //요일나오게하기(숫자로)
+		    if(dayOfTheWeek != 1){   //해당요일이 일요일이 아닌경우
+		        dayOfTheWeek = dayOfTheWeek-2;
+		     }else{           //해당요일이 일요일인경우
+		        dayOfTheWeek = 7;
+		     }
+		    inDay = inDay-dayOfTheWeek;
+
+		    for(int i = 0; i < 7; i++){
+				cal.set(inYear, inMonth, inDay+i);
+				String y = Integer.toString(cal.get(cal.YEAR));
+				String m = Integer.toString(cal.get(cal.MONTH)+1);
+				String d = Integer.toString(cal.get(cal.DAY_OF_MONTH));
+				if(m.length() == 1) m = "0" + m;
+				if(d.length() == 1) d = "0" + d;
+
+			    arrYMD[i] = y +"-"+m +"-"+d;
+//			    arrYMD[i] = m +"-"+d;
+		    }
+		} catch (Exception e) {
+
+		}
+
+		return arrYMD;
+	}
+}

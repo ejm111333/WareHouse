@@ -1,0 +1,11 @@
+package kr.or.warehouse.service;
+
+import java.sql.SQLException;
+import java.util.Map;
+
+import kr.or.warehouse.command.Criteria;
+
+public interface KnowhowService {
+
+	Map<String,Object> getRecommendWorkList(Criteria cri, int eno)throws SQLException;
+}

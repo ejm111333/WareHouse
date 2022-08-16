@@ -1,0 +1,46 @@
+package kr.or.warehouse.dao;
+
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+
+import kr.or.warehouse.command.Criteria;
+import kr.or.warehouse.dto.EmployeeVO;
+import kr.or.warehouse.dto.WorkManagerVO;
+import kr.or.warehouse.dto.WorkVO;
+
+public interface WorkDAO {
+	//내 업무
+	public List<WorkVO> selectMyWorkAllStatusList(int eno, Criteria cri) throws SQLException;
+	public List<WorkVO> selectMyWorkReadCheckList(int eno, Criteria cri) throws SQLException;
+	public List<WorkVO> selectMyWorkList(int eno,String wstatus,Criteria cri) throws SQLException;
+	public int selectMyWorkTotalCount(int eno, String wstatus, Criteria cri) throws SQLException;
+
+	//요청한 업무
+	public List<WorkVO> selectToReqAllStatusList(int eno, Criteria cri) throws SQLException;
+	public List<WorkVO> selectToReqReadCheckList(int eno, Criteria cri) throws SQLException;
+	public List<WorkVO> selectToReqList(int eno, String wstatus, Criteria cri) throws SQLException;
+	public int selectToReqTotalCount(int eno, String wstatus, Criteria cri) throws SQLException;
+
+	//부서업무
+	public List<WorkVO> selectDepWorkAllStatusList(int dno, Criteria cri) throws SQLException;
+	public List<WorkVO> selectDepWorkReadCheckList(int dno, Criteria cri) throws SQLException;
+	public List<WorkVO> selectDepWorkList(int dno, String wstatus, Criteria cri) throws SQLException;
+	public int selectDepWorkTotalCount(int dno, String wstatus, Criteria cri) throws SQLException;
+
+	//업무 상세
+	public WorkVO selectWorkByWcode(String wcode) throws SQLException;
+
+
+	//해쉬태그 가져오기
+	public String selectHashTagByWcode(String wcode) throws SQLException;
+
+	//담당자 검색
+	public int selectEnoByKeyword(String keyword) throws SQLException;
+	public EmployeeVO selectWorkRequestBy(String wcode) throws SQLException;
+	public List<WorkManagerVO> selectWorkManagerList(String wcode) throws SQLException;
+
+	//미확인 업무 체크
+	public int workReadCheck(String wcode, int eno) throws SQLException;
+
+}
