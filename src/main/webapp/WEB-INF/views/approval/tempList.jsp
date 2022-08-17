@@ -208,7 +208,7 @@
 								</tr>
 							</c:if>
 							<c:forEach items="${tempList }" var="temp">
-								<tr onclick="goDetail('approval/detailGo.do?signNo=${temp.signNo }','${menu.mcode }')">
+								<tr onclick="goDetail('approval/detailGo.do?signNo=${temp.signNo }','${menu.mcode }')" style=" font-size: 0.9em;">
 									<td class="field-content" data-field="기안일">
 										<fmt:formatDate value="${temp.ddate}" pattern="yyyy-MM-dd"/>
 									</td>

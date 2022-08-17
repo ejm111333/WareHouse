@@ -197,7 +197,7 @@
 
 	function requiredDocumentListGo(startPage,signNo, title){
 		aPage = startPage
-		$('#title').text("'" + title + "'의 추천 업무");
+		$('#title').text("'" + title + "'의 추천 문서");
 
 		var data = {
 				'page' : aPage,
@@ -255,11 +255,16 @@
 		});
 	}
 
+	//노하우 목록 가져오기
 	function getAllKnowhowList(page, type, content){
+		//page : 이동할 페이지
+		//type : 검색유형
+		//content : 검색어
 		var allKnowHowPage = page;
 		var searchType = $('select[name="searchType"]').val();
 		var keyword = $('input[name="keyword"]').val();
 		if(type){
+			//검색유형이 선택됐을때 검색에 필요한 parameter설정
 			searchType = type,
 			keyword = content
 		}
@@ -294,6 +299,7 @@
 				}else{
 					printWorkData(res.knowhowList, $('.knowhowList'), $('#recommendWorkList-template'));
 				}
+				//공통 pagination template를 사용하기 위한 pageMaker객체 값 설정
 				lPage = page - 1;
 				if(lPage < 1){lPage = 1;}
 				rPage = page + 1;
@@ -429,8 +435,8 @@
 		location.reload();
 	}
 
-	
-	
+
+
 	function addDocFavDoc(event){
 		event.stopPropagation();
 		var signNo = event.target.id;
@@ -451,8 +457,8 @@
 			}
 		});
 	}
-	
-	
+
+
 	function favRemove(event){
 		event.stopPropagation();
 		var signNo = event.target.id;
@@ -592,7 +598,7 @@
 <div class="row">
 	<div class="col-12 mt-3">
 		<table class="table table-hover text-nowrap"
-			style="text-align: center; table-layout: fixed;">
+			style="text-align: center; table-layout: fixed; font-size:0.95em;">
 			<tr >
 				<th style="width: 35%;">제목</th>
 				<th style="width: 10%;">기안자</th>
@@ -603,7 +609,7 @@
 			</tr>
 {{#each .}}
 			<tr onclick="goDetail('kw/detailGo.do?signNo={{signNo}}','${menu.mcode }')">
-				<td text-align:left;>{{title title}}</td>
+				<td style="text-align:left;">{{title title}}</td>
 				<td>{{name}}</td>
 				<td>{{signForm.formClass}}</td>
 				<td>{{formatDate eDate}}</td>

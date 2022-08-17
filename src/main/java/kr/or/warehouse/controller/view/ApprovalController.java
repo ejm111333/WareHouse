@@ -258,19 +258,19 @@ public class ApprovalController {
 
 		if (referMcode.equals("M121000")) {
 			mnv.addObject("refer", referMcode);
-			newApprovalService.updateSignerScehck(allSign);
+//			newApprovalService.updateSignerScehck(allSign);
 		}
 		if (referMcode.equals("M122000")) {
 			mnv.addObject("refer", referMcode);
-			newApprovalService.updateSignerScehck(allSign);
+//			newApprovalService.updateSignerScehck(allSign);
 		}
 		if (referMcode.equals("M123000")) {
 			mnv.addObject("refer", referMcode);
-			newApprovalService.updateSignViewerScehck(allSign);
+//			newApprovalService.updateSignViewerScehck(allSign);
 		}
 		if (referMcode.equals("M124000")) {
 			mnv.addObject("refer", referMcode);
-			newApprovalService.updateSingDocScehck(allSign);
+//			newApprovalService.updateSingDocScehck(allSign);
 		}
 		if (referMcode.equals("M125000")) {
 			mnv.addObject("refer", referMcode);
@@ -278,10 +278,16 @@ public class ApprovalController {
 		if (referMcode.equals("M126000")) {
 			mnv.addObject("refer", referMcode);
 		}
+		
+		newApprovalService.updateSignerScehck(allSign);
+		newApprovalService.updateSignViewerScehck(allSign);
+		newApprovalService.updateSingDocScehck(allSign);
+		
 		signDoc = newApprovalService.getSignDocBySignNo(signNo);
 
 		int cnt = newApprovalService.selectReaderCount(allSign);
-		if(cnt < 1) {
+		System.out.println("cnt : " + cnt);
+		if(cnt == 0) {
 			newApprovalService.insertSignReader(allSign);
 		}
 

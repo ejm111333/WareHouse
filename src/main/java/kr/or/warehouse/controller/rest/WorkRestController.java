@@ -36,6 +36,22 @@ import kr.or.warehouse.service.KnowhowService;
 import kr.or.warehouse.service.WorkReplyService;
 import kr.or.warehouse.service.WorkService;
 
+/**
+ * @author PC-25
+ *
+ */
+/**
+ * @author PC-25
+ *
+ */
+/**
+ * @author PC-25
+ *
+ */
+/**
+ * @author PC-25
+ *
+ */
 @RestController
 @RequestMapping("/work")
 public class WorkRestController {
@@ -49,6 +65,12 @@ public class WorkRestController {
 	@Autowired
 	private KnowhowService knowhowService;
 
+	/** 댓글목록
+	 * @param wcode : 업무 기본키
+	 * @param cri : 검색,페이지네이션 공통객체
+	 * @return 결과리스트와 pagination객체
+	 * @throws Exception
+	 */
 	@RequestMapping("/replyList")
 	public ResponseEntity<Map<String, Object>> replyList(@RequestParam String wcode, Criteria cri) throws Exception{
 		cri.setPerPageNum(5);
@@ -66,6 +88,13 @@ public class WorkRestController {
 		return result;
 	}
 
+
+	/** 댓글등록
+	 * @param reply : 댓글내용을 담은 VO객체
+	 * @param session : loginUser를 가져오기 위한 session객체
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping("/replyRegist")
 	public ResponseEntity<String> replyRegist(WorkReplyVO reply, HttpSession session) throws Exception{
 		ResponseEntity<String> result = null;
@@ -82,6 +111,11 @@ public class WorkRestController {
 		return result;
 	}
 
+	/** 내 업무 수정
+	 * @param work : 수정된 업무내용이 담긴 VO객체
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping(value = "/myWorkModify", method=RequestMethod.POST)
 	public ResponseEntity<String> myWorkModify(WorkVO work) throws Exception{
 		ResponseEntity<String> result = null;
@@ -98,6 +132,12 @@ public class WorkRestController {
 		return result;
 	}
 
+
+	/** 요청한 업무 수정
+	 * @param data : 첨부파일이 담긴 multipartFormData 객체
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping(value = "/toReqModify", method=RequestMethod.POST)
 	public ResponseEntity<String> toReqModify(@RequestParam(name = "formData") String data) throws Exception{
 		ResponseEntity<String> result = null;
@@ -116,6 +156,12 @@ public class WorkRestController {
 		return result;
 	}
 
+	/** 업무 협업 요청
+	 * @param cooper : 협업요청 내용이 담긴 VO객체
+	 * @param session : loginUser를 가져오기 위한 session객체
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping(value = "/myWorkCooperReq" , method=RequestMethod.POST)
 	public ResponseEntity<String> myWorkCooperReq(CooperReqVO cooper, HttpSession session) throws Exception{
 		ResponseEntity<String> result = null;
@@ -131,6 +177,12 @@ public class WorkRestController {
 		return result;
 	}
 
+	/** 업무 대리요청
+	 * @param proxy : 대리요청 내용이 담긴 VO객체
+	 * @param session :  loginUser를 가져오기 위한 session객체
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping(value = "/myWorkProxyReq", method=RequestMethod.POST)
 	public ResponseEntity<String> myWorkProxyReq(ProxyReqVO proxy,  HttpSession session) throws Exception{
 		ResponseEntity<String> result = null;
@@ -148,6 +200,11 @@ public class WorkRestController {
 		return result;
 	}
 
+	/** 조직도로 사원 정보 가져오기
+	 * @param eno : 조직도의 nodeId
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping("/getEmpByNodeId.do")
 	public ResponseEntity<EmployeeVO> getEmpByNodeId(int eno) throws Exception{
 		ResponseEntity<EmployeeVO> result = null;
@@ -163,6 +220,11 @@ public class WorkRestController {
 		return result;
 	}
 
+	/** 협업요청 승인
+	 * @param data : 협업요청을 승인하고 수정할 정보가 담긴 multipartFormData객체
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping(value = "/cooperReqApprove", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
 	public ResponseEntity<String> cooperReqModify(@RequestParam(name = "formData") String data) throws Exception{
 		ResponseEntity<String> result = null;
@@ -181,6 +243,12 @@ public class WorkRestController {
 		return result;
 	}
 
+	/** 이의신청 승인
+	 * @param data : 이의신청을 승인하고 수정할 정보가 담긴 multipartFormData객체
+	 * @param eno : 이의신청한 사원의 기본키
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping(value = "/objectionApprove", method=RequestMethod.POST, produces = "application/json; charset=utf-8")
 	public ResponseEntity<String> objectionApprove(@RequestParam(name = "formData")String data , int eno)throws Exception{
 		ResponseEntity<String> result = null;
@@ -199,6 +267,11 @@ public class WorkRestController {
 		return result;
 	}
 
+	/** 대리요청 승인
+	 * @param data : 대리요청을 승인하고 수정할 정보가 담긴 multipartFormData객체
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping(value = "/proxyReqApprove", method=RequestMethod.POST, produces = "application/json; charset=utf-8")
 	public ResponseEntity<String> proxyReqApprove(@RequestParam(name = "formData")String data )throws Exception{
 		ResponseEntity<String> result = null;
@@ -216,6 +289,7 @@ public class WorkRestController {
 
 		return result;
 	}
+
 
 	@RequestMapping("/workApprove")
 	public ResponseEntity<String> workApprove(String wcode, HttpSession session) throws Exception{

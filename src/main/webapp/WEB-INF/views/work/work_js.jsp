@@ -9,6 +9,9 @@
 	});
 
 	function list_go(url, page, statusNo){
+		//url : 이동할 url
+		//page : 이동할 page
+		//statusNo : 이동할 업무상태번호
 		var jobForm=$('#jobForm');
 		jobForm.find("[name='page']").val(page);
 		jobForm.find("[name='perPageNum']").val();
@@ -830,16 +833,20 @@
 		})
 	}
 
+	//관련 노하우 가져오기
 	function getRelationKnowhow(page){
+		//page : 이동할 페이지
 
 		var data;
 		if(!$('input[name="rnKeyword"]').val()){
+			//검색어가 없다면 기본추천
 			data = {
 				wcode : '${work.wcode}',
 				page : page
 			}
 			url = "<%=request.getContextPath()%>/work/getRelationKnowhow.do";
 		}else{
+			//검색어가 있을경우 검색어와 관련된 노하우 추천
 			data = {
 				page : page,
 				searchType : 'h',

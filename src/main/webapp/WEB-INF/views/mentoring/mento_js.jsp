@@ -285,7 +285,6 @@ function remove_go(smno){
 			</div>
 		</td>
 		<td>{{formclass}}</td>
-		<td>{{formatDDate ddate}}</td>
 		<td class="project-state">
 		<span class="badge {{docStateColor state}}">{{docState state}}</span>
 		</td>

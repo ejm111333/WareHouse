@@ -145,9 +145,8 @@
 							<thead>
 								<tr>
 									<th style="width: 25%">제목</th>
-									<th style="width: 20%">기안자(멘티)</th>
+									<th style="width: 25%">기안자(멘티)</th>
 									<th style="width: 20%">결재양식</th>
-									<th style="width: 20%">기안일</th>
 									<th style="width: 15%">상태</th>
 								</tr>
 							</thead>

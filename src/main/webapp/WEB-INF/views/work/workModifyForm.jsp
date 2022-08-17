@@ -377,9 +377,10 @@
 			$('div[data-no="'+dataNum+'"]').remove();
 		}
 
+		//jstree 생성함수
 		$('#organization').jstree({
 			core : {
-				data :${organizationNode}
+				data :${organizationNode} // 조직도 노드 목록
 			},
 			types : {
 				'default' : {'icon': 'jstree-folder'}
@@ -387,32 +388,39 @@
 			 plugins: ['wholerow', 'types']
 		})
 
+		//조직도 클릭 이벤트 함수
 		 $('#organization').on("changed.jstree", function (e, data) {
 		    if(data.node.id.length > 3){
+		    	//클릭한 조직도의 노드가 사원일때 사원정보를 가져와 담당자 추가하기
 		    	$.ajax({
 		    		url : "<%=request.getContextPath()%>/work/getEmpByNodeId.do?eno=" + data.node.id,
 		    		type:'get',
 		    		success:function(res){
 		    			if(res.eno == ${work.eno}){
+		    				//클릭한 사원이 업무 요청자일때
 		    				Swal.fire({
 		  				      icon: 'warning',
 		  				      title: '업무 요청자는 담당자로 추가할 수 없습니다.',
 		  				      confirmButtonColor: '#3085d6',
 		  				    });
 		    			}else if($('div[data-eno="' + res.eno + '"]').length == 0){
+		    				//새로운 담당자를 추가했을때
 		    				if('${work.wstatus}' == '대리요청' && newWorkManager.length >= 1){
+		    					//업무의 상태가 대리요청이고 이미 담당자를 추가했을때
 		    					Swal.fire({
 				  				      icon: 'warning',
 				  				      title: '이미 담당자를 수정하였습니다.',
 				  				      confirmButtonColor: '#3085d6',
 				  				    });
 		    				}else if('${work.wstatus}' == '진행'){
+		    					//업무의 상태가 대리요청,협업요청도 아닌 진행상태에서는 담당자를 추가할 수 없다.
 				    			Swal.fire({
 				  				      icon: 'warning',
 				  				      title: '담당자를 추가할 수 없습니다.',
 				  				      confirmButtonColor: '#3085d6',
 				  				    });
 		    				}else{
+		    					//담당자 추가
 				    			addEmp(res, $('.emp_List'), $('#addEmp-template'))
 				    			var hashTag = $('input[name=hashTag]').val();
 
@@ -432,6 +440,7 @@
 				    			addWorkManager(res.eno);
 		    				}
 		    			}else{
+		    				// 클릭한 사원이 이미 추가된 담당자일때
 		    				Swal.fire({
 			  				      icon: 'warning',
 			  				      title: '이미 등록된 담당자는 추가할 수 없습니다.',

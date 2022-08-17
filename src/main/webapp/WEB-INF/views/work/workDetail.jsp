@@ -124,7 +124,7 @@
 <%-- 									<c:if test="${refer eq 'M113000'}"> --%>
 										<c:forEach items="${work.workManagerList}" var="manager">
 											<c:if test="${manager.eno eq loginUser.eno and manager.answer eq '대기' or manager.eno eq loginUser.eno and manager.answer eq '반려'}">
-												<div class="row col-6">
+												<div class="row col-6 menu detail-menu" style="display: flex;">
 													<div class="col-4">
 														<button type="button" class="btn btn-block btn-outline-dark" onclick="workApprove();">승인</button>
 													</div>
@@ -241,32 +241,36 @@
 												</div>
 											</c:if>
 										</c:if>
-							<div class="col-4 title menu report-menu">
-								<button class="btn btn-block btn-outline-dark" style="width: 80px; height: 40px; margin:0 5px;" onclick="OpenWindow('<%=request.getContextPath()%>/office/wordRegistForm.do', 'word', '1200', '800')">
-								<i class="fas fa-file-word"></i><span style="margin-left: 3px">word</span>
-								</button>
-								<button type="button" class="btn  btn-outline-dark" style="width: 120px; height:40px;"
-								onclick="OpenWindow('<%= request.getContextPath()%>/work/reportRegistForm.do?wcode=${work.wcode }','보고서 작성', '800','600')">보고서 작성</button>
-							</div>
-							<div class="col-4 title menu proceeding-menu">
-								<button class="btn  btn-outline-dark" style="width: 80px; height: 40px; margin:0 5px;" onclick="OpenWindow('<%=request.getContextPath()%>/office/wordRegistForm.do', 'word', '1200', '800')">
-								<i class="fas fa-file-word"></i><span style="margin-left: 3px">word</span>
-								</button>
-								<button type="button" class="btn btn-block btn-outline-dark" style="width: 120px; height:40px;"
-								onclick="OpenWindow('<%= request.getContextPath()%>/work/proceedRegistForm.do?wcode=${work.wcode }','회의록 작성', '800','600')">회의록 작성</button>
-							</div>
-							<div class="col-4 title menu qna-menu">
-								<button type="button" class="btn btn-block btn-outline-dark" style="width: 120px; height:40px;"
-								onclick="OpenWindow('<%= request.getContextPath()%>/work/qnaRegistForm.do?wcode=${work.wcode }','회의록 작성', '800','600')">질문 작성</button>
-							</div>
-							<div class="row col-6 title menu modify-menu">
-								<div class="col-6">
-									<button type="button" class="btn btn-block btn-outline-primary" onclick="">저장</button>
-								</div>
-								<div class="col-6">
-									<button type="button" class="btn btn-block btn-outline-dark" onclick="calcelModify()">취소</button>
-								</div>
-							</div>
+							<c:forEach items="${work.workManagerList}" var="manager">
+								<c:if test="${manager.eno eq loginUser.eno and manager.answer ne '대기' }">
+									<div class="col-4 title menu report-menu">
+										<button class="btn btn-block btn-outline-dark" style="width: 80px; height: 40px; margin:0 5px;" onclick="OpenWindow('<%=request.getContextPath()%>/office/wordRegistForm.do', 'word', '1200', '800')">
+										<i class="fas fa-file-word"></i><span style="margin-left: 3px">word</span>
+										</button>
+										<button type="button" class="btn  btn-outline-dark" style="width: 120px; height:40px;"
+										onclick="OpenWindow('<%= request.getContextPath()%>/work/reportRegistForm.do?wcode=${work.wcode }','보고서 작성', '800','600')">보고서 작성</button>
+									</div>
+									<div class="col-4 title menu proceeding-menu">
+										<button class="btn  btn-outline-dark" style="width: 80px; height: 40px; margin:0 5px;" onclick="OpenWindow('<%=request.getContextPath()%>/office/wordRegistForm.do', 'word', '1200', '800')">
+										<i class="fas fa-file-word"></i><span style="margin-left: 3px">word</span>
+										</button>
+										<button type="button" class="btn btn-block btn-outline-dark" style="width: 120px; height:40px;"
+										onclick="OpenWindow('<%= request.getContextPath()%>/work/proceedRegistForm.do?wcode=${work.wcode }','회의록 작성', '800','600')">회의록 작성</button>
+									</div>
+									<div class="col-4 title menu qna-menu">
+										<button type="button" class="btn btn-block btn-outline-dark" style="width: 120px; height:40px;"
+										onclick="OpenWindow('<%= request.getContextPath()%>/work/qnaRegistForm.do?wcode=${work.wcode }','회의록 작성', '800','600')">질문 작성</button>
+									</div>
+									<div class="row col-6 title menu modify-menu">
+										<div class="col-6">
+											<button type="button" class="btn btn-block btn-outline-primary" onclick="">저장</button>
+										</div>
+										<div class="col-6">
+											<button type="button" class="btn btn-block btn-outline-dark" onclick="calcelModify()">취소</button>
+										</div>
+									</div>
+								</c:if>
+							</c:forEach>
 						</div>
 					<div class="card" style="margin-top: 20px;">
 						<div class="card-header p-0 pt-1 border-bottom-0 bg-navy" style="font-weight: bold; color: white">

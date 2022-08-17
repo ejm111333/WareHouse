@@ -449,19 +449,19 @@ public class NewApprovalServiceImpl implements NewApprovalService {
 		for (AllSignVO signDoc : signDocList) {
 			if(signDoc.getSignerList() != null && signDoc.getSignerList().size() > 0) {				
 				for(SignerVO signer : signDoc.getSignerList()) {
-					if (signer.getEno() == eno && signer.getSignCheck() == 1) {
+					if (signer.getEno() == eno && signer.getSignState() == 1) {
 						addCnt(noneCheckMap, signDoc, eno, "1");
 					}
-					if (signer.getEno() == eno && signer.getSignCheck() == 4 && signer.getSignState() == 2) {
+					if (signer.getEno() == eno && signer.getSignState() == 2) {
 						addCnt(noneCheckMap, signDoc, eno, "2");
 					}
-					if (signer.getEno() == eno && signer.getSignCheck() == 2 && signer.getSignState() == 3) {
+					if (signer.getEno() == eno && signer.getSignState() == 3) {
 						addCnt(noneCheckMap, signDoc, eno, "3");
 					}
-					if (signer.getEno() == eno && signer.getSignCheck() == 3 && signer.getSignState() == 4) {
+					if (signer.getEno() == eno && signer.getSignState() == 4) {
 						addCnt(noneCheckMap, signDoc, eno, "4");
 					}
-					if (signer.getEno() == eno && signer.getSignCheck() == 2 && signer.getSignState() == 5) {
+					if (signer.getEno() == eno && signer.getSignState() == 5) {
 						addCnt(noneCheckMap, signDoc, eno, "5");
 					}
 				}
@@ -576,7 +576,6 @@ public class NewApprovalServiceImpl implements NewApprovalService {
 
 			String name = newApprovalDAO.selectNameOfLastSigner(approve.getSignNo());
 			approve.setLastSigner(name);
-			System.out.println("참조 문서함 최종결재자 : " + name);
 		}
 
 		// 리스트 갯수

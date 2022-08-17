@@ -306,7 +306,7 @@ body > div.wrapper > div:nth-child(5) > div > div.card-body > table > tbody > tr
 								</tr>
 							</c:if>
 							<c:forEach items="${draftList }" var="draft">
-								<tr style="font-weight: ${draft.scheck eq 1 ? '' : 'bold'};" onclick="goDetail('approval/detailGo.do?signNo=${draft.signNo }','${menu.mcode }')">
+								<tr style="font-weight: ${draft.scheck eq 1 ? '' : 'bold'}; font-size: 0.9em;" onclick="goDetail('approval/detailGo.do?signNo=${draft.signNo }','${menu.mcode }')">
 									<td class="field-content" data-field="기안일">
 										<fmt:formatDate value="${draft.ddate}" pattern="yyyy-MM-dd"/>
 									</td>

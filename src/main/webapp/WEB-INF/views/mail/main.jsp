@@ -12,7 +12,6 @@
 <head>
 	<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/css/mail.css">
 	<link rel="stylesheet" href="<%=request.getContextPath() %>/resources/bootstrap/plugins/summernote/summernote-bs4.min.css">
-	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.10/dist/sweetalert2.min.css">
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.10/dist/sweetalert2.min.js"></script>
 <style>
@@ -238,17 +237,25 @@
 
 <c:if test="${from eq 'commuRegist'}" >
 	<script>
-		swal("메일 전송", "메일이 전송되었습니다.", "success");
-// 		alert("메일을 전송하였습니다.");
-		window.close();
+	Swal.fire({
+	      icon: 'success',
+	      title: '메일이 전송되었습니다.',
+	      confirmButtonColor: '#3085d6',
+	    }).then(function(){
+	    	window.close();
+	      });
 	</script>
 </c:if>
 
 <c:if test="${from eq 'regist'}" >
 	<script>
-		swal("메일 전송", "메일이 전송되었습니다.", "success");
-// 		alert("메일을 전송하였습니다.");
-		window.close();
+	Swal.fire({
+	      icon: 'success',
+	      title: '메일이 전송되었습니다.',
+	      confirmButtonColor: '#3085d6',
+	    }).then(function(){
+	    	window.close();
+	      });
 	</script>
 </c:if>
 <script>

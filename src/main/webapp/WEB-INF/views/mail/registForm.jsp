@@ -213,7 +213,11 @@ $(function(){
 var dataNum=0;
 function addFile_go(){
 	if($('input[name="uploadFile"]').length>=(5- ${fn:length(mail.attachList)})){
-		alert("파일첨부는 5개까지만 가능합니다.");
+		Swal.fire({
+		      icon: 'warning',
+		      title: '파일첨부는 5개까지 가능합니다.',
+		      confirmButtonColor: '#3085d6',
+		    });
 		return;
 	}
 
@@ -236,9 +240,14 @@ function regist_go(){
 	for(var file of files){
 		console.log(file.name+" : "+file.value);
 		if(file.value == ""){
-			alert("파일을 선택하세요.");
-			file.focus();
-			file.click();
+			Swal.fire({
+			      icon: 'warning',
+			      title: '파일을 선택하세요.',
+			      confirmButtonColor: '#3085d6',
+			    }).then(function(){
+			    	file.focus();
+					file.click();
+			    });
 			return;
 		}
 	}
@@ -247,14 +256,22 @@ function regist_go(){
 	form.action="mailRegist.do";
 	console.log("form",form);
 	if(form.title.value == ""){
-		alert("제목은 필수입니다.");
+		Swal.fire({
+		      icon: 'warning',
+		      title: '제목은 필수입니다.',
+		      confirmButtonColor: '#3085d6',
+		    });
 		return;
 	}
 
 	// 수신자 없이 메일 전송 못하게
 	var receiver = $('input[name="receiver"]').val();
 	if(typeof receiver == "undefined"){
-		alert("받는 사람을 선택하세요.");
+		Swal.fire({
+		      icon: 'warning',
+		      title: '받는 사람을 선택하세요.',
+		      confirmButtonColor: '#3085d6',
+		    });
 		return;
 	}
 	form.submit();
@@ -290,66 +307,76 @@ function urgent(){
 
 // 다시쓰기
 function again(){
-	var answer = confirm("다시 작성하시겠습니까?");
-	if(answer){
-// 		$('input[type="text"]').val('');
-// 		$('#content').val('');
-// 		$('.note-editable').text('');
-// 		console.log($('#content').val());
-		window.location.reload();
-	}
+	
+	Swal.fire({
+	    title: '다시쓰기',
+	    text: "다시 작성하시겠습니까?",
+	    icon: 'question',
+	    showCancelButton: true,
+	    confirmButtonColor: '#3085d6',
+	    cancelButtonColor: '#d33',
+	    confirmButtonText: '확인',
+	    cancelButtonText: '취소',
+	    reverseButtons: true, // 버튼 순서 거꾸로
+	  }).then((result) => {
+	    if (result.isConfirmed) {
+	    	window.location.reload();
+	    }
+	 })
+	
 }
 
 // 임시저장
 function tempSave(){
-	var answer = confirm("작성중이던 메일을 임시저장하시겠습니까?");
+	
 	var receiver = $('input[name="receiver"]').val();
 
-	if(answer){
-
-		var emergency = 0;
-		if($('input[name="emergency"]:checked').length > 0){
-			emergency = $('input[name="emergency"]').val();
-		}
-
-		var uploadFile = [];
-		$.each($('input[name="uploadFile"]'), function(i,v){
-			uploadFile.push(v.value);
-		})
-// 		if(uploadFile.length > 0){
-// 		}
-
-		var form = $('#registForm');
-
-		var formData = new FormData(form[0]);
-
-		console.log(formData);
-// 		var data = {
-// 				'mFrom' : ${loginUser.eno },
-// 				'title' : $('input[name="title"]').val(),
-// 				'content' : $('#content').val(),
-// 				'emergency' : emergency,
-// 				'uploadFile' : uploadFile,
-// 				'receiver' : receiver
-// 		}
-
-
-		$.ajax({
-			url : '<%=request.getContextPath()%>/mail/insertTemp.do',
-			data : formData,
-			type : 'post',
-			contentType : false,
-			processData :false,
-			success : function(res){
-				alert(res);
-				console.log(res);
-// 				window.location.reload();
-			},
-			error : function(error){
-				alert("error : " + error.status);
+	Swal.fire({
+	    title: '임시저장',
+	    text: "작성중이던 메일을 임시저장하시겠습니까?",
+	    icon: 'question',
+	    showCancelButton: true,
+	    confirmButtonColor: '#3085d6',
+	    cancelButtonColor: '#d33',
+	    confirmButtonText: '확인',
+	    cancelButtonText: '취소',
+	    reverseButtons: true, // 버튼 순서 거꾸로
+	  }).then((result) => {
+		  var emergency = 0;
+			if($('input[name="emergency"]:checked').length > 0){
+				emergency = $('input[name="emergency"]').val();
 			}
-		})
-	}
+
+			var uploadFile = [];
+			$.each($('input[name="uploadFile"]'), function(i,v){
+				uploadFile.push(v.value);
+			})
+
+			var form = $('#registForm');
+
+			var formData = new FormData(form[0]);
+
+			console.log(formData);
+
+			$.ajax({
+				url : '<%=request.getContextPath()%>/mail/insertTemp.do',
+				data : formData,
+				type : 'post',
+				contentType : false,
+				processData :false,
+				success : function(res){
+					Swal.fire({
+					      icon: 'success',
+					      title: res,
+					      confirmButtonColor: '#3085d6',
+					    });
+				},
+				error : function(error){
+					alert("error : " + error.status);
+				}
+			})
+	 })
+	
 }
 </script>
 
@@ -373,15 +400,15 @@ $('#organization').on("changed.jstree", function (e, data) {
     		url : "<%=request.getContextPath()%>/mail/getEmpByNodeId.do?eno=" + data.node.id,
     		type:'get',
     		success:function(res){
-//     			console.log("aa",res.eno);
     			var temp = $('.emp_select_card');
-//     			console.log("temp",temp);
     			for (var test of temp){
-//     				console.log(test);
     				var result = $(test).attr('data-eno');
-//     				console.log(result);
 	    			if(result == res.eno){
-	    				alert("이미 등록된 담당자는 추가할 수 없습니다.");
+	    				Swal.fire({
+	  				      icon: 'warning',
+	  				      title: '이미 등록된 담당자는 추가할 수 없습니다.',
+	  				      confirmButtonColor: '#3085d6',
+	  				    });
 	    				return false;
 	    			}
     			}

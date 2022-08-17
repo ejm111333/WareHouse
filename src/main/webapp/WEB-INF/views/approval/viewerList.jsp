@@ -321,7 +321,7 @@ body > div.wrapper > div:nth-child(5) > div > div.card-body > table > tbody > tr
 								</tr>
 							</c:if>
 							<c:forEach items="${viewerList }" var="viewer">
-								<tr style="font-weight:${viewer.scheck eq 1 ? '' : 'bold'};" onclick="goDetail('approval/detailGo.do?signNo=${viewer.signNo }','${menu.mcode }')">
+								<tr style="font-weight:${viewer.scheck eq 1 ? '' : 'bold'}; font-size: 0.9em;" onclick="goDetail('approval/detailGo.do?signNo=${viewer.signNo }','${menu.mcode }')">
 									<td class="field-content" data-field="기안일">
 										<fmt:formatDate value="${viewer.ddate}" pattern="yyyy-MM-dd"/>
 									</td>

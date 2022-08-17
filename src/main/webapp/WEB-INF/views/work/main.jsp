@@ -250,6 +250,7 @@
 		getWaitToReqWorkList(1);
 	});
 
+	//금주 마감 업무(내업무) 페이지 목록 가져오기
 	function getThisWeekEndMyWorkList(page){
 		$('.home_tab li').removeClass("active");
 		$('.myWork').addClass("active")

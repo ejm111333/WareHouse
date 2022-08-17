@@ -223,7 +223,7 @@
 								</tr>
 							</c:if>
 							<c:forEach items="${circulateList }" var="circulate">
-								<tr onclick="goDetail('approval/detailGo.do?signNo=${circulate.signNo }','${menu.mcode }')">
+								<tr onclick="goDetail('approval/detailGo.do?signNo=${circulate.signNo }','${menu.mcode }')" style=" font-size: 0.9em;">
 									<td class="field-content" data-field="기안일">
 										<fmt:formatDate value="${circulate.ddate}" pattern="yyyy-MM-dd"/>
 									</td>

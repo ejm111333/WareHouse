@@ -272,7 +272,7 @@ function leaveWork(){
 			if(res == "false"){
 				Swal.fire({
 				      icon: 'warning',
-				      title: '허가된 ip에서만 가능합니다.',
+				      title: '허가된 ip에서만 \n가능합니다.',
 				      confirmButtonColor: '#3085d6',
 				    });
 				return;
@@ -320,7 +320,7 @@ function goToWork(){
 			if(res == "false"){
 				Swal.fire({
 				      icon: 'warning',
-				      title: '허가된 ip에서만 가능합니다.',
+				      title: '허가된 ip에서만 \n가능합니다.',
 				      confirmButtonColor: '#3085d6',
 				    });
 				return;
@@ -362,7 +362,7 @@ function changeCondition(condition){
 			if(res == "OK"){
 				Swal.fire({
 				      icon: 'success',
-				      title: '근무상태가 '+condition+'으로 변경되었습니다.',
+				      title: '근무상태가 '+condition+'(으)로 \n변경되었습니다.',
 				      confirmButtonColor: '#3085d6',
 				    });
 			}

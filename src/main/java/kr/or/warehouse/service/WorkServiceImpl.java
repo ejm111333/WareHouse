@@ -36,6 +36,10 @@ import kr.or.warehouse.dto.WorkManagerVO;
 import kr.or.warehouse.dto.WorkReportVO;
 import kr.or.warehouse.dto.WorkVO;
 
+/**
+ * @author PC-25
+ *
+ */
 @Service
 public class WorkServiceImpl implements WorkService{
 
@@ -149,10 +153,16 @@ public class WorkServiceImpl implements WorkService{
 		}
 	}
 
+
+	/**
+	 * depList : 조직도를 구성하기 위한 부서VO 목록
+	 */
 	public List<OrganizationNode> organization(List<DepartmentVO> depList){
 		List<OrganizationNode> nodeList = new ArrayList<OrganizationNode>();
 
+		//부서의 고유 노드ID, 부서명, 부서에 속한 사원 설정
 		for(DepartmentVO dep : depList) {
+			//OrganicationNode : 노드정보를 담은 객체
 			OrganizationNode node = new OrganizationNode();
 			node.setId(Integer.toString(dep.getDno()));
 			node.setText(dep.getDname());
@@ -183,8 +193,13 @@ public class WorkServiceImpl implements WorkService{
 		return nodeList;
 	}
 
+	/** cri : 검색,페이지설정정보를 담은 객체
+	 *  statusNo : 업무상태를 나타내는 고유번호
+	 *  eno : 로그인한 유저 기본키
+	 */
 	@Override
 	public Map<String, Object> getMyWorkList(Criteria cri, int statusNo, int eno) throws SQLException {
+		//업무상태 고유번호를 문자열 업무상태로 변경
 		String wstatus = statusNo == 0 ? "대기" : statusNo == 1 ? "진행" : statusNo == 2 ? "완료" : statusNo == 3 ? "협업요청" :
 			statusNo == 4 ? "대리요청" : "전체";
 
@@ -193,11 +208,13 @@ public class WorkServiceImpl implements WorkService{
 		//workList
 		List<WorkVO> myWorkList = null;
 		int totalCount = 0;
+		//업무의 상태가 전체이면 전체업무목록 가져오고 아니면 해당 상태의 목록만 가져오기
 		if(wstatus.equals("전체")) {
 			myWorkList = workDAO.selectMyWorkAllStatusList(eno, cri);
 		}else {
 			myWorkList = workDAO.selectMyWorkList(eno,wstatus,cri);
 		}
+		//총 페이지를 표시하기위한 업무상태에 따른 총 결과 갯수
 		totalCount = workDAO.selectMyWorkTotalCount(eno, wstatus,cri);
 
 		//pageMaker
@@ -205,9 +222,11 @@ public class WorkServiceImpl implements WorkService{
 		pageMaker.setCri(cri);
 		pageMaker.setTotalCount(totalCount);
 
+		// 업무담당자,요청자,마감일 기준 남은 일수 계산 등 업무의 세부정보 셋팅
 		myWorkList = setWorkInfo(myWorkList);
 		setWorkReadCheck(myWorkList, eno);
 		for(WorkVO work : myWorkList) {
+			//업무의 해시태그 셋팅
 			String hashTag = workDAO.selectHashTagByWcode(work.getWcode());
 			work.setHashTag(hashTag);
 		}
@@ -848,11 +867,14 @@ public class WorkServiceImpl implements WorkService{
 	public Map<String, Object> getThisWeekToReqList(int eno, Criteria cri) throws SQLException {
 		Map<String, Object> dataMap = new HashMap<String, Object>();
 
-		cri.setPerPageNum(5);
-		List<WorkVO> thisWeekEndToReqList = workDAO.selectThisWeekEndToReqList(eno, cri);
-		thisWeekEndToReqList = setWorkInfo(thisWeekEndToReqList);
-		setWorkReadCheck(thisWeekEndToReqList, eno);
-		int totalCount = workDAO.selectThisWeekEndToReqTotalCount(eno);
+		cri.setPerPageNum(5); // 한 페이지에 보여줄 목록 개수 설정
+
+		List<WorkVO> thisWeekEndToReqList = workDAO.selectThisWeekEndToReqList(eno, cri); // mybatis를 통해 목록결과 가져오기
+
+		thisWeekEndToReqList = setWorkInfo(thisWeekEndToReqList); // 가져온 목록결과에 추가정보 셋팅
+		setWorkReadCheck(thisWeekEndToReqList, eno); // 읽은업무 체크
+
+		int totalCount = workDAO.selectThisWeekEndToReqTotalCount(eno); //pagination을 위한 총 갯수 설정
 		PageMaker pageMaker = new PageMaker();
 		pageMaker.setCri(cri);
 		pageMaker.setTotalCount(totalCount);

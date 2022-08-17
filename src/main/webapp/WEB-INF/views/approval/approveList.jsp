@@ -304,8 +304,8 @@ body > div.wrapper > div:nth-child(5) > div > div.card-body > table > tbody > tr
 					<table class="table text-nowrap projects">
 						<thead>
 							<tr>
-								<th style="width: 10%; padding: 0.5rem;" class="fieldItem" id="기안일">기안일</th>
-								<th style="width: 10%; padding: 0.5rem;" class="fieldItem" id="결재양식">결재양식</th>
+								<th style="width: 7%; padding: 0.5rem;" class="fieldItem" id="기안일">기안일</th>
+								<th style="width: 7%; padding: 0.5rem;" class="fieldItem" id="결재양식">결재양식</th>
 								<th style="width: 5%; padding: 0.5rem;" class="fieldItem" id="긴급">긴급</th>
 								<th style="width: 13%; padding: 0.5rem;" class="fieldItem" id="제목">제목</th>
 								<th style="width: 5%; padding: 0.5rem;" class="fieldItem" id="첨부">첨부</th>
@@ -327,7 +327,7 @@ body > div.wrapper > div:nth-child(5) > div > div.card-body > table > tbody > tr
 							</c:if>
 
 							<c:forEach items="${approveList }" var="approve">
-								<tr style="font-weight:${approve.scheck eq 1 ? '' : 'bold'};" onclick="goDetail('approval/detailGo.do?signNo=${approve.signNo }','${menu.mcode }')" >
+								<tr style="font-weight:${approve.scheck eq 1 ? '' : 'bold'}; font-size: 0.9em;" onclick="goDetail('approval/detailGo.do?signNo=${approve.signNo }','${menu.mcode }')" >
 									<td class="field-content" data-field="기안일">
 										<fmt:formatDate value="${approve.ddate}" pattern="yyyy-MM-dd"/>
 									</td>

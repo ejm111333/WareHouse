@@ -137,7 +137,7 @@ function pdsSendMail(){
 
 		Swal.fire({
 	      icon: 'warning',
-	      title: '선택한 파일이 없습니다.',
+	      title: '선택한 파일이 \n없습니다.',
 	      confirmButtonColor: '#3085d6',
 	    });
 		return;
@@ -213,6 +213,7 @@ pdsLength();
 <script type="text/javascript">
 function newFolder(){
 	var fileName = prompt("새폴더 이름");
+
 	if(fileName == null) return;
 // 	console.log(fileName);
 	var dist = $('#dist').val();
@@ -270,7 +271,7 @@ function regist(){
 		if($(arr[i]).text().trim() == fileName)  {
 			Swal.fire({
 			      icon: 'warning',
-			      title: fileName+"은(는) 이미 있습니다.",
+			      title: fileName+"은(는) \n이미 있습니다.",
 			      confirmButtonColor: '#3085d6',
 			    });
 	    	return;
@@ -292,7 +293,7 @@ function regist(){
 			if(res=="OK"){
 				Swal.fire({
 				      icon: 'warning',
-				      title: fileName+"이(가) 업로드 되었습니다.",
+				      title: fileName+"이(가) \n업로드 되었습니다.",
 				      confirmButtonColor: '#3085d6',
 				    }).then(function(){
 						goInOut(upPno);
@@ -320,7 +321,7 @@ function moveTrash(){
 
 	Swal.fire({
 	    title: '파일 휴지통 이동',
-	    text: "선택한 파일을 휴지통으로 이동하시겠습니까?",
+	    text: "선택한 파일을 휴지통으로 \n이동하시겠습니까?",
 	    icon: 'question',
 	    showCancelButton: true,
 	    confirmButtonColor: '#3085d6',
@@ -331,7 +332,7 @@ function moveTrash(){
 	  }).then((result) => {
 	    if (result.isConfirmed) {
 	      Swal.fire(
-	        '파일을 휴지통으로 이동하였습니다.'
+	        '파일을 휴지통으로 \n이동하였습니다.'
 	      ).then(function(){
 	    	  for(var pno of chekedFile ){
 	    	      console.log(pno);
@@ -370,7 +371,7 @@ function getPnoForfileDownload(){
 		if(type=="folder") {
 			Swal.fire({
 			      icon: 'warning',
-			      title: '폴더 다운로드는 지원하지 않습니다.',
+			      title: '폴더 다운로드는 \n지원하지 않습니다.',
 			      confirmButtonColor: '#3085d6',
 			    });
 			return false;
@@ -553,7 +554,7 @@ function removeAllFile(){
 
 	Swal.fire({
 	    title: '파일 삭제',
-	    text: "휴지통의 모든 파일을 삭제하시겠습니까?",
+	    text: "휴지통의 모든 파일을 \n삭제하시겠습니까?",
 	    icon: 'question',
 	    showCancelButton: true,
 	    confirmButtonColor: '#3085d6',
@@ -575,14 +576,14 @@ function removeAllFile(){
 					if(res == 0){
 						Swal.fire({
 						      icon: 'warning',
-						      title: '삭제할 파일이 없습니다.',
+						      title: '삭제할 파일이 \n없습니다.',
 						      confirmButtonColor: '#3085d6',
 						    });
 						}
 					else{
 						Swal.fire({
 						      icon: 'success',
-						      title: res+"개의 파일이 삭제되었습니다.",
+						      title: res+"개의 파일이 \n삭제되었습니다.",
 						      confirmButtonColor: '#3085d6',
 						    }).then(function(){
 								var upPno = $('#upPno').val();

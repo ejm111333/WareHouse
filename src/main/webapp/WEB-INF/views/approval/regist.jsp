@@ -406,7 +406,7 @@
 																<th  style="width:10%"></th>
 																<th  style="width:20%">이름</th>
 																<th  style="width:50%">부서</th>
-																<th  style="margin-left: 15px;width:20%">상태</th>
+																<th  style="padding-left: 25px;width:20%">상태</th>
 																<th>
 																	<span class="material-symbols-outlined">
 																	delete
@@ -423,7 +423,7 @@
 																<th style="width:10%"></th>
 																<th style="width:20%" class="SignName"></th>
 																<th style="width:50%" class="DepName" ></th>
-																<th style="width:20%;padding-right: 50px">예정</th>
+																<th style="width:20%;padding-left: 0px">예정</th>
 																<th >
 																</th>
 															</tr>
@@ -851,7 +851,6 @@ function butTempSave(){
 		signDocForm.find("[name='hashTag']").val($('input[name="hashTag"]').val());
 
 		if('${param.sFormNo}' == 'SF000005'){
-			alert("vacation");
 		}
 
 		var files=$('input[name="uploadFile"]');
@@ -1033,7 +1032,7 @@ function SignReq(){
 	}
 
 
-	parent.sendSignal(signerMemberList[0],signDocForm.find('[name=title]').val(),"C101","approval/approveList.do","M122000");
+	parent.sendSignal(signerMemberList[0],signDocForm.find('[name=title]').val(),"C101","approval/main.do","M120000");
 
 
  	var request = new XMLHttpRequest();
