@@ -54,9 +54,8 @@
 		<if test="catecode1 == '4'.toString() and catecode2 == '4'.toString() and catecode3 == '4'.toString()">
 			and catecode = 4
 		</if>
-		
-		
 	</sql>
+
 
 	<select id="selectSearchCalendarList" resultMap="calendarMap">
         select
