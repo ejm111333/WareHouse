@@ -56,29 +56,33 @@ WareHouse는 업무처리에 중점을 둔 타 그룹웨어와는 달리 업무�
 
 ### View
 
-<p align="center"> <img src="https://github.com/ejm111333/CGBox/assets/66450798/43fd4cc4-a217-4fa2-a687-b423d1ce7218"> 
+<p align="center"> <img src="https://github.com/ejm111333/WareHouse/assets/66450798/b6d843d3-18e3-4cb9-9e48-09153bd241d0">
 </p>
-<p align="center"> <img src="https://github.com/ejm111333/CGBox/assets/66450798/1152ce06-aacf-4dbe-94cb-952c9c6a02cc">
+<p align="center"> <img src="https://github.com/ejm111333/WareHouse/assets/66450798/3cf3de86-5f60-4802-983b-b3fb98c915d9">
 </p>
-<p align="center"> <img src="https://github.com/ejm111333/CGBox/assets/66450798/d3f9d91e-a074-486c-b17f-a244fb14b7b7">
+<p align="center"> <img src="https://github.com/ejm111333/WareHouse/assets/66450798/cb76ff14-eacf-4788-ba4e-736dfa4af5d6">
 </p>
-<p align="center"> <img src="https://github.com/ejm111333/CGBox/assets/66450798/7b008e00-782c-4dfb-beca-8db6279664c9">
+<p align="center"> <img src="https://github.com/ejm111333/WareHouse/assets/66450798/a4bdeff2-d1f4-440e-9682-b524c2d201c8">
 </p>
-<p align="center"> <img src="https://github.com/ejm111333/CGBox/assets/66450798/3445658f-512b-4856-91a0-c978f79eea80">
+<p align="center"> <img src="https://github.com/ejm111333/WareHouse/assets/66450798/361e2aea-443b-40b6-b622-0cb7d6614cdf">
 </p>
-<p align="center"> <img src="https://github.com/ejm111333/CGBox/assets/66450798/afba4f4d-e925-499d-9b8d-d57f731e4bd6">
+<p align="center"> <img src="https://github.com/ejm111333/WareHouse/assets/66450798/2124714a-9712-4450-94a1-1478215d96f6">
 </p>
-<p align="center"> <img src="https://github.com/ejm111333/CGBox/assets/66450798/cb21602f-5126-459e-a239-4d786b25e976">
+<p align="center"> <img src="https://github.com/ejm111333/WareHouse/assets/66450798/0f844c52-b6d1-4bb7-9195-aa76f59a626d">
 </p>
-<p align="center"> <img src="https://github.com/ejm111333/CGBox/assets/66450798/50eeab81-ad54-4902-ae83-376108c02a23">
+<p align="center"> <img src="https://github.com/ejm111333/WareHouse/assets/66450798/a3281116-3b7b-4b57-8346-ced38da0ecd7">
 </p>
-<p align="center"> <img src="https://github.com/ejm111333/CGBox/assets/66450798/2a045190-26a5-4df1-9966-628304f2fb68">
+<p align="center"> <img src="https://github.com/ejm111333/WareHouse/assets/66450798/99c8ac38-9678-469d-a1a3-f433a93db130">
 </p>
-<p align="center"> <img src="https://github.com/ejm111333/CGBox/assets/66450798/784a6ad9-e06b-4f08-ba0f-a38e2760cdb8">
+<p align="center"> <img src="https://github.com/ejm111333/WareHouse/assets/66450798/b71eb156-e351-4af2-8360-6a2c2fe4ba92">
 </p>
-<p align="center"> <img src="https://github.com/ejm111333/CGBox/assets/66450798/169b9bdb-32ba-4a42-a098-c1e0248bf974">
+<p align="center"> <img src="https://github.com/ejm111333/WareHouse/assets/66450798/5f845236-47b7-4316-b194-79be640117ac">
 </p>
-<p align="center"> <img src="https://github.com/ejm111333/CGBox/assets/66450798/9c8342e9-698c-40cd-8b96-3763de3e57f9">
+<p align="center"> <img src="https://github.com/ejm111333/WareHouse/assets/66450798/4856bc38-b1db-442a-a9c9-9a6b02344cee">
+</p>
+<p align="center"> <img src="https://github.com/ejm111333/WareHouse/assets/66450798/e8fa8e65-83dc-4992-ad32-830a686070e6">
+</p>
+<p align="center"> <img src="https://github.com/ejm111333/WareHouse/assets/66450798/98d7f107-a329-4761-9608-d2f2cb902795">
 </p>
 
 
